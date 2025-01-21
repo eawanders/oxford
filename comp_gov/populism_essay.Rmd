@@ -5,8 +5,8 @@ date: "25-11-2024"
 output: pdf_document
 zotero: true
 link-citations: true
-csl: harvard-cite-them-right.csl
-bibliography: references.bib
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
 header-includes:
   - \usepackage{setspace}
   - \setstretch{1.5}  # Adjust the number for desired line spacing

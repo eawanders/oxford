@@ -21,9 +21,9 @@ header-includes:
   - \setstretch{1.25}
   - \usepackage{graphicx}
 citation_package: biblatex
-csl: harvard-cite-them-right.csl
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
 link-citations: true
-bibliography: zotero_library.bib
 ---
 
 ``` {r setup, include=FALSE}
