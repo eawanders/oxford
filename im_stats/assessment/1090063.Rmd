@@ -1,0 +1,1838 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+author: '1090063'
+date: '`r Sys.Date()`'
+output: 
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    includes:
+      in_header: header.tex
+header-includes:
+  - \usepackage{tabularray}
+  - \usepackage{float}
+  - \usepackage{graphicx}
+  - \usepackage{codehigh}
+  - \usepackage[normalem]{ulem}
+  - \UseTblrLibrary{booktabs}
+  - \UseTblrLibrary{siunitx}
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+  - \usepackage{graphicx}
+citation_package: biblatex
+csl: harvard-cite-them-right.csl
+link-citations: true
+bibliography: zotero_library.bib
+---
+
+``` {r setup, include=FALSE}
+
+# Load the necessary packages.
+# Install pacman if not already installed
+if (!require("pacman")) install.packages("pacman")
+
+# Load and install required packages using pacman for efficient package management
+pacman::p_load(
+  # Data manipulation and wrangling
+  dplyr,        # Data manipulation (filter, select, mutate, etc.)
+  tidyr,        # Data tidying (pivoting, reshaping data)
+  tidyverse,    # Collection of R packages for data science (includes dplyr, ggplot2, tidyr, readr, etc.)
+  janitor,      # Cleaning data (e.g., cleaning column names, tabulations)
+  
+  # Data import/export
+  readr,        # Reading and writing CSV and other text data
+  haven,        # Importing and exporting SPSS, Stata, and SAS files
+  
+  # Data visualisation
+  ggplot2,      # Data visualisation (base for plots)
+  ggthemes,     # Additional themes for ggplot2 visualisation
+  ggeffects,    # Predicted marginal effects plots for regression models
+  dotwhisker,   # Visualisation of regression model output (dot-and-whisker plots)
+  scales,       # Scaling and formatting of axes and legends in plots
+  tikzDevice,   # Exporting high-quality LaTeX-compatible graphics
+  vip,          # Variable importance plots for machine learning models
+  
+  # Regression analysis and statistical modelling
+  MASS,         # Statistical functions and distributions (e.g., Negative Binomial regression)
+  pscl,         # Political science models (e.g., zero-inflated and hurdle models)
+  brant,        # Brant test for proportional odds assumption in ordinal regression
+  broom,        # Tidying model outputs for analysis and visualisation
+  glmnet,       # Regularised regression models (LASSO, Ridge, Elastic Net)
+  rpart,        # Recursive partitioning for classification and regression trees
+  rpart.plot,   # Visualising rpart models (decision trees)
+  randomForest, # Random forests for classification and regression
+  
+  # Machine learning and model evaluation
+  tidymodels,   # Framework for machine learning workflows
+  caret,        # Machine learning model training and cross-validation
+  yardstick,    # Model evaluation metrics (accuracy, precision, recall, etc.)
+  
+  # Model reporting and presentation
+  modelsummary, # Automated model summary tables
+  knitr,        # Dynamic report generation (integrates with RMarkdown)
+  kableExtra    # Enhanced table formatting for knitr/kable outputs
+)
+
+```
+
+# Exercise 1: Owning a gun in the U.S.
+
+<!-- Code for initial data setup, cleaning, and understanding through summary statistics -->
+
+``` {r view-US-data, results='hide', echo=FALSE}
+
+# Load the cces22.csv data.
+gun_data <- read.csv("cces22.csv")
+
+# View(gun_data) # View the data.
+
+# View the first few rows of the data.
+head(gun_data, n = 10)
+
+# Some basic information about the data.
+dim(gun_data)
+str(gun_data)
+sapply(gun_data, class)
+summary(gun_data$education)
+
+```
+
+``` {r data-cleaning-US, results='hide', echo=FALSE, fig.show='hide'}
+
+# Convert 'gun' to a factor
+gun_data$gun <- factor(gun_data$gun, levels = c(0, 1), labels = c("No Gun", "Gun"))
+
+# Convert binary and categorical variables to factors
+# Convert 'female' to a binary numeric variable (0 = Male, 1 = Female)
+gun_data$female <- ifelse(gun_data$female == "Female", 1, 0) # Female is the modal value.
+gun_data$register <- ifelse(gun_data$register == "Registered", 1, 0) # Registered is the modal value.
+gun_data$white <- ifelse(gun_data$white == "White", 1, 0) # White is the modal value.
+
+str(gun_data$female)  # Check the structure and levels
+str(gun_data$white)  # View the levels of the factor
+
+# Convert categorical variables with multiple levels
+gun_data$pid <- factor(gun_data$pid, 
+                       levels = c("Democrat", "Republican", "Independent", "Other")) # Note that Democrat is the modal value of pid variable and so the levels have remained the same.
+
+str(gun_data$pid)  # Check the structure and levels
+
+gun_data$trust_fed_gov <- factor(gun_data$trust_fed_gov, 
+                                  levels = c("Not very much", "A great deal", "A fair amount", 
+                                              "None at all")) # Not very much is the modal value for trust_fed_gov. For use as the base value in logistic modelling, it has been re-levelled to the first level.
+
+gun_data$region <- factor(gun_data$region, 
+                          levels = c("South", "Northeast", "Midwest", "West")) # South is the modal value for region. For use as the base value in logistic modelling, it has been re-levelled to the first level. 
+
+gun_data$education <- factor(gun_data$education, 
+                             levels = c("High school graduate", "Did not graduate from high school",
+                                        "Some college, but no degree (yet)", 
+                                        "2-year college degree", 
+                                        "4-year college degree", 
+                                        "Postgraduate degree (MA, MBA, MD, JD, PhD, etc.)")) # High School Graduate is the modal value for education. For use as the base value in logistic modelling, it has been re-levelled to the first level.
+
+# Check the structure of the data
+sapply(gun_data, class)
+levels(gun_data$pid)
+str(gun_data$education)
+summary(gun_data$education)
+view(gun_data)
+
+```
+
+``` {r data-summary, results='hide', echo=FALSE, fig.show='hide', fig.keep='none'}
+
+# The gun_data consists of 60,000 observations (rows) and 9 variables (columns). The variables are as follows:
+
+# Creates a new variable data_summary that summarises the data and the class of each variable.
+data_summary <- sapply(gun_data, class)
+data_summary
+
+# Calculate the number of unique values for each variable.
+unique_values <- sapply(gun_data, function(x) length(unique(x)))
+print(unique_values)
+
+# Print the unique values for each variable.
+for (i in 1:ncol(gun_data)) {
+  print(unique(gun_data[[i]]))
+}
+
+# Summary statistics for age. na.rm = TRUE removes missing values.
+mean_age <- mean(gun_data$age, na.rm = TRUE)
+print(mean_age)
+summary(gun_data$age)
+hist(gun_data$age, main = "Histogram of Age", xlab = "Age")
+
+# A bar plot showing how political affiliation (pid) is distributed.
+ggplot(gun_data, aes(pid)) +
+  geom_bar() +
+  labs(title = "Distribution of Political Affiliation",
+       x = "Political Affiliation",
+       y = "Count")
+
+# A bar plot showing how political affiliation (pid) is distributed across regions.
+library(ggplot2)
+ggplot(gun_data, aes(x = region, fill = pid)) +
+    geom_bar(position = "dodge") +
+    labs(title = "Political Affiiliation by Region", x = "Region", y = "Count") +
+    scale_fill_grey() +  # Grayscale colours
+    theme_classic(base_family = "serif")  # Classic theme with serif font
+
+```
+
+``` {r gun-ownership-summary, results='hide', echo=FALSE, fig.show='hide', fig.keep='none'}
+
+# Summary statistics for gun ownership.
+summary(gun_data$gun)
+
+# A bar plot showing how gun ownership is distributed by region.
+ggplot(gun_data, aes(x = region, fill = gun)) +
+  geom_bar() +
+  labs(title = "Distribution of Gun Ownership",
+       x = "Gun Ownership",
+       y = "Count")
+
+# A bar plot showing how gun ownership is distributed by political affiliation.
+gun_data %>%
+  filter(!is.na(gun)) %>% # Remove missing values
+  ggplot(aes(x = pid, fill = gun)) +
+  geom_bar() +
+  labs(title = "Distribution of Gun Ownership by Political Affiliation",
+       x = "Political Affiliation",
+       y = "Count",
+       fill = "Gun Ownership")
+
+
+# Calculate the percentage of gun ownership within each political group
+data_percent <- gun_data %>%
+  filter(!is.na(gun), !is.na(pid)) %>%  # Exclude missing values
+  group_by(pid, gun) %>%                # Group by political ID and gun ownership
+  summarise(count = n(), .groups = "drop") %>%  # Count the number in each group
+  group_by(pid) %>%                     # Regroup by political ID
+  mutate(percentage = (count / sum(count)) * 100)  # Calculate percentage
+
+# View the calculated percentages
+print(data_percent)
+
+# Plot the percentage of gun ownership within each political group
+ggplot(data_percent, aes(x = pid, y = percentage, fill = gun)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Percentage of Gun Ownership by Political Affiliation",
+       x = "Political Affiliation",
+       y = "Percentage",
+       fill = "Gun Ownership") +
+  scale_fill_grey(start = 0.8, end = 0.2) +  # Apply grayscale fill
+  theme_classic(base_family = "serif")       # Apply classic theme with serif font
+
+# Calculate the percentage of gun ownership by age
+ownership_by_age <- gun_data %>%
+  filter(!is.na(gun)) %>%  # Remove missing values
+  group_by(age) %>%
+  summarise(ownership_percent = mean(gun == "Gun") * 100)
+
+# Plotting the data
+ggplot(ownership_by_age, aes(x = age, y = ownership_percent)) +
+  geom_line(color = "black") +  # Line plot for trend
+  geom_point(color = "black") + # Points for exact values
+  labs(
+    title = "Gun Ownership by Age",
+    x = "Age",
+    y = "Percentage of Gun Ownership (%)"
+  ) +
+  theme_classic(base_family = "serif")  # Classic grayscale look with serif font
+
+# Calculate the percentage of gun ownership by education level
+education_percent <- gun_data %>%
+  filter(!is.na(gun)) %>%  # Remove missing values
+  group_by(education) %>%
+  summarise(ownership_percent = mean(gun == "Gun") * 100)
+
+# Plot histogram of gun ownership percent by education level
+ggplot(education_percent, aes(x = education, y = ownership_percent)) +
+  geom_bar(stat = "identity", fill = "gray") +
+  labs(
+    title = "Gun Ownership by Education Level",
+    x = "Education Level",
+    y = "Percentage of Gun Ownership (%)"
+  ) +
+  theme_classic(base_family = "serif")  # Classic grayscale look with serif font
+
+# Calculate the percentage of gun ownership by race
+race_percent <- gun_data %>%
+  filter(!is.na(gun)) %>%  # Remove missing values
+  group_by(white) %>%
+  summarise(ownership_percent = mean(gun == "Gun") * 100)
+
+race_percent
+
+```
+
+<!-- Code for answering Exercise 1 -->
+
+## Data Summary
+
+The Cooperative Congressional Election Study surveys Americans during elections. The data collected from 2022 provides useful insights into gun ownership in the U.S. The following analyses is based on the `cces22.csv` file consisting of 60,000 observations over 9 variables.
+
+The variables used in the analysis are coded as: `age`, `female`, `register`, `white`, `pid`, `trust_fed_gov`, `region`, and `education`. Gun ownership is a binary variable where `Gun Ownership = 1` and `No Gun = 0` and has been converted to a factor variable for readability. The average age of respondents is `r signif(mean_age, 3)`. This exercise is predominantly interested in gun ownership. By summarising the data as percentages, we can understand the distribution of gun ownership across different groups. *Figure (1)* shows how gun ownership is distributed by political affiliation.
+
+``` {r gun-ownership-by-pid, results='hide', echo=FALSE, fig.width=5, fig.height=3, fig.align='center', fig.cap = "Percentage of Gun Ownership by Political Affiliation", fig.keep='none'}
+
+# Summary statistics for gun ownership by political affiliation.
+
+# Calculate the percentage of gun ownership within each political group
+data_percent <- gun_data %>%
+  filter(!is.na(gun), !is.na(pid)) %>%  # Exclude missing values
+  group_by(pid, gun) %>%                
+  summarise(count = n(), .groups = "drop") %>%  # Count the number in each group
+  group_by(pid) %>%                  
+  mutate(percentage = (count / sum(count)) * 100)  # Calculate percentage
+
+# View the calculated percentages
+print(data_percent)
+
+# Stacked bar plot with percentages adding up to 100%
+ggplot(data_percent, aes(x = pid, y = percentage, fill = gun)) +
+  geom_bar(stat = "identity", position = "fill") + 
+  labs(
+    # title = "Percentage of Gun Ownership by Political Affiliation",
+    x = "Political Affiliation",
+    y = "Percentage",
+    fill = "Gun Ownership"
+  ) +
+  scale_y_continuous(labels = scales::percent_format()) +  # Format y-axis as percentages
+  scale_fill_grey(start = 0.8, end = 0.2) + 
+  theme_classic(base_family = "serif") +    
+  theme(
+  axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10)
+)
+
+```
+
+The next section looks at building an appropriate model for predicting gun ownership and producing a clear demographic profile of gun owners in the U.S.
+
+## Model of Gun Ownership
+
+To model gun ownership, we initially take into account the following variables: `age`, `female`, `white`, `region`, and `education`. Consequently, the model is specified in (1):
+
+\begin{equation}
+Y_{\text{Gun} = 1} = \beta_0 + \beta_1 \cdot \text{age} + \beta_2 \cdot \text{age}^2 + \beta_3 \cdot \text{female} + \beta_4 \cdot \text{white} + \beta_5 \cdot \text{region} + \beta_6 \cdot \text{education} + \epsilon
+\end{equation}
+
+As age is a continuous variable, it cannot be assumed that there is a linear relationship between `age` and $Y_{\text{Gun} = 1}$. Therefore, a quadratic term $\text{age}^2$ is included to account for non-linear relationships. This non-linear assumption is supported by Figure (2) showing the percentage of respondents owning guns by age to be slightly concave in nature.
+
+``` {r summary-gun-ownership-by-age, results='hide', echo=FALSE, fig.width=5, fig.height=3, fig.align='center', fig.cap = "Percentage of Gun Ownership by Age", fig.keep='none'}
+
+# Summary statistics for gun ownership by age.
+
+# Calculate the percentage of gun ownership by age
+ownership_by_age <- gun_data %>%
+  filter(!is.na(gun)) %>%  # Remove missing values
+  group_by(age) %>%
+  summarise(ownership_percent = mean(gun == "Gun") * 100)
+
+# Plotting the data
+ggplot(ownership_by_age, aes(x = age, y = ownership_percent)) +
+  geom_line(color = "black") + 
+  geom_point(color = "black") + 
+  labs(
+    x = "Age",
+    y = "Percentage of Gun Ownership (%)"
+  ) +
+  theme_classic(base_family = "serif") + 
+ theme(
+  axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10)
+)
+```
+
+To estimate this model, logit or probit models are most appropriate due to the binary, categorical nature of the dependent variable,$Y_{\text{Gun} = 1}$. Therefore, (assuming a logit approach) the model is as follows:
+
+\begin{equation}
+\text{logit}(P(\text{gun} = 1)) = \beta_0 + \beta_1 \cdot \text{age} + \beta_2 \cdot \text{age}^2 + \beta_3 \cdot \text{female} + \beta_4 \cdot \text{white} + \beta_5 \cdot \text{region} + \beta_6 \cdot \text{education} + \epsilon
+\end{equation}
+
+where `logit` is the logistic function, `P(gun = 1)` is the probability of gun ownership, and $\epsilon$ is the error term.
+
+Initially, a few incomplete models were run to check for the significance of individual variables. The results showed that `age` and `white` were significant predictors of gun ownership. For example, a logit model based just on `white` showed the predicted probability of gun ownership is higher for white individuals (41%) compared to non-white individuals (30%).
+
+Next, the full model containing `age`, `I(age^2)`, `female`, `white`, `region` and `education` was estimated for both logit and probit model to check for consistency in direction of effects. *Table (1)* shows these results, comparing both logit and probit models. The primary focus is on the logit regression results which are given as log-odds in the first column. The odds ratio for `age` is `1.03`, indicating that for each additional year of age, the odds of gun ownership increase by 3%. The odds ratio for `white` is `1.68`, indicating that white individuals have `68%` higher odds of owning a gun compared to non-white individuals. Therefore, with taking the modal values of categorical variables into account, the model predicts the probability of gun ownership based on the demographic profile of the average respondent. This demographic profile indicates that white men in the South with a 2-year college degree are most likely to own guns, compared to baseline alternatives of being a woman, non-white, living in the South, and being a high school graduate.
+
+``` {r logit-model-estimation, results='hide', echo=FALSE, fig.show='hide', fig.keep='none'}
+
+# === Logit Model Estimation ===
+
+# A logit model is estimated to predict gun ownership based on age.
+logit_model_age <- glm(gun ~ age + I(age^2), # This includes the age^2 term
+                   data = gun_data,
+                   family = binomial(link = "logit"))
+
+summary(logit_model_age)
+
+# A logit model is estimated to predict gun ownership based on race.
+logit_model_white <- glm(gun ~ white,
+                   data = gun_data,
+                   family = binomial(link = "logit"))
+
+summary(logit_model_white)
+
+# A full logit model is estimated to predict gun ownership based on all variables.
+logit_model <- glm(gun ~ age + I(age^2) + female + white + region + education,
+                   data = gun_data,
+                   family = binomial(link = "logit"))
+
+summary(logit_model)
+
+```
+
+``` {r probit-model-estimation, results='hide', echo=FALSE, fig.show='hide', fig.keep='none'}
+
+# Probit model for gun ownership
+probit_model <- glm(gun ~ age + I(age^2) + female + white + region + education,
+                    data = gun_data,
+                    family = binomial(link = "probit"))
+
+summary(probit_model)
+
+```
+
+``` {r pred-probs-estimates, results='hide', echo=FALSE, fig.show='hide',  warning = FALSE, message = FALSE, fig.keep='none'}
+
+# ==== Predicted Probabilities for age ====
+
+# Generate predicted probabilities for the 'age' predictor
+age_predictions <- ggpredict(logit_model_age, terms = "age [18:80]")
+
+# View the results
+print(age_predictions) # The result shows that the predicted probability of gun ownership increases with age up to around the age of 65 before declining again.
+
+# Plot the predicted probabilities for age
+plot(age_predictions) +
+  labs(
+    title = "Predicted Probability of Gun Ownership by Age",
+    x = "Age",
+    y = "Predicted Probability"
+  )
+
+
+# ==== Predicted Probabilities for race ====
+
+# Generate predicted probabilities for the 'white' predictor
+white_predictions <- ggpredict(logit_model_white, terms = "white")
+
+# View the results
+print(white_predictions) # The results show that the predicted probability of gun ownership is higher for white individuals (41%) compared to non-white individuals (30%).
+
+```
+
+``` {r probit-model-comparison, results='hide', echo=FALSE}
+
+# ==== Predicted Probabilities for full probit model, varying age  ====
+# ==== Step 1: Generates a new data frame for use in the probit model ====
+
+# Creating median/modal values for each variable to generate results for core demographic profile.
+median_age <- median(gun_data$age, na.rm = TRUE) # Calculate the median age, value = 52
+mode_female <- as.numeric(names(sort(table(gun_data$female), decreasing = TRUE)[1])) # Calculate the mode for gender, value = 1 (female)
+mode_white <- as.numeric(names(sort(table(gun_data$white), decreasing = TRUE)[1])) # Calculate the mode for race, value = 1 (white)
+mode_region <- names(sort(table(gun_data$region), decreasing = TRUE))[1] # Calculate the mode for region, value = "South"
+mode_education <- names(sort(table(gun_data$education), decreasing = TRUE))[1] # Calculate the mode for education, value = "High school graduate"
+
+
+# Create a new data frame for the Probit model predictions where age is varied and other variables are held constant at their modal values.
+df_grid_probit <- expand.grid(
+  age = seq(18, 80, by = 1),
+  female = mode_female,
+  white = mode_white,
+  region = mode_region,
+  education = mode_education
+)
+
+# ==== Step 2: Generating Predicted Probabilities with Confidence Intervals for Probit Model ====
+
+# Generate predicted z-scores (probit scale) with standard errors
+preds_probit <- predict(probit_model, 
+                        newdata = df_grid_probit, 
+                        type = "link",
+                        se.fit = TRUE)    # Get standard errors
+
+# Add predicted z-scores and standard errors to the Probit data frame
+df_grid_probit$predicted_probit <- preds_probit$fit  # Predicted z-scores
+df_grid_probit$se_probit <- preds_probit$se.fit      # Standard errors
+
+# Calculate 95% confidence intervals on the probit (z-score) scale
+crit_value <- 1.96  # For 95% CI
+df_grid_probit$lower_probit <- preds_probit$fit - crit_value * preds_probit$se.fit
+df_grid_probit$upper_probit <- preds_probit$fit + crit_value * preds_probit$se.fit
+
+# Convert probit predictions and intervals to probabilities using the normal CDF (pnorm)
+df_grid_probit$predicted_prob <- pnorm(df_grid_probit$predicted_probit)
+df_grid_probit$lower_ci <- pnorm(df_grid_probit$lower_probit)
+df_grid_probit$upper_ci <- pnorm(df_grid_probit$upper_probit)
+
+print(df_grid_probit)
+
+```
+
+``` {r model-summary, echo=FALSE, warning = FALSE}
+
+# ==== Summary Table for Logit vs Probit Models  ====
+
+# Create a summary table for the logit and probit models
+# Create a summary table with Logit (Odds Ratio), Probit (Odds Ratio), and Logit (Log-Odds)
+modelsummary(
+  list(
+    "Logit (Odds Ratio)" = logit_model,       # Exponentiated Logit
+    "Probit (Latent z-scores)" = probit_model,     # Non-Exponentiated Probit
+    "Logit (Log-Odds)" = logit_model         # Non-Exponentiated Logit
+  ),
+  exponentiate = c(TRUE, FALSE, FALSE),  # Apply exponentiation only to the first two models
+  statistic = "({std.error})",
+  stars = TRUE,
+  gof_omit = "IC|Log.Lik.",
+  title = "Comparison of Logit and Probit Models with Log-Odds",
+  
+  # Custom variable names
+  coef_map = c(
+    "(Intercept)" = "Intercept",
+    "age" = "Age",
+    "I(age^2)" = "Age Squared",
+    "female" = "Female (1 = Female)",
+    "white" = "White (1 = White)",
+    "regionNortheast" = "Region: Northeast",
+    "regionMidwest" = "Region: Midwest",
+    "regionWest" = "Region: West",
+    "educationSome college, but no degree (yet)" = "Education: Some College",
+    "education4-year college degree" = "Education: 4-Year Degree",
+    "education2-year college degree" = "Education: 2-Year Degree",
+    "educationPostgraduate degree (MA, MBA, MD, JD, PhD, etc.)" = "Education: Postgraduate Degree",
+    "educationDid not graduate from high school" = "Education: No High School Diploma"
+  ),
+  
+  notes = "Standard errors are shown in parentheses. Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. The baseline for regional comparisons is the South region. The baseline for education comparisons is 'High school graduate' as these are the modal values for each variable.",
+  output = "latex"  # Renders in LaTeX/PDF
+)
+```
+
+To focus on age more specifically, the predicted probabilities of gun ownership by age are shown in *Figure (3)*. The plot shows that the predicted probability of gun ownership increases with age up to around 57 years before stabalising and declining slightly again. The shaded region represents 95% confidence intervals around the predicted probabilities. The predicticted probability of owning a gun peaks at around age 57 when estimated as a function of `age`, `I(age^2)`, `female`, `white`, `region` and `education`.
+
+``` {r age-pred-probs-estimates-full-model, results='hide', echo=FALSE, fig.align='center', warning = FALSE, message = FALSE, fig.cap = "Predicted Probability of Gun Ownership by Age"}
+
+# ==== Predicted Probabilities for full logit model, varying age  ====
+
+# ==== Step 1: Create a new data frame with standerdised variables  ====
+
+# Create a data frame varying only 'age' and holding others constant where age is varied and other variables are held constant at their modal values.
+df_grid_modal <- expand.grid(
+  age = seq(18, 80, by = 1),
+  female = mode_female,
+  white = mode_white,
+  region = mode_region,
+  education = mode_education
+)
+
+# ==== Step 2: Generate predicted probabiltiies (and manually calculate confidence intervals)  ====
+
+# Generate predicted probabilities with standard errors.
+# Note that predict () is used instead of ggpredict() as ggpredict() does not support more than 4 variables. On testing, removing a variable had noticeable effects on results so predict() is used instead.
+preds_logit <- predict(logit_model, 
+                 newdata = df_grid_modal, 
+                 type = "link",
+                 se.fit = TRUE)
+
+# Add predicted log-odds and standard errors to the data frame
+df_grid_modal$predicted_logit <- preds_logit$fit     # Predicted log-odds
+df_grid_modal$se_logit <- preds_logit$se.fit         # Standard errors
+
+# Calculate 95% confidence intervals on the logit scale
+# This has to be done manually as ggpredict() does not support more than 4 variables
+crit_value <- 1.96  # For 95% CI
+df_grid_modal$lower_logit <- preds_logit$fit - crit_value * preds_logit$se.fit
+df_grid_modal$upper_logit <- preds_logit$fit + crit_value * preds_logit$se.fit
+
+# Convert logit predictions and intervals to probabilities
+df_grid_modal$predicted_prob <- plogis(df_grid_modal$predicted_logit)
+df_grid_modal$lower_ci <- plogis(df_grid_modal$lower_logit)
+df_grid_modal$upper_ci <- plogis(df_grid_modal$upper_logit)
+
+# ==== Step 3: Logit Model Plot ====
+
+ggplot(df_grid_modal, aes(x = age, y = predicted_prob)) +
+  # Shaded 95% Confidence Interval
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), 
+              fill = "lightgray", alpha = 0.3) +
+  
+  # Prediction Line
+  geom_line(size = 0.75, colour = "black") +
+  
+  # Labels and Caption
+  labs(
+    x = "Age",
+    y = "Predicted Probability of Gun Ownership",
+    caption = str_wrap(
+      "Notes: The plot shows the predicted probabilities of gun ownership by age, 
+      estimated from a logistic regression model. The shaded region represents 95% confidence intervals. 
+      Predictors with p-values < 0.05 are considered statistically significant. 
+      Predictions are adjusted for gender, race, region, and education.",
+      100
+    )
+  ) +
+  
+  # Convert Y-axis to percentages
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1),
+                     limits = c(0, NA)) +  # Set Y-axis to start at 0 and sets axis to be in percent.
+  
+  # Classic Theme with Serif Font
+  theme_classic(base_family = "serif") + 
+  
+  # Custom Caption, Title, and Axis Styling
+  theme(
+    plot.caption = element_text(size = 10, hjust = 0),
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 12),
+  axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10)
+    
+  )
+
+```
+
+## Considering Political Variables
+
+Next, the model is re-estimated to consider variables related to politics like partisanship, trust in government, and whether the respondent was registered to vote (`pid`, `trust_fed_gov`, `register`).
+
+An updated table comparing the logit and probit models is provided in *Table (2)* below.
+
+``` {r politics-logit-model-estimation, results='hide', echo=FALSE, fig.show='hide'}
+
+# A full logit model is estimated to predict gun ownership based on all variables, including political variables.
+political_logit_model <- glm(gun ~ age + I(age^2) + female + white + region + education + pid + trust_fed_gov + register,
+                   data = gun_data,
+                   family = binomial(link = "logit"))
+
+# View the summary of the logit model
+summary(political_logit_model)
+
+```
+
+``` {r politics-probit-model-estimation, results='hide', echo=FALSE, fig.show='hide'}
+
+# A full probit model is estimated to predict gun ownership based on all variables, including political variables.
+political_probit_model <- glm(gun ~ age + I(age^2) + female + white + region + education + pid + trust_fed_gov + register,
+                   data = gun_data,
+                   family = binomial(link = "logit"))
+
+# View the summary of the logit model
+summary(political_probit_model)
+
+```
+
+``` {r politics-model-summary, echo=FALSE, warning = FALSE}
+
+# ==== Summary Table for Logit vs Probit Models  ====
+
+# Create a summary table for the logit and probit models
+# Create a summary table with Logit (Odds Ratio), Probit (Odds Ratio), and Logit (Log-Odds)
+
+modelsummary(
+  list(
+    "Logit (Odds Ratio)" = political_logit_model,       # Exponentiated Logit
+    "Probit (Latent z-scores)" = political_probit_model,     # Non-Exponentiated Probit
+    "Logit (Log-Odds)" = political_logit_model         # Non-Exponentiated Logit
+  ),
+  exponentiate = c(TRUE, FALSE, FALSE),  # Apply exponentiation only to the first two models
+  statistic = "({std.error})",          # Show standard errors in parentheses
+  stars = TRUE,                         # Significance stars (*, **, ***)
+  gof_omit = "IC|Log.Lik.",             # Omit AIC and Log-Likelihood
+  title = "Comparison of Logit and Probit Models with Log-Odds (inc. political variables)",
+  
+    # Custom variable names
+  coef_map = c(
+    "(Intercept)" = "Intercept",
+    "age" = "Age",
+    "female" = "Female (1 = Female)",
+    "white" = "White (1 = White)",
+    "regionNortheast" = "Region: Northeast",
+    "regionMidwest" = "Region: Midwest",
+    "regionWest" = "Region: West",
+    "educationSome college, but no degree (yet)" = "Education: Some College",
+    "education2-year college degree" = "Education: 2-Year Degree",
+    "pidRepublican" = "Political Affiliation: Republican",
+    "pidIndependent" = "Political Affiliation: Independent",
+    "pidOther" = "Political Affiliation: Other",
+    "trust_fed_govA great deal" = "Trust in Government: A Great Deal",
+    "trust_fed_govA fair amount" = "Trust in Government: A Fair Amount",
+    "trust_fed_govNone at all" = "Trust in Government: None at All",
+    "register" = "Not Registered to Vote"
+  ),
+
+  
+  notes = "Standard errors are shown in parentheses. Statistically insignificant variables have been removed. The baselines for region, education, political affiliation, and registered are 'South', 'High school graduate', 'Democrat' and 'Registered' respectively.",
+  output = "latex"  # Renders in LaTeX/PDF
+)
+```
+
+This updated model now shows how demographic traits from the original model have been dampended by the political variables which have a large effect. For example, the odds ratio for being a Republican is `2.46`, indicating that Republicans have `146%` higher odds of owning a gun compared to Democrats. Moreover, having some level of trust in government reduces the odds of owning a gun compared to having not much trust, whereas not being registered to vote increases the odds of owning a gun by 84%, compared to being registered.
+
+Next, we look specifically at certain profiles: a registered white male Republican from the North-East, compared to a registered white male Democrat from the South. These results are shown together in Figure (4) below. For the Republican profile, the predicted probability of gun ownership at its peak (60 years of age), is at `55%`, whereas for the Democrat profile (also at 60 years of age), the predicted probability is at `34%`. This shows how political affiliation is such a strong driver of gun ownership in the U.S.
+
+```{r political-profiles-predictions, results='hide', echo=FALSE, fig.cap = "Predicted Probability of Gun Ownership by Age for Two Political Profiles"}
+
+# ==== Step 1: Create a modal value for trust_fed_gov  ====
+
+# Function to calculate the mode for a factor variable, ignoring NAs
+calculate_mode <- function(x) {
+  x <- na.omit(x)  # Remove NA values
+  levels_x <- levels(x)  # Get factor levels
+  mode_value <- levels_x[which.max(tabulate(as.integer(x)))]  # Find the most frequent level
+  return(mode_value)
+}
+
+# Apply the function to gun_data$trust_fed_gov
+mode_trust_fed_gov <- calculate_mode(gun_data$trust_fed_gov)
+
+# Critical value for 95% Confidence Interval
+crit_value <- 1.96  
+
+# ==== Step 2: Create a new data frame for a registered white male Republican from the North-East  ====
+
+# Create a data frame varying only 'age' and holding others constant
+df_grid_modal_scenario_1 <- expand.grid(
+  age = seq(18, 80, by = 1),   # Age varies from 18 to 80 by 1 year
+  female = 0,                  # Male (0 for male, 1 for female)
+  white = 1,                   # White (1 for white, 0 for non-white)
+  region = "Northeast",        # Region is Northeast
+  education = mode_education,  # Modal education level
+  pid = "Republican",          # Party identification is Republican
+  trust_fed_gov = mode_trust_fed_gov,  # Modal trust level
+  register = 1                 # Registered voter (1 for registered, 0 for not)
+)
+
+# ==== Step 3: Generate predicted probabilities for Scenario 1 ====
+
+# Generate predicted probabilities with standard errors
+preds_logit_scenario_1 <- predict(logit_model, 
+                                  newdata = df_grid_modal_scenario_1, 
+                                  type = "link",    
+                                  se.fit = TRUE)
+
+# Add predicted log-odds and standard errors to the data frame
+df_grid_modal_scenario_1$predicted_logit <- preds_logit_scenario_1$fit     
+df_grid_modal_scenario_1$se_logit <- preds_logit_scenario_1$se.fit         
+
+# Calculate 95% confidence intervals on the logit scale
+df_grid_modal_scenario_1$lower_logit <- preds_logit_scenario_1$fit - crit_value * preds_logit_scenario_1$se.fit
+df_grid_modal_scenario_1$upper_logit <- preds_logit_scenario_1$fit + crit_value * preds_logit_scenario_1$se.fit
+
+# Convert logit predictions and intervals to probabilities
+df_grid_modal_scenario_1$predicted_prob <- plogis(df_grid_modal_scenario_1$predicted_logit)
+df_grid_modal_scenario_1$lower_ci <- plogis(df_grid_modal_scenario_1$lower_logit)
+df_grid_modal_scenario_1$upper_ci <- plogis(df_grid_modal_scenario_1$upper_logit)
+
+# ==== Step 4: Create a new data frame for a registered white male Democrat from the South  ====
+
+# Create a data frame varying only 'age' and holding others constant
+df_grid_modal_scenario_2 <- expand.grid(
+  age = seq(18, 80, by = 1),   # Age varies from 18 to 80 by 1 year
+  female = 0,                  # Male (0 for male, 1 for female)
+  white = 1,                   # White (1 for white, 0 for non-white)
+  region = "South",            # Region is South
+  education = mode_education,  # Modal education level
+  pid = "Democrat",            # Party identification is Democrat
+  trust_fed_gov = mode_trust_fed_gov,  # Modal trust level
+  register = 1                 # Registered voter (1 for registered, 0 for not)
+)
+
+# ==== Step 5: Generate predicted probabilities for Scenario 2 ====
+
+# Generate predicted probabilities with standard errors
+preds_logit_scenario_2 <- predict(logit_model, 
+                                  newdata = df_grid_modal_scenario_2, 
+                                  type = "link",    
+                                  se.fit = TRUE)
+
+# Add predicted log-odds and standard errors to the data frame
+df_grid_modal_scenario_2$predicted_logit <- preds_logit_scenario_2$fit     
+df_grid_modal_scenario_2$se_logit <- preds_logit_scenario_2$se.fit         
+
+# Calculate 95% confidence intervals on the logit scale
+df_grid_modal_scenario_2$lower_logit <- preds_logit_scenario_2$fit - crit_value * preds_logit_scenario_2$se.fit
+df_grid_modal_scenario_2$upper_logit <- preds_logit_scenario_2$fit + crit_value * preds_logit_scenario_2$se.fit
+
+# Convert logit predictions and intervals to probabilities
+df_grid_modal_scenario_2$predicted_prob <- plogis(df_grid_modal_scenario_2$predicted_logit)
+df_grid_modal_scenario_2$lower_ci <- plogis(df_grid_modal_scenario_2$lower_logit)
+df_grid_modal_scenario_2$upper_ci <- plogis(df_grid_modal_scenario_2$upper_logit)
+
+library(ggplot2)
+library(scales)
+library(stringr)
+
+# ==== Step 6: Combine the two scenarios into one data frame ====
+
+# Add a scenario label to each data frame
+df_grid_modal_scenario_1$scenario <- "Republican (Northeast)"
+df_grid_modal_scenario_2$scenario <- "Democrat (South)"
+
+# Combine both data frames
+df_combined <- rbind(df_grid_modal_scenario_1, df_grid_modal_scenario_2)
+
+# ==== Step 7: Plot the predicted probabilities for both scenarios ====
+
+ggplot(df_combined, aes(x = age, y = predicted_prob, colour = scenario, fill = scenario)) +
+  # Shaded 95% Confidence Intervals
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2, colour = NA) +
+  
+  # Prediction Lines
+  geom_line(size = 0.75) +
+  
+  # Labels and Caption
+  labs(
+    x = "Age",
+    y = "Predicted Probability of Gun Ownership",
+    colour = "Political Profile",  # Legend title for line colour
+    fill = "Political Profile",    # Legend title for shaded area
+    caption = str_wrap(
+      "Notes: The plot shows the predicted probabilities of gun ownership by age for two political profiles, 
+      estimated from a logistic regression model. The shaded regions represent 95% confidence intervals. 
+      Predictions use the modal values of education and trust in government, with the other variables specified for each profile.",
+      100
+    )
+  ) +
+  
+  # Convert Y-axis to percentages
+  scale_y_continuous(labels = percent_format(accuracy = 1), limits = c(0, NA)) +
+  
+  # Classic Theme with Serif Font
+  theme_classic(base_family = "serif") +
+  
+  # Custom Caption, Title, and Axis Styling
+  theme(
+    plot.caption = element_text(size = 10, hjust = 0),
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 12),
+  axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 9)
+  ) +
+  
+  # Manual Colours (Optional: customise colours)
+  scale_colour_manual(values = c("Republican (Northeast)" = "black", "Democrat (South)" = "gray")) +
+  scale_fill_manual(values = c("Republican (Northeast)" = "black", "Democrat (South)" = "gray"))
+
+# Filter the combined data for age 60
+age_60_results <- df_combined[df_combined$age == 60, ]
+
+# View the results
+print(age_60_results)
+
+```
+
+
+
+
+# Exercise 2: Preferences for redistribution across the EU
+
+<!-- Code for initial data setup, cleaning, and understanding through summary statistics -->
+
+``` {r view-EU-data, results='hide', echo=FALSE}
+
+# Load the ess_gb9.csv data.
+european_survey_data <- read.csv("ess_gb9.csv")
+
+view(european_survey_data) # View the data.
+
+# View the first few rows of the data.
+head(european_survey_data, n = 10)
+
+# Some basic information about the data.
+dim(european_survey_data)
+str(european_survey_data)
+summary(european_survey_data)
+
+```
+
+``` {r data-cleaning-EU, results='hide', echo=FALSE}
+
+# Convert 'red' to an ordered factor
+european_survey_data$red <- ordered(european_survey_data$red,
+                                    levels = c(1, 2, 3, 4, 5),
+                                    labels = c("Low", "Moderate-Low", "Moderate", "Moderate-High", "High"))
+
+
+# Convert categorical variables to factors
+european_survey_data$mbtru <- factor(european_survey_data$mbtru, levels = c("No", "Yes, previously", "Yes, currently")) # The modal value is 'No' so its current coding as first level is appropriate.
+european_survey_data$ctzcntr <- factor(european_survey_data$ctzcntr, levels = c("Yes", "No")) # The levels have been adjusted to reflect the modal value of 'Yes' sucht that this is now acting as the base in analysis.
+european_survey_data$gndr <- factor(european_survey_data$gndr, levels = c("Female", "Male")) # The levels have been adjusted to reflect the modal value of 'Female' such that this is now acting as the base in analysis.
+european_survey_data$rlgblg <- factor(european_survey_data$rlgblg, levels = c("No", "Yes")) # The modal value is 'No' so its current coding as first level is appropriate.
+
+# View summary to confirm changes
+summary(european_survey_data)
+
+```
+
+<!-- Code for answering Exercise 2 -->
+
+## Data Summary
+
+The dataset used in the following analysis comes from Round 9 (2018) of the European Social Survey (ESS). The primary dependent variable of interest is `red`, which measures preferences for redistribution on a numerical scale from 1-5 (1 = low, 5 = high). The average age of respondents is 52.4 and average preference for redistribution is 3.76. A histogram plot of the values `red` can take is plotted below in *Figure (5)*. The dataset contains a range of demographic variables which may influence preferences for redistribution which are analysed in the following sections.
+
+``` {r red-histogram, results="hide", echo=FALSE, fig.cap = "Histogram of Preferences for Redistribution", fig.align='center', fig.width=6, fig.height=4, fig.keep='none'}
+
+ggplot(european_survey_data, aes(x = red)) +
+  geom_bar(fill = "gray") +
+  labs(
+    x = "Preferences for Redistribution",
+    y = "Frequency",
+    caption = str_wrap("Notes: The histogram shows the distribution of preferences for redistribution (red) among respondents in the ESS dataset.", width = 80)
+  ) +
+  theme_classic(base_family = "serif") +
+  theme(
+    plot.caption = element_text(size = 10, hjust = 0),
+    axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+    axis.title.y = element_text(size = 10),
+    plot.margin = ggplot2::margin(t = 10, r = 20, b = 20, l = 20)
+    )
+
+```
+
+## Ordered Logit Model
+
+The first model estimated is an ordered logit model to predict preferences for redistribution based on all of the available variables. This ordered logit model is used as `red` is oridinal (values from 1-5), but we are unsure on whether the intervals are equally spaced. The model provides an estimate of the probability that the outcomes `red` falls into one of the ordered categories by modelling the log-odds of being at or below a certain category `j`. The model is specified as follows:
+
+\begin{equation}
+\text{red} = \beta_0 + \beta_1 \cdot \text{age} + \beta_2 \cdot \text{mbtru} + \beta_3 \cdot \text{imbgeco} + \beta_4 \cdot \text{ctzcntr} + \beta_5 \cdot \text{gndr} + \beta_6 \cdot \text{iphlppl} + \beta_7 \cdot\text{hhmmb} + \beta_8 \cdot \text{rlgblg} + \epsilon
+\end{equation}
+
+The results of the ordered logit model are shown in *Table (3)* below. The table shows the ordered logit model estimates for how different variables in the model influence respondents’ preferences for income redistribution, measured on a scale from 1 (low support) to 5 (high support).
+
+Firstly, age, citizenship status, and the number of household members have no statistically significant effect on preferences for redistribution. However, being a member of a trade union (both previously and currently) has a significant positive effect on preferences for redistribution. Those who see immigration as beneficial to the economy are more likely to support redistribution. Whereas men are less likely to support redistribution than woman, as are those with religious beliefs. Finally, altruism and income have a positive effect on preferences for redistribution.
+
+``` {r ordered-logit-model, echo=FALSE, warning = FALSE}
+
+# ==== Step 1: Fit the Ordered Logit Model  ====
+
+# Fit the Ordered Logit Model
+ordered_logit_model <- polr(
+  red ~ agea + mbtru + imbgeco + ctzcntr + gndr + iphlppl + hhmmb + rlgblg + inc_c,
+  data = european_survey_data, Hess = TRUE
+)
+
+# ==== Step 2: Extract Coefficients and P-Values  ====
+
+# Extract coefficient summary
+coef_table <- coef(summary(ordered_logit_model))
+
+# Calculate p-values
+p_values <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
+
+# Create a tidy data frame for modelsummary
+library(broom)
+
+tidy_model <- broom::tidy(ordered_logit_model)
+tidy_model$p.value <- p_values  # Add p-values
+
+# ==== Step 3: Generate Model Summary Table  ====
+
+# View the summary with p-values
+modelsummary(
+  list("Ordered Logit Model" = ordered_logit_model),
+  stars = TRUE,
+  title = "Ordered Logit Model for Preferences for Redistribution",
+  gof_omit = "IC|Log.Lik.",             # Omit AIC and Log-Likelihood
+  coef_map = c(
+    "Low|Moderate-Low" = "Low to Moderate-Low Cut",
+    "Moderate-Low|Moderate" = "Moderate-Low to Moderate Cut",
+    "Moderate|Moderate-High" = "Moderate to Moderate-High Cut",
+    "Moderate-High|High" = "Moderate-High to High Cut",
+    "agea" = "Age",
+    "mbtruYes, previously" = "Member of Trade Union (Previously)",
+    "mbtruYes, currently" = "Member of Trade Union (Currently)",
+    "imbgeco" = "Effect of Immigration on Economy",
+    "ctzcntrNo" = "Not a Citizen",
+    "gndrMale" = "Male",
+    "iphlppl" = "Altruism",
+    "hhmmb" = "Household Members",
+    "rlgblgYes" = "Religious Beliefs = Yes",
+    "inc_c" = "Income"
+  ),
+  statistic_override = tidy_model$p.value,  # Include p-values as the statistic
+  notes = "Standard errors are shown in parentheses. Note that `imbgeco` has been left as a continuous variable rather than being converted into an ordinal variable. Whilst it has ordered properties, it is assumed linear here.",
+  output = "latex"
+)
+
+```
+
+## Expected Probabilities
+
+Although the effect of opinions on the impact of immigration on the economy `imbgeco` was previously left as a continuous variable, we now consider the expected probabilities of preferences for redistribution based on this variable from an ordinal perspective. The plot below in *Figure (6)* shows the predicted probabilities of preferences for redistribution across each level of `imbgeco` from 0 to 10.
+
+Whilst there my be hypotheses that those who think immigration is beneficial for the economy will want more redistribution to encourage immigration, the results show that support for redistribution is generally consistent across different levels of perceived impact of immigration on the economy. The greatest increase in support for redistribution as `imbegco` increases is seen for those with the highest level of support for redistribution. The results suggest that the majority of the preferences towards redistribution are moderate, suggesting how other factors than just attitudes on immigration effect redistribution attitudes.  The results are all statistically significant, with narrow confidence intervals.
+
+``` {r expected-probabilities,  results='hide', echo=FALSE, fig.align='center', warning = FALSE, message = FALSE, fig.cap = "Predicted Redistribution Preferences by Perception of Immigration's Economic Impact", fig.keep='none'}
+
+# ==== Step 1: Create a data frame for imbegco  ====
+
+# Function to calculate the mode (most frequent value)
+calculate_mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Create a prediction grid where `imbgeco` varies from 0 to 10
+prediction_grid <- data.frame(
+  imbgeco = seq(0, 10, by = 1),  # Full range of immigration impact
+
+  # Set continuous variables to their median
+  agea = median(european_survey_data$agea, na.rm = TRUE),
+  iphlppl = median(european_survey_data$iphlppl, na.rm = TRUE),
+  hhmmb = median(european_survey_data$hhmmb, na.rm = TRUE),
+  inc_c = median(european_survey_data$inc_c, na.rm = TRUE),
+
+  # Set categorical variables to their mode
+  mbtru = calculate_mode(european_survey_data$mbtru),
+  ctzcntr = calculate_mode(european_survey_data$ctzcntr),
+  gndr = calculate_mode(european_survey_data$gndr),
+  rlgblg = calculate_mode(european_survey_data$rlgblg)
+)
+
+# ==== Step 2: Generate Expected Probabilities  ====
+
+# Generate expected probabilities for each redistribution level
+predicted_probs <- ggpredict(
+  ordered_logit_model,
+  terms = "imbgeco [0:10]",  # Vary `imbgeco` from 0 to 10
+  condition = list(
+    agea = median(european_survey_data$agea, na.rm = TRUE),
+    iphlppl = median(european_survey_data$iphlppl, na.rm = TRUE),
+    hhmmb = median(european_survey_data$hhmmb, na.rm = TRUE),
+    inc_c = median(european_survey_data$inc_c, na.rm = TRUE),
+    mbtru = calculate_mode(european_survey_data$mbtru),
+    ctzcntr = calculate_mode(european_survey_data$ctzcntr),
+    gndr = calculate_mode(european_survey_data$gndr),
+    rlgblg = calculate_mode(european_survey_data$rlgblg)
+  )
+)
+
+
+# ==== Step 3: Plot Expected Probabilities  ====
+
+# Plot the predicted probabilities across `imbgeco` with explicit x-axis values
+ggplot(predicted_probs, aes(x = x, y = predicted, color = response.level, fill = response.level)) +
+  geom_line(size = 1.2) +  # Line plot for predicted probabilities
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
+              alpha = 0.2, linetype = 0) +  # Confidence intervals in grayscale
+  labs(
+    x = "Perceived Impact of Immigration on Economy (0 = Bad, 10 = Good)",
+    y = "Predicted Probability",
+    color = "Redistribution Preference",
+    fill = "Redistribution Preference",
+    caption = str_wrap(
+      "Notes: The plot shows the expected probabilitiy of preferences for redistribution over the values of participant views on whether immigration is good or bad for the economy. Additional continuous predictors are held at their mediam values, and categorical predictors are held at their modal values.",
+    )
+  ) +
+  # Apply grayscale to lines and ribbons
+  scale_color_grey(start = 0.2, end = 0.8) +  # Lines in shades of grey
+  scale_fill_grey(start = 0.2, end = 0.8) +   # Ribbons in shades of grey
+  # Explicitly add tick marks for each value from 0 to 10
+  scale_x_continuous(
+    breaks = seq(0, 10, by = 1),  # Set breaks for each integer from 0 to 10
+    labels = seq(0, 10, by = 1)   # Ensure each tick is labeled
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    labels = scales::percent_format()  # Show y-axis in percentages
+  ) +
+  # Classic Theme with Serif Font
+  theme_classic(base_family = "serif") +   # Classic theme with serif font
+  
+  # Custom Caption, Title, and Axis Styling
+  theme(
+    plot.caption = element_text(size = 10, hjust = 0),
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 12),
+
+    # Custom Axis Labels
+    axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+    axis.title.y = element_text(size = 10)
+  )
+
+```
+## Proportional Odds Assumption
+
+When we have an ordinal dependent variable, we can model the outcome using an ordered logit model. We need a number of key assumptions to hold for this model to estimate unbiased, valid results. The primary assumption of this model is the proportional odds assumption. This assumption states that each effect of the indepdendent, predictor, variables is constant across all levels of the dependent variable. In other words, the slope coefficent is the same for all categories of the dependent variable, meaning we only need to predict one set of $\beta$ coefficients for all levels of the dependent variable, helping interpretability. However, if this assumption does not hold, we will have biased estimates as the effect of predictors differs across outcome levels, such that the model misrepresents the data.
+
+To test this assumption, we use the `brant` function from the `brant` package in R. The results of the Brant test are shown in *Table (4)* below.
+
+``` {r brant-test, echo=FALSE, warning = FALSE, results='hide'}
+
+# Brant Test
+brant_test <- brant(ordered_logit_model)
+
+```
+
+```{r brant-test-results, echo=FALSE, warning = FALSE, results='asis'}
+
+# Convert Brant test results to a data frame
+brant_results <- as.data.frame(brant_test)
+
+# Rename columns for clarity
+colnames(brant_results) <- c("Chi-Square", "Degrees of Freedom", "p-value")
+
+# Clean up predictor names for better readability
+predictor_labels <- c(
+  "Omnibus" = "Omnibus",
+  "agea" = "Age",
+  "mbtruYes, previously" = "Union Membership (Previously)",
+  "mbtruYes, currently" = "Union Membership (Currently)",
+  "imbgeco" = "Perception of Immigration Impact",
+  "ctzcntrNo" = "Non-Citizen",
+  "gndrMale" = "Gender (Male)",
+  "iphlppl" = "Altruism",
+  "hhmmb" = "Household Size",
+  "rlgblgYes" = "Religious Belief (Yes)",
+  "inc_c" = "Income Level"
+)
+
+# Apply the descriptive labels
+brant_results$Predictor <- predictor_labels[rownames(brant_results)]
+
+# Reorder columns correctly
+brant_results <- brant_results[, c("Predictor", "Chi-Square", "Degrees of Freedom", "p-value")]
+
+# Rounding the results
+brant_results$`Chi-Square` <- round(brant_results$`Chi-Square`, 2)
+brant_results$`p-value` <- round(brant_results$`p-value`, 4)
+
+# Generate table with brant results
+kable(
+  brant_results,
+  format = "latex",
+  booktabs = TRUE,
+  caption = "Brant Test for Proportional Odds Assumption",
+  col.names = c("Predictor", "Chi-Square", "Degrees of Freedom", "p-value"),
+  align = c("l", "c", "c", "c"),
+  row.names = FALSE  # This removes the far-left column
+
+) %>%
+  footnote(
+    general = "The null hypothesis assumes the proportional odds assumption holds. A p-value < 0.05 suggests violation of the assumption.",
+    threeparttable = TRUE
+  )
+
+```
+
+To interpret the `brant` test, we look at the p-values for each variable. If the p-value is $p \leq 0.05$, we reject the null hypothesis that the proportional odds assumption holds, and the assumption is violated. The `Omnibus` value gives an overall test of the proportional odds assumption for the whole model.
+
+The variables for altruism `(iphlppl)`, religious beliefs `(rlgblg)`, and income `(inc_c)` all have p-values less than $p \leq 0.05$. This suggests that the effect of these predictors on redistribution preferences varies across categories. The overall test of the proportional odds assumption, given by `Omnibus` is also violated.
+
+From the `ordered_logit_model` used throughout these estimates, the parallel lines assumption is violated overall and the use of an ordered logit model may not be entirely appropriate, with a generalised ordered logistic model being a possible alternative.
+
+
+
+
+# Exercise 3: International trade and protests in Russia
+
+<!-- Code for initial data setup, cleaning, and understanding through summary statistics -->
+
+``` {r view-russia-data, results='hide', echo=FALSE}
+
+# Read the protest data using read_dta() from the haven package
+russia_protest_data <- read_dta("protests.dta")
+view(russia_protest_data) # View the data.
+
+```
+
+``` {r data-cleaning-russia, results='hide', echo=FALSE}
+
+# Check the structure of the data and check variable names
+str(russia_protest_data)
+names(russia_protest_data)
+
+# View the data types of variables
+sapply(russia_protest_data, class)
+
+# Summary statistics for the data
+unique(russia_protest_data$dname)
+
+# Replace numeric district codes with descriptive labels
+russia_protest_data$dname <- factor(russia_protest_data$dname,
+                                    levels = c(1, 2, 3, 4, 5, 6, 7, 8),
+                                    labels = c("Central", "Far East", "North Caucasus", 
+                                               "North West", "Siberia", "South", 
+                                               "Ural", "Volga"))
+
+```
+
+<!-- Code for answering Exercise 3 -->
+
+## Data Summary
+
+The dataset used in the following analysis, `protests.dta`, contains ~2,000 observations of protests in Russia. The data contains variables on the Russian regions and districts where protests occurred, along with socio-economic and demographic variables. The primary dependent variable of interest is `protest_ikd` which gives the number of protests in a given region for a specific year. The key predictor of interest is `tradeopen`, which measures the sum of imports and exports (% of GDP). For example we can see the count of the number of protests by district in *Figure (3)* below.
+
+
+``` {r protest-data-summary, results='asis', echo=FALSE, fig.cap = "Total Number of Protests by District", fig.align='center', fig.width=6, fig.height=4}
+
+# Summary statistics for the protest data, looking at count of protests across districts
+
+# Clean the data of NA values
+clean_data_district <- na.omit(russia_protest_data[, c("protest_ikd", "dname")])
+
+# Summarise total protests by district
+total_protests_district <- clean_data_district %>%
+  group_by(dname) %>%
+  summarise(total_protests = sum(protest_ikd, na.rm = TRUE))
+
+# Create a bar plot with grayscale and classic theme
+ggplot(total_protests_district, aes(x = reorder(dname, total_protests), y = total_protests)) +
+  geom_bar(stat = "identity", fill = "gray") +  # Grayscale colours
+  labs(
+    x = "District",
+    y = "Total Number of Protests",
+  ) +
+  
+  # Classic theme with serif font
+  theme_classic(base_family = "serif") +
+  
+  # Custom Caption, Title, and Axis Styling
+  theme(
+    plot.caption = element_text(size = 10, hjust = 0),         # Left-align caption
+    plot.title = element_text(face = "bold", size = 14),       # Bold and larger title
+    plot.subtitle = element_text(size = 12),                   # Subtitle size
+    axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+    axis.title.y = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 9)
+  )
+
+```
+
+## Understanding Count Models
+
+An OLS regression model is typically used to model the relationship between a continuous dependent variable and one or more independent variables. For OLS to be appropriately used, the residuals should be normally distributed and homoscedastic in nature. However, when the dependent variable is not continuous, other models should be used. Specifically, in the case of count data, where the dependent variable is a non-negative integer, count models are more appropriate. Count data refers to data that measures how often something (e.g., protests, `protest_ikd`) occurs in a given time interval or space, measuring the frequency of the event. Therefore, count models such as Poisson or Negative Binomial models can be used to model the relationship between the count dependent variable and the independent variables, instead of an OLS model. 
+
+These count models look at calculating the probability of observing a certain count given the independent variables, based on the Poisson distribution. A Poisson model specifically assumes that the dependent variable, $Y$ follows the Poisson distribution of parameter rate (expected occurrences) $\lambda$ such that $Y \sim \text{Poisson}(\lambda)$. This means that the mean and the variance of the dependent variable are equal: $E(Y) = \mu = \text{Var}(Y)$. However, in practice, the variance of count data is often greater than the mean ($\text{Var}(Y) > E(Y)$) known as overdispersion. In such cases, a Negative Binomial model is used which builds on the Poisson distribution to allow for the variance to be greater than the mean, providing a better fit for the data.
+
+With the data on protests being count data, and skewed such that the errors will not be normally distributed, a Poisson or Negative Binomial model is more appropriate than an OLS model.
+## Protests between 2000-2014
+
+We are firstly interested in the relationship between international trade openness and the number of protests in Russia between 2000 and 2014. To determine whether a Poisson or Negative Binomial model is most appropriate, two overdispersion tests are conducted. Firstly, a test of a baseline negative binomial model using `odTest()` is used to show that the Null Hypotheses (no overdispersion) is rejected and therefore a negative binomial model is more appropriate. Moreover, by evaluating the mean and variance values across 2000-2014 for our dependent variable  `protest_ikd`, we find that they are significantly different (`mean = 12.28 < var = 1507.53`), again supporting the use of a negative binomial model.
+
+``` {r overdispersion-test, echo=FALSE, warning = FALSE, results='hide'}
+
+# ==== Step 1: Filter the data on years 2000-2014  ====
+
+# Filter data for years 2000-2014
+filtered_data <- russia_protest_data %>%
+  filter(year >= 2000 & year <= 2014)
+
+# ==== Step 2: Fit a Negative Binomial regression model  ====
+
+# This will be used as a baseline model for the overdispersion test
+nb_model <- glm.nb(protest_ikd ~ tradeopen, data = filtered_data)
+
+# ==== Step 3: Overdispersion Test  ====
+
+# Perform the overdispersion test
+odTest(nb_model) # The output of this test shows that the Null Hypotheses (no overdispersion) is rejected and therefore a Negative Binomial model is more appropriate.
+
+# ==== Step 4: Conduct manual testing of mean and variance  ====
+
+# Calculate the mean of protest counts
+mean_protests <- mean(filtered_data$protest_ikd, na.rm = TRUE)
+
+# Calculate the variance of protest counts
+variance_protests <- var(filtered_data$protest_ikd, na.rm = TRUE)
+
+# Print the results
+print(paste("Mean of protest_ikd:", mean_protests))
+print(paste("Variance of protest_ikd:", variance_protests)) # The variance is greater than the mean, indicating overdispersion.
+
+```
+
+As a negative binomial model is most appropriate, this is now used to estimate the relationship between international trade openness and the number of protests in Russia between 2000 and 2014. The coefficient for `tradeopen` is not statistically significant in predicting the number of protests. This suggests that levels of trade openness do not have a significant effect on the number of protests in Russia between 2000 and 2014.
+
+However, a number of regions have strong statistically significant effects, suggesting that protests are not uniform across Russia, but rather vary significantly by region. For example, `Leningrad`, `Kaliningrad`, and `Moscow` have a significantly higher number of protests compared to the omitted reference category of `Central` Russia. This suggests that regional factors play a more significant role in predicting the number of protests than trade openness.
+
+``` {r negative-binomial-model, echo=FALSE, warning = FALSE}
+
+# ==== Step 1: Fit a Negative Binomial regression model  ====
+
+# Note that we have already created filtered_data for 2000-2014 for the overdispersion test
+# Fit the Negative Binomial regression model
+nb_model <- glm.nb(protest_ikd ~ tradeopen + rname, data = filtered_data)
+
+# View the model summary
+# summary(nb_model) <- set not to display
+
+# ==== Step 2: Generate Model Summary Table  ====
+
+# Present the model summary in a table
+full_model_summary <- modelsummary(nb_model,
+             output = "markdown",
+             title = "Negative Binomial Regression: Protests and Trade Openness",
+             coef_rename = c("tradeopen" = "Trade Openness"),
+             stars = TRUE,
+             gof_omit = "Log.Lik|AIC|BIC")
+
+# Updated modelsummary() which is easier to interpret with fewer regions
+
+# Extract model coefficients and filter - only want the statistically significant regions (but also keep in `tradeopen`)
+significant_coefs <- tidy(nb_model) %>%
+  filter(term == "tradeopen" | (grepl("rname", term) & p.value < 0.05))  # Keep 'tradeopen' and significant regions
+
+# Select the top 10 regions by the absolute size of their coefficients
+top_10_regions <- significant_coefs %>%
+  filter(term != "tradeopen") %>%  # Exclude 'tradeopen' for this ranking
+  mutate(abs_estimate = abs(estimate)) %>%  # Absolute value for ranking
+  arrange(desc(abs_estimate)) %>%
+  slice(1:10)
+
+# Combine 'tradeopen' with the top 10 significant regions
+final_coefs <- bind_rows(
+  significant_coefs %>% filter(term == "tradeopen"),  # Keep 'tradeopen'
+  top_10_regions  # Add top 10 regions
+)
+
+modelsummary(nb_model,
+             coef_map = c(
+               "tradeopen" = "Trade Openness",
+               "rnameMoscow C" = "Moscow (City)",
+               "rnameLeningrad" = "Leningrad Region     ",
+               "rnameSaint Petersburg" = "Saint Petersburg",
+               "rnameKaliningrad" = "Kaliningrad Region",
+               "rnameNovosibirsk" = "Novosibirsk Region",
+               "rnameSverdlovsk" = "Sverdlovsk Region",
+               "rnameMoscow O" = "Moscow (Oblast)",
+               "rnameSamara" = "Samara Region",
+               "rnameIrkutsk" = "Irkutsk Region",
+               "rnamePerm" = "Perm Region"
+             ),
+             title = "Negative Binomial Regression: Trade Openness and Significant Regions",
+             stars = TRUE,
+             gof_omit = "Log.Lik|AIC|BIC",
+             model_names = "Negative Binomial Model",  # Custom column header
+             notes = "Standard errors are shown in parentheses. The table shows the significant regions with the largest effects on the number of protests in Russia between 2000 and 2014.",
+             output = "latex"
+)
+
+```
+
+## Interaction Effects of Educational Attainment and Trade Openness
+
+After initially finding that there is little explained effect of trade openness on protests, we are now interested in seeing whether the effect of trade openness on protests varies depending on a region's educational attainment. In other words, does educational attainment modify the relationship between trade openness and protest activity.
+
+We are primarily interested in whether the variables `seceduc`, `tereduc` and `seceduc + tereduc` have a moderating effect on the relationship of the independent variable `tradeopen` and dependent variable `protest_ikd`. We therefore need to test different models with education variables interacted with `tradeopen` to see if they have a significant effect on the number of protests.
+
+\begin{equation}
+\text{Protest Count} = \beta_0 + \beta_1 \text{tradeopen} + \beta_2 \text{seceduc} + \beta_3 \left(\text{tradeopen} \cdot \text{seceduc}\right) + \varepsilon
+\end{equation}
+
+\begin{equation}
+\text{Protest Count} = \beta_0 + \beta_1 \text{tradeopen} + \beta_2 \text{tereduc} + \beta_3 \left(\text{tradeopen} \cdot \text{tereduc}\right) + \varepsilon
+\end{equation}
+
+\begin{equation}
+\text{Protest Count} = \beta_0 + \beta_1 \, \text{tradeopen} + \beta_2 \left( \text{seceduc} + \text{tereduc} \right)
++ \beta_3 \left( \text{tradeopen} \cdot \left( \text{seceduc} + \text{tereduc} \right) \right) + \varepsilon
+\end{equation}
+
+These models are estimated again using a negative binomial model, to account for the count nature of the dependent variable and overdispersion in the data. The results of these models are shown in *Table (6)* below. From the results, we see that in the model of the interaction between trade openness and secondary education, trade openness is positive and statistically significant (unlike without the interaction term). This means that higher trade openness can be associated with an increase in protests in the regions where there is low secondary education, with the `tradeopen:seceduc` interaction term showing that as secondary education increases, the effect of trade openness on protests decreases. This suggests that the effect of trade openness on protests is moderated by the level of secondary education in a region. For the second model with tertiary education, there is an association between a decrease in protests in regions with lower tertiary education. The final model suggests that trade openness decreases the number of protests in regions where there is a low overall level of education. In regions where the combined level of education is higher, trade openness is more likely to effect the number of protests. Consequently, we can conclude that where there are lower levels of education, trade openness is more likely to increase the number of protests.
+
+The models specified, however, assume that the effects of trade openness are linear across all levels of education, and the effects of secondary and tertiary education are of equal weight. For example, the added value of tertiary education could have a much stronger effect in removing someone from being sheltered from the effects of trade openness. Firstly a weighted model is given by:
+
+\begin{equation}
+\text{Protest Count} = \beta_0 + \beta_1 \, \text{tradeopen} + \beta_2 \, \text{weightededucation} + \beta_3 \left( \text{tradeopen} \cdot \text{weightededucation} \right) + \varepsilon
+\end{equation}
+
+where $\text{weightededucation} = \alpha \cdot \mathrm{seceduc} + (1 - \alpha) \cdot \mathrm{tereduc}$, with $\alpha = 0.37$, giving 70% weighting to tertiary education and 30% to secondary education. A second additional specification looks at the non-linear effects of both secondary and tertiary education to identify whether these education levels have different relationships with trade openness and protests.
+
+\begin{equation}
+\begin{split}
+\text{Protest Count} = \beta_0 + \beta_1 \, \text{tradeopen} + \beta_2 \, \text{seceduc} + \beta_3 \, \text{seceduc}^2 + \beta_4 \, \text{tereduc} + \beta_5 \, \text{tereduc}^2 \\
++ \beta_6 \left( \text{tradeopen} \cdot \text{seceduc} \right) + \beta_7 \left( \text{tradeopen} \cdot \text{tereduc} \right) + \varepsilon
+\end{split}
+\end{equation}
+
+
+From the results, we find that the weighted model provides value insight whereas the non-linear model is not statistically significant. This suggests that the weighted model is more appropriate for understanding the relationship between education, trade openness, and protests in Russia. From the weighted model, we see that a weighted model which emphasises tertiary education has the strongest interaction, supporting the idea that higher levels of education can leader to inequality in trade exposure, thus economic grievances arise and increase the likelihood of protests.
+
+
+``` {r interaction-effects, echo=FALSE, warning = FALSE, results='asis'}
+
+# ==== Model 1: Interaction effects of `seceduc`  ====
+
+# Estimate the Negative Binomial model with interaction between trade openness and secondary education
+model_interact_seceduc <- glm.nb(protest_ikd ~ tradeopen * seceduc, data = filtered_data)
+
+# ==== Model 2: Interaction effects of `tereduc`  ====
+
+# Estimate the Negative Binomial model with interaction between trade openness and tertiary education
+model_interact_tereduc <- glm.nb(protest_ikd ~ tradeopen * tereduc, data = filtered_data)
+
+
+# ==== Model 3: Interaction effects of `seceduc` and `tereduc` summed  ====
+
+# Create the combined education variable
+filtered_data <- filtered_data %>%
+  mutate(combined_edu = seceduc + tereduc)
+
+# Estimate the Negative Binomial model with interaction between trade openness and combined education
+model_interact_combined <- glm.nb(protest_ikd ~ tradeopen * combined_edu, data = filtered_data)
+
+# ==== Model 4: Weighted model  ====
+
+# Assign weight (e.g., 30% to secondary education, 70% to tertiary)
+alpha <- 0.3
+
+# Create the weighted education index
+filtered_data <- filtered_data %>%
+  mutate(edu_weighted = alpha * seceduc + (1 - alpha) * tereduc)
+
+# Estimate the Negative Binomial regression model with the weighted education interaction
+model_interact_weighted <- glm.nb(protest_ikd ~ tradeopen * edu_weighted, data = filtered_data)
+
+# ==== Model 5: Non-Linear Model  ====
+
+# Create a new variable for the squared terms of secondary and tertiary education
+filtered_data <- filtered_data %>%
+  mutate(
+    seceduc_sq = seceduc^2,
+    tereduc_sq = tereduc^2
+  )
+
+# Estimate the Negative Binomial regression model with non-linear effects of education
+model_interact_sep_sq <- glm.nb(protest_ikd ~ tradeopen * seceduc + seceduc_sq + 
+                                               tradeopen * tereduc + tereduc_sq, 
+                                data = filtered_data)
+
+# === Combine the model summaries ===
+
+# Combine all three models into a single list
+models_list <- list(
+  "Secondary Educ" = model_interact_seceduc,
+  "Tertiary Educ" = model_interact_tereduc,
+  "Summed Educ" = model_interact_combined,
+  "Weighted Educ" = model_interact_weighted,
+  "Non-Linear Educ" = model_interact_sep_sq
+)
+
+# Present all models in one comparative table
+cat("\\begin{landscape}\n")
+modelsummary(models_list,
+             output = "latex",
+             title = "Negative Binomial Regression: Interaction Effects of Education on Trade Openness and Protests",
+             coef_rename = c(
+               "tradeopen" = "Trade Openness",
+               "seceduc" = "Secondary Education",
+               "tereduc" = "Tertiary Education",
+               "combined_edu" = "Combined Education",
+               "tradeopen:seceduc" = "Trade Open × Secondary Education",
+               "tradeopen:tereduc" = "Trade Open × Tertiary Education",
+               "tradeopen:combined_edu" = "Trade Open × Combined Education",
+               "edu_weighted" = "Weighted Education",
+               "tradeopen:edu_weighted" = "Trade Open × Weighted Education",
+               "seceduc_sq" = "Secondary Education Squared",
+               "tereduc_sq" = "Tertiary Education Squared"
+             ),
+             stars = TRUE,
+             notes = "Standard errors are shown inparentheses. The table shows the results of five negative binomial regression models estimating the effect of trade openness on protests, moderated by different levels of education. The 'Weighted Education' model assigns 30% weight to secondary education and 70% to tertiary education.",
+             gof_omit = "Log.Lik|AIC|BIC")
+cat("\\end{landscape}\n")
+
+```
+
+## Expanding the Model
+
+To further complete the model to better understand the relationship between trade openness and protests, we can include additional control and moderator variables. Control variables can be included to ensure there are no omitted confounders, whereas moderator variables, such as education can be added to explain how the effect of trade openness on protests changes. Therefore, for deciding whether to include additional moderaters, we need to consider whether there are variables which may alter the strength of the relationship between trade openness and protests. One key variable which may alter effects of trade openness on protests is the interaction of population `reg_pop` size which is a proxy for the mobiliasation capacity of the region. We can therefore propose a new model specification to consider this moderator:
+
+\begin{equation}
+\begin{split}
+\text{Protest Count} = \beta_0 + \beta_1 \, \text{tradeopen} + \beta_2 \, \text{weightededucation} + \beta_3 \, \text{regionpop} \\ + \beta_4 \left( \text{tradeopen} \cdot \text{weightededucation} \right) + \beta_5 \left( \text{tradeopen} \cdot \text{regionpop} \right) + \varepsilon
+\end{split}
+\end{equation}
+
+``` {r expanded-model, echo=FALSE, warning = FALSE}
+
+# ==== Additional Moderation  ====
+
+# Fit the model with interaction terms
+model_interact_pop <- glm.nb(protest_ikd ~ tradeopen * edu_weighted + 
+                                           tradeopen * reg_pop, 
+                             data = filtered_data)
+
+
+# Present the model summary in a table
+modelsummary(model_interact_pop,
+             output = "latex",
+             title = "Negative Binomial Regression: Interaction Effects of Education and Population on Trade Openness and Protests",
+             coef_rename = c(
+               "tradeopen" = "Trade Openness",
+               "edu_weighted" = "Weighted Education",
+               "reg_pop" = "Population",
+               "tradeopen:edu_weighted" = "Trade Open × Weighted Education",
+               "tradeopen:reg_pop" = "Trade Open × Population"
+             ),
+             stars = TRUE,
+             notes = "Standard errors are shown inparentheses. The table shows the results of a negative binomial regression model estimating the effect of trade openness on protests, moderated by education and population.",
+             gof_omit = "Log.Lik|AIC|BIC")
+
+
+```
+
+The results from adding this additional moderator show that the interaction of trade openness and population is statistically significant such that the when population increases, trade openness is more effective at reducing the number of protests. This suggests that the effect of trade openness on protests is moderated by the population size of the region by potentially allowing the benefits of trade to be widespread across the region, or there may be more focus on state control in these dense regions. This moderator should be kept in the analysis. Next, we should include additional control variables. @palmtag2020 suggest controlling for political variables such as regional welfare, economic grievances, understanding of regional developments, regional structural conditions, and economic globalisation.
+
+A final model is now fitted to include these controls, such that the model shows the effect of trade openness on protest activity, moderated by education and population, while controlling for key socio-economic and demographic factors. The control variables in the model are `grp`, `reg_grpgr`, `reg_levelofunempl`, `reg_avwage`, `reg_urbanshare`, `lnroadden`, and `pctRussian`. The results from this fully specified model are shown in *Table (7)* and are particularly interesting since adding control variables. The results show that there is no longer a significant effect of education as a moderator for trade openness has no effect on protests. Instead, population becomes the primary driver of protest activity. When evaluating the model's coefficients, a unit increase in population (1 million additional people) will double the expected count of protests for a given region, holding all else constant. Trade openness is no longer a direct influence on protests but has a strong effect when interacted with population. Protests are also suppressed where there is higher economic growth; although, perhaps because of the earlier stages of growth (during urbanisation), more protests are seen. 
+
+``` {r final-model, echo=FALSE, warning = FALSE}
+
+# ==== Full Model with Control Variables  ====
+
+# Check missing values in key variables
+control_vars <- c("grp", "reg_grpgr", "reg_levelofunempl", "reg_avwage",
+                  "reg_urbanshare", "lnroadden", "pctRussian")
+
+# Display count of missing values for each control variable
+invisible(sapply(filtered_data[control_vars], function(x) sum(is.na(x))))
+
+# Optional: Remove rows with missing values in control variables
+filtered_data <- filtered_data %>%
+  drop_na(all_of(control_vars))
+
+model_full_controls <- glm.nb(protest_ikd ~ tradeopen * edu_weighted + 
+                                              tradeopen * reg_pop + 
+                                              grp + reg_grpgr + 
+                                              reg_levelofunempl + 
+                                              reg_avwage + 
+                                              reg_urbanshare + 
+                                              lnroadden + 
+                                              pctRussian, 
+                              data = filtered_data)
+
+# Full model summary table
+modelsummary(model_full_controls,,
+             output = "latex",
+             title = "Negative Binomial Regression: Impact of Trade Openness, Education, Population, and Controls on Protest Activity",
+             coef_rename = c(
+               "tradeopen" = "Trade Openness",
+               "edu_weighted" = "Weighted Education",
+               "reg_pop" = "Population Size",
+               "grp" = "Gross Regional Product (USD Million)",
+               "reg_grpgr" = "GRP Growth (%)",
+               "reg_levelofunempl" = "Unemployment Rate (%)",
+               "reg_avwage" = "Average Wage",
+               "reg_urbanshare" = "Urbanisation Rate",
+               "lnroadden" = "Distance to Moscow (log)",
+               "pctRussian" = "% Share of Ethnic Russians",
+               "tradeopen:edu_weighted" = "Trade Open × Weighted Education",
+               "tradeopen:ref_pop" = "Trade Open × Population"
+             ),
+             stars = TRUE,
+             notes = "Standard errors are shown inparentheses. The table shows the results of a negative binomial regression model estimating the effect of trade openness on protests, moderated by education and population, while controlling for `grp`, `reg_grpgr`, `reg_levelofunempl`, `reg_avwage`, `reg_urbanshare`, `lnroadden`, and `pctRussian`",
+             gof_omit = "Log.Lik|AIC|BIC")
+
+
+# ==== Interpretation of Negative Binominal Coefficients with IRR  ====
+
+# Calculate IRR and Confidence Intervals
+irr_table <- tidy(model_full_controls) %>%
+  mutate(IRR = exp(estimate),                    # IRR Calculation
+         IRR_SE = exp(std.error),
+         CI_Lower = exp(estimate - 1.96 * std.error),  # Lower CI
+         CI_Upper = exp(estimate + 1.96 * std.error))  # Upper CI
+
+
+```
+
+
+# Exercise 4: LGBTI acceptance across Africa
+
+<!-- Code for initial data setup, cleaning, and understanding through summary statistics -->
+
+``` {r view-africa-data, results='hide', echo=FALSE, warning = FALSE, show_col_types = FALSE}
+
+# Load the afrobaromater.csv file
+africa_data <- read_csv("afrobarometer.csv", show_col_types = FALSE)
+
+# Clean the data by removing missing values
+africa_data_clean <- africa_data %>%
+  filter(!is.na(Q87C), !is.na(REGION))
+
+# Convert REGION to dummy variables
+africa_model_data <- model.matrix(Q87C ~ . - 1, data = africa_data_clean)
+
+```
+
+## Data Summary
+
+This exercise looks at attitudes towards LGBTI individuals across Africa. In particular, we are interested in understanding the factors determining the attitudes towards LGBTI individuals in Africa. The dataset used in the analysis, `afrobarometer.csv`, contains data on a wide set of attitudes towards LGBTI individuals in Africa, along with the core dependent variable of interest, `Q87C` which measures attitudes towards having homosexuals as neighbours on a Likert scale of 1 (strongly dislike) to 5 (strongly like). On initial inspection of the `Q87C` variable, *Figure (4)* shows a histogram plot of the views on LGBTI neighours in Africa, grouped by `REGION`, showing that frequency density is skewed towards `1` on the Likert scale, which is particularly pronounced in Southern and Western Africa.
+
+``` {r africa-data-histogram,  results='hide', echo=FALSE, warning = FALSE , fig.width=5, fig.height=3, fig.align='center', fig.cap = "Histogram of Attitudes towards LGBTI Neighbours by African Region"}
+
+# Create the histogram with classic grayscale styling and updated facet labels
+ggplot(africa_data_clean, aes(x = Q87C)) +
+  geom_histogram(binwidth = 1, fill = "gray", colour = "black") +
+  facet_wrap(~ REGION, strip.position = "bottom") +  # Move labels below
+  labs(
+    x = "Attitude Score (1 = Strongly Dislike, 5 = Strongly Like)",
+    y = "Frequency",
+    caption = str_wrap("Notes: The histogram shows the distribution of attitudes towards having homosexuals as neighbours (Q87C) across different African regions.", width = 80)
+  ) +
+  theme_classic(base_family = "serif") +
+  theme(
+    strip.background = element_blank(),  # Remove the box around facet labels
+    strip.placement = "outside",         # Place labels outside the plot area
+    plot.caption = element_text(size = 10, hjust = 0),
+    axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+    axis.title.y = element_text(size = 10),
+    plot.margin = ggplot2::margin(t = 10, r = 20, b = 20, l = 20) 
+  ) +
+  scale_x_continuous(breaks = 1:5)
+```
+
+## LASSO Regression Model
+
+This section looks at which variables best predict the attitudes towards LGBTI neighbours by using a LASSO regression model. This model is used to keep only the most important predictors in the model by penalising overfitting. As we have a large number of variables, the model is particularly useful here to identify the best predictors in our model. By splitting the data into 5 folds for training and testing, we get a Mean Squared Error (MSE) plot across different lambda values. The best lambda value (the value which is smallest) is then used to fit the LASSO model. This lambda value is `0.001` and is then used to test the model's performance and identify the best predictors. The results of the LASSO model are shown in *Figure (5)* below. This shows that the the variables which are most important in predicting attitudes towards LGBTI neighbours are `REGIONSouthern Africa`, `EA_SVC_D`, and `EA_SEC_A` which are the region of Southern Africa, access to cell phone service, and police in the area respectively.
+
+``` {r lasso-model, echo=FALSE, warning = FALSE, fig.cap = "LASSO Regression: Top 10 Predictors of Attitudes towards LGBTI Neighbours in Africa", fig.align='center', fig.width=6, fig.height=4}
+
+# === LASSO Regression Model ===
+
+set.seed(9999)  # Set seed for reproducibility
+
+
+# === Step 1: Split the data  ===
+
+# Define response and predictors
+y <- africa_data_clean$q87c
+X <- africa_model_data
+
+# Split the data into training and testing -> 80% training, 20% testing. We do this to see if the model can make accurate predictions on new data.
+data_split <- initial_split(africa_data_clean, prop = 0.8)
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+
+# Extract response and predictors for training and testing
+X_train <- model.matrix(Q87C ~ . - 1, data = train_data)
+X_test  <- model.matrix(Q87C ~ . - 1, data = test_data)
+y_train <- train_data$Q87C
+y_test  <- test_data$Q87C
+
+# === Step 2: Fit the LASSO model  ===
+
+# Set up 5-fold cross-validation. Here the data is split into 5 parts (folds) and the model is trained on 4 parts and tested on the 5th part. With the average performance being used to improve accuracy.
+cv_folds <- vfold_cv(train_data, v = 5)
+
+# Train the LASSO model with cross-validation
+lasso_model <- train(
+  x = X_train,
+  y = y_train,
+  method = "glmnet",
+  trControl = trainControl(method = "cv", number = 5),
+  tuneGrid = expand.grid(
+    alpha = 1,  # LASSO penalty, this tells the model to shrink less important predictors to zero (removing them)
+    lambda = seq(0.001, 1, by = 0.01)  # Regularisation parameter, this tells the model how much to penalise the coefficients
+  )
+)
+
+# === Step 3: Model Evaluation  ===
+
+# Extract the best lambda value from cross-validation
+best_lambda <- lasso_model$bestTune$lambda
+
+# Fit the final LASSO model using the best lambda
+final_lasso_model <- glmnet(
+  x = X_train, 
+  y = y_train, 
+  alpha = 1,         # LASSO regression
+  lambda = best_lambda
+)
+
+# === Step 4: Fit the LASSO model with the best lambda  ===
+
+# Extract the coefficients from the LASSO model and plot using vip (Variable Importance in Projection)
+# Unfortunately I could not find a way to easily rename the lavels of the variables without getting multiple console warnings.
+vip::vip(final_lasso_model, num_features = 10, lambda = best_lambda) +
+  labs(
+    y = "Coefficient Magnitude",
+    x = "Predictor Variables",
+    caption = "Note: Generated using the LASSO regression model. Variables with higher importance contribute more to the prediction."
+  ) + 
+  theme_classic(base_family = "serif") +
+  theme(
+  aaxis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10),
+  plot.margin = ggplot2::margin(t = 10, r = 20, b = 20, l = 20)
+)
+
+```
+
+## Comparison to Regression Trees
+
+We can also use a regression decision-tree model to predict attitudes towards LGBTI individuals in Africa. We start by splitting the data into smaller and smaller groups based on the values of the predictors. The model then chooses a predictor that best splits the data into two groups (by reducing variability), and continues this process until the criteria (e.g., maximum depth) is reached. As with the LASSO model, we can obtain the top predictors of attitudes towards LGBTI individuals in Africa. The results of the regression tree model are shown in *Figure (6)* below. This shows that the the variables which are most important in predicting attitudes towards LGBTI neighbours are `REGIONSouthern Africa`, `EA_SVC_C`, and `LivedPoverty` which are the region of Southern Africa, has a sewage system for most houses, and the Lived Poverty Index.
+
+Both models emphasise the value of `REGIONSouthern Africa` in predicting attitudes towards LGBTI individuals in Africa. However, due to the nature of the models, they uncover different drivers and complex patterns for prediction. In particular, due to the linear nature of the LASSO model, many interactions may be missed; whereas, the regression tree model can capture these non-linear interactions and capture more complex relationships.
+
+Yet, regression trees can also be problematic. Primarily, they are prone to overfitting meaning noise is often captured rather than the general patters. This can occur when a tree starts going too deep. However, the approach to limit the tree's size of pruning is also problematic. By yielding smaller trees, pruning makes the best splits at each node which is a short-sighted approach that reduces RSS. Moreover, as there are very discrete choices made at each node, any variation in the data can have large effects on the outcomes of the model. Alternatively, a random forest can be used to overcome these limitations. This model is an a set of decision trees which can reduce the variance of the model and improve the prediction accuracy. They work by taking each split in the tree and randomly selecting a subset of predictors to make the split. This means that the model is less likely to overfit as average predictions are created which reduces variance and overfitting of any one tree. This random nature also means they are more robust to variations in the data and the ensemble nature means we can better generalise more stable and accurate data from the random forests.
+
+``` {r regression-tree-model, echo=FALSE, warning = FALSE, fig.show='hide'}
+
+# === Regression Tree Model ===
+# We previously created variables for data_split, train_data, test_data for the LASSO model
+
+# === Step 1: Define the Recipe ===
+tree_recipe <- recipe(Q87C ~ ., data = train_data) %>%
+  step_dummy(all_nominal_predictors()) %>%  # Convert categorical predictors to dummies
+  step_zv(all_predictors())                 # Remove zero-variance predictors
+
+# === Step 2: Define the Regression Tree Model ===
+tree_model <- decision_tree(
+  cost_complexity = tune(),  # Complexity parameter for pruning
+  tree_depth = tune()        # Maximum depth of the tree
+) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")     # Regression for continuous outcomes
+
+# === Step 3: Define the Workflow ===
+tree_workflow <- workflow() %>%
+  add_model(tree_model) %>%
+  add_recipe(tree_recipe)
+
+# === Step 4: Cross-Validation Setup ===
+cv_folds <- vfold_cv(train_data, v = 5)
+
+# === Step 5: Define Tuning Grid ===
+tree_grid <- grid_regular(
+  cost_complexity(range = c(-5, -1)),  # Smaller cp values to allow more splits
+  tree_depth(range = c(2, 15)), # Deeper trees allowed
+  levels = 10
+)
+
+# === Step 6: Model Tuning ===
+tree_tuned <- tree_workflow %>%
+  tune_grid(
+    resamples = cv_folds, # Cross-validation
+    grid = tree_grid, # Hyperparameter grid
+    metrics = metric_set(rmse), # Evaluation metric (RMSE)
+    control = control_resamples(save_pred = TRUE)
+  )
+
+# === Step 7: Select Best Model ===
+best_tree <- tree_tuned %>% select_best(metric = "rmse")
+
+# === Step 8: Finalize Workflow with Best Parameters ===
+tree_final <- tree_workflow %>%
+  finalize_workflow(best_tree)
+
+# === Step 9: Fit Final Model on Training Data ===
+final_tree_fit <- tree_final %>%
+  fit(data = train_data)
+
+# === Step 10: Predict on Test Data ===
+predictions <- predict(final_tree_fit, new_data = test_data) %>%
+  bind_cols(test_data)
+
+# === Step 11: Evaluate Model Performance ===
+rmse_result <- rmse(predictions, truth = Q87C, estimate = .pred)
+
+# === Step 12: Prune the Tree Using Optimal CP ===
+# Extract the fitted tree model
+final_tree_model <- extract_fit_engine(final_tree_fit)
+
+# Select the best CP for pruning
+optimal_cp <- final_tree_model$cptable[which.min(final_tree_model$cptable[, "xerror"]), "CP"]
+
+# Prune the tree
+pruned_tree <- rpart::prune(final_tree_model, cp = optimal_cp)
+
+# === Step 13: Plot the Pruned Tree ===
+rpart.plot(pruned_tree, roundint = FALSE)
+
+```
+
+``` {r regression-tree-plot, echo=FALSE, warning = FALSE, fig.cap = "Random Forest: Top 10 Predictors of Attitudes towards LGBTI Neighbours in Africa", fig.align='center', fig.width=6, fig.height=4}
+
+# === Step 14: Plot Variable Importance ===
+
+vip::vip(pruned_tree, num_features = 10) +
+  labs(
+    y = "Coefficient Magnitude",
+    x = "Predictor Variables",
+    caption = "Note: Generated using the regression tree model. Variables with higher importance contribute more to the prediction."
+  ) + 
+  theme_classic(base_family = "serif") +
+  theme(
+  axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10),
+  plot.margin = ggplot2::margin(t = 10, r = 10, b = 10, l = 10)
+)
+          
+```
+
+## Random Forest
+
+We finally use a random forest model to predict attitudes towards LGBTI individuals in Africa. The model predicts `LivedPoverty`, `REGION`, and `AGE_COND` which are the Lived Poverty Index, region, and age group respectively. Again, these most important predicters differ from the previous models. By therefore finally estimating the RMSE values for each of the respective models, random forest modelling is the optimal model as it minimises RMSE to `0.968` compared to `0.986` for regression trees and `1.02` for LASSO regression. This suggests that we should use the random forest model to predict attitudes towards LGBTI individuals in Africa as it will have the best accuracy whilst being able to consider the complex relationships. It has the best predictive power whilst akso being robust, despite being harder to interpret.
+
+``` {r random-forest-model, echo=FALSE, warning = FALSE, fig.cap = "Random Forest: Top 10 Predictors of Attitudes towards LGBTI Neighbours in Africa", fig.align='center', fig.width=6, fig.height=4}
+
+# === Random Forest Model ===
+
+# === Step 1: Fit the Random Forest Model ===
+
+# Using the training data, fit the random forest model
+rf_model <- randomForest(
+  Q87C ~ .,             # Model formula (predict Q87C)
+  data = train_data,    # Training data
+  ntree = 1000,         # Number of trees
+  mtry = 4              # Number of variables randomly sampled at each split
+)
+
+# === Step 3: View Variable Importance ===
+invisible(importance(rf_model))    # View variable importance numerically
+
+# Plot variable importance
+vip::vip(rf_model, num_features = 10) +
+  labs(
+    x = "Predictor Variables",
+    y = "Coefficient Magnitude",
+    caption = "Note: Generated using the Random Forest model. Variables with higher importance contribute more to the prediction."
+  ) +
+  theme_classic(base_family = "serif") +
+  theme(
+  axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+  axis.title.y = element_text(size = 10),
+  plot.margin = ggplot2::margin(t = 10, r = 10, b = 10, l = 10)
+)
+
+
+
+# === Step 4: Predict on Test Data ===
+# Assuming 'test_data' is the testing dataset
+pred_rf <- predict(rf_model, newdata = test_data)
+
+```
+
+``` {r rmse-model comparisons, echo=FALSE, warning = FALSE, results='hide'}
+
+# === Model Comparison ===
+
+# Predicting for random forest
+pred_rf <- predict(rf_model, newdata = test_data)
+
+# Calculate RMSE for Random Forest
+rf_rmse <- sqrt(mean((test_data$Q87C - pred_rf)^2))
+
+# Calculate RMSE for LASSO model
+pred_lasso <- predict(final_lasso_model, newx = X_test, s = best_lambda)
+lasso_rmse <- sqrt(mean((y_test - pred_lasso)^2))
+
+# Calculate RMSE for Regression Tree model
+pred_tree <- predict(final_tree_fit, new_data = test_data)$.pred
+tree_rmse <- sqrt(mean((test_data$Q87C - pred_tree)^2))
+
+```
+
+
+
+# Bibliography

@@ -1,0 +1,101 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+author: "Research Design in Comparative Political Science"
+date: "1090063"
+output: pdf_document
+header-includes:
+  - \setlength{\footnotesep}{1em} % Adjusts the spacing between footnotes
+  - \setlength{\skip\footins}{2em} % Adds space between the main text and footnotes
+  - \usepackage{setspace}
+  - \setstretch{1.25} # Change the value to adjust line spacing
+citation_package: biblatex
+csl: harvard-cite-them-right.csl # Replace with your chosen .csl file
+link-citations: true
+bibliography: zotero_library.bib
+---
+
+## Research Question
+
+Advancements in machine learning techniques, particularly transformer models trained to efficiently handle sequential data inputs and outputs, have popularised the field of Artificial Intelligence (AI) [@vaswani2017]. Amongst AI’s applications, generating hyper-realistic textual and visual content has become easily accessible, helping AI become an enabling informational tool. Yet, as unregulated AI technologies remain prone to hallucinations and misuse from bad actors, they are raising concern in social and political contexts [@rawte2023; @duberry2022]. AI can be used to generate manipulative political information and deceitful deepfakes which can be used to incite hate or spread misinformation. Questions are therefore being raised on whether AI-generated content influences voting behaviour and election outcomes such that it poses a threat to the trust and integrity of democratic political institutions [@stockwell2024a]. To better understand these concerns, my MPhil research question asks:
+
+\begin{quote}
+\textit{What are the causal effects of AI-generated news articles on voter attitudes of party and leader competence, issue ownership, and the economy?}
+\end{quote}
+
+This question builds upon the rise of fake news, and fills a distinct gap in the new AI literature. Structural effects of globalisation and economic liberalism, coupled with individual political failings and electoral shocks have created an increasingly unequal and divided world. Consequent disillusionment and disconnected identities have encouraged voter volatility and rising populist narratives, notably in the United Kingdom (UK) [@norris2019; @fieldhouse2019: 28-32]. This environment — coupled with social media — has encouraged the dangerous spread of fake news which has been shown to favour populists, affect voting behaviour, and strengthen identities and affective polarisation within echo chambers [@cantarella2023; @pfister2023; @hobolt2023]. Despite minimal literature on AI in political science, early research suggests AI-generated messages can also be persuasive, and propaganda produced by AI can be compelling [@bai2023; @goldstein2024]. But, when aware of political content being AI-generated, readers become sceptical of its validity even if the content is true [@altay2024]. Given possible scepticism towards veracity, @cashell2024 argues deepfakes are used to perpetuate existing stereotypes rather than attempting to persuade new views. As AI-generated content can be compelling and used to polarise in similar ways to fake news, the volatile political landscape also provides fertile ground for widespread dissemination of deceitful AI-generated information. Therefore, my research hypothesis is that AI-generated content can influence political attitudes. Although not a primary research focus, possible mechanisms include effects on trust in politicians, media, and democratic institutions.
+
+To test this hypothesis, my research investigates whether exposure to AI-generated articles affects political attitudes, and trust more generally. The research focuses on the UK to expand the literature beyond the United States. The dependent variables are conceptually grounded in voting behaviour and valence theory, with consideration given to their operationalisation and measurement validity so results can be reliably used for further research [@adcock2001; @goertz2006; @green2012; @fisher2017]. Consequently, if AI is shown to influence attitudes, it could validate populists using the technology to shape political discourse and threaten institutions, risking democratic backsliding [@haggard2021]. Whilst further DPhil research would address the mechanisms through which AI influences attitudes, and aggregate-level effects on elections, the implications of this research topic would inform how we regulate, highlight, or restrict AI-generated news — whether inaccurate or not.[^1] This essay proceeds to evaluate appropriate research designs and their limitations for answering this research question.
+
+[^1]: Aggregate-level effects of AI on the 2024 UK election were minimal [@simon2024b].
+
+## Research Design
+
+My research aims to identify the direction and size of *effects of causes*. Causal mechanisms of *how* and *why* effects occur is not explicitly within scope, but initial indications may be found. I make the principal argument for a between-subjects laboratory experimental research design by justifying large-N methods, before explaining the value of laboratory experiments for providing strong internal validity, and finally evaluating the limitations of this experimental design.
+
+### Small- vs Large-N Research Designs
+
+To identify valid causal effects, the independent variable(s) must have isolated, exogenous variation that is independent of observed and unobserved confounders to ensure conditional independence. To then estimate causality through counterfactual comparisons, the positivity assumption should hold giving a non-zero probability that the treatment is received [@przeworski2009; @holland1986].[^2] Although @king1994 argue causal effects can be estimated using a unified ‘logic of inference’ across both qualitative and quantitative methods, small-N research design is not appropriate for estimating casual effects of AI-generated news articles on political attitudes. Small-N methods focus on comparing a small number of cases to generalise about the case’s population, but small samples with limited variation encourages Omitted Variable Bias and endogeneity [@brady2010: 197]. Whilst thick case analysis helps explain specific cases, small-N studies often focus on within-case analysis meaning conclusions cannot be postulated to wider populations without questions of selection bias and replicability [@goertz2012: 89]. Alternatively, large-N designs use large, cross-case comparison with experimental or natural randomisation to achieve exogeneity, conditional independence, and positivity [@goertz2012: 102]. A large-N design is therefore most appropriate for my research due to being able to leverage exogenous variation, apply statistical techniques for robust estimates, and isolate moderator variables.
+
+[^2]: Unit homogeneity, Stable Unit Treatment Value Assumption (SUTVA), and no measurement error are implicitly assumed.
+
+### Experiments for Causal Inference
+
+For rigorous causal empiricism, internal validity — achieved through a focused research question and strong identification strategy — is prioritised over generalisation and theoretical development. (Sammi, 2016: 942). In a model of causal inference, units $u$ (e.g., an electorate’s voters) are associated with an outcome response variable $Y \rightarrow Y(u)$, which is affected by a treatment $t$ (e.g., AI-generated news articles) or a non-treatment control $c$ [@holland1986: 945]. The causal effect of $t$ on the unit $U$, relative to the control is:
+
+\begin{equation}
+Y_t(u) - Y_c(u)
+\end{equation}
+
+However, the Fundamental Problem of Causal Inference arises as it ‘is impossible to observe the value of $Y_t (u)$ and $Y_c (u)$ on the same unit' [@holland1986: 947]. A credible theory-led laboratory experiment — instead of simply large-N observations which favour statistical power — is best-suited to solve this problem [@titiunik2015]. Experiments test a causal proposition through random assignment of conditions given to treatment and control groups to allow for counterfactual comparisons, independent of confounding variables [@druckman2011: 4]. In particular, laboratory experiments ensure randomisation and controlled settings to help satisfy the core conditions of causal inference for internally valid results [@druckman2022]. Random assignment of the treatment ensures the cause is isolated and exogenous of any observed or unobserved confounders. Consequently, this exogeneity of the treatment guarantees conditional independence such that the causal effects are unbiased estimates, unaffected by external factors [@holland1986: 948]. Randomisation also ensures unit homogeneity. As unobserved heterogeneity in characteristics are randomly distributed, units are assumed comparable for valid counterfactual analysis [@druckman2022: 29]. However, my research is also interested in understanding which voter characteristics affect susceptibility to effects of AI-generated news. Based on UK literature, valence-based political attitudes are often correlated with views on integrity, leadership, past performance, image, and party management [@green2012]. Therefore, these heterogeneous covariates will be explicitly controlled in my analysis, with additional tests for moderator effects.[^3] Another benefit of randomisation is that all units have a non-zero probability of receiving the treatment, meaning the positivity assumption holds to ensure identifiable, unbiased treatment effects. Moreover, the controlled nature of the experimental design helps satisfy SUTVA. The controlled environment means no interference between participants, so one person’s exposure does not affect another’s outcomes. With these conditions for internally valid results met, causal effects are interpreted as Average Treatment Effects (ATE) [@druckman2022: 30]:
+
+[^3]: Stratified Random Assignment can help ensure heterogeneous characteristics are distributed across groups.
+
+\begin{equation}
+\text{ATE} = \mathbb{E}[Y_t(u) - Y_c(u)]
+\end{equation}
+
+The primary source of internal validity comes from randomisation, a condition difficult to achieve outside of controlled experiments. @angrist2010 argue that observational studies, such as natural experiments, can also exploit randomisation for causal inference. These studies use natural events and phenomena to generate ‘as-good-as-randomly-assigned’ treatments, but still require sophisticated statistical controls for possible confounders meaning exogeneity is not guaranteed. Notwithstanding issues of endogeneity, natural experiments are difficult to identify, and examples are especially localised meaning they have no advantage over laboratory experiments for increasing external validity. In the fake news literature, @cantarella2023 exploit a natural experiment through an instrumental variable of the proportion of Italian-to-German-speaking voters in each municipality to vary exposure to fake news. However, potential confounders of political and news preferences, or cultural differences, may affect consumption of fake news. With potential endogeneity, and SUTVA easily violated from spillover effects between groups, this example shows how a non-laboratory experiment brings multiple challenges for estimating causal effects of AI-generated articles on political attitudes. The final section outlines the cost of external validity and other trade-offs when using laboratory experiments.
+
+### Limitations of Laboratory Experiments
+
+The primary limitations of laboratory experiments are interconnected issues of validity and realism. Firstly, external validity — where cause-effect relationships hold across people, treatments, and scenarios, i.e., does the causal relationship generalise? — is most prominent [@druckman2022: 61]. Due to the laboratory’s artificial environment the ‘causal effect is always local, derived from a particular time, place, and research design’ [@angrist2010: 23]. Whilst this issue is significant for policy-focused studies concerned with effect size, my research prioritises observing the effect direction, making generalisability less critical. Moreover, heterogenous covariates across nations such as political trust and media literacy limit comparisons outside of the UK, especially if these variables have varying moderation and mediation effects altering how individuals interact with AI-generated news. But, to maximise external validity, an Independent and Identically Distributed (IID) sample of UK-based voters will be used. Working with a partner such as YouGov will ensure a representative and accurately weighted sample of the UK, helping generalise results within UK settings [@yougov2025; @aronow2016: 261].[^4] Secondly, a contributing factor to external validity is realism. Mundane realism considers whether the treatment and its setting represent the real world [@druckman2022: 51]. Field experiments representing a randomised study conducted in a real-world setting help solve for the aspirational ecological validity of mundane realism [@gerber2012: 10]. But, field experiments struggle to control and measure complex mechanisms, and the ‘high dimensionality’ of interactions which determine the formation of political attitudes meaning important moderators can be missed [@kocher2016: 954]. Instead, theoretically informed moderators can be included and isolated in an laboratory experiment to test interaction effects, and for use in later mediation analysis of causal mechanisms, giving the possible experiment design:
+
+[^4]: @angrist2010 recommend multiple replicable studies to increase external validity, but this is outside of scope.
+
+\clearpage
+
+```{r Experiment Design, echo=FALSE, results='asis'}
+
+library(knitr)
+library(kableExtra)
+
+# Table data with normal content
+table_data <- data.frame(
+  ` ` = c("Control", "Treatment"),
+  `True Articles` = c("Labeled as AI", "No label"),
+  `False Articles` = c("Labeled as AI", "No label"),
+  check.names = FALSE
+)
+
+# Create the table without using footnote()
+kable(table_data, align = "l", escape = FALSE, caption = "AI-generated News Control vs Treatment conditions.") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  add_header_above(c(" " = 1, "AI-generated News Articles" = 2), escape = FALSE) %>%  # Bold top header
+  row_spec(0, bold = TRUE) %>%  # Bold the "True" and "False" headers
+  column_spec(1, width = "4cm") %>%  # Widen the first column
+  column_spec(2, width = "4cm") %>%  # Widen "True" column
+  column_spec(3, width = "4cm")      # Widen "False" column
+
+# Manually add a LaTeX footnote below the table
+cat("\\begin{flushleft} \\footnotesize Note: Treatment variations to test for interaction effects of veracity, ideological stance, context, and source will be used. \\end{flushleft}")
+```
+
+Furthermore, experimental realism ensures participants authentically engage with the experiment despite the artificial laboratory environment. This predominantly focuses on internal validity affected by spillover effects violating SUTVA, such that treatments should be designed in an engaging and natural format representing how news is consumed [@druckman2022: 52]. Moreover, a between-subjects design to separate groups and avoid interference — whilst avoiding issues of temporal stability and causal transience in a within-subjects design — is used [@holland1986: 948].
+
+This essay has argued that a between-subjects randomised laboratory experiment is the most suitable research design for evaluating causal effects of AI-generated news on political attitudes. Laboratory experiments are shown as the most effective choice over qualitative or natural experiments due to their use of a large-N approach and guaranteed randomisation for strong internal validity despite the possible limitations of external validity and realism.
+
+`Word Count: 1,999`
+
+\newpage
+
+# Bibliography

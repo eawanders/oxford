@@ -1,0 +1,93 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+author: "YouGov Survey Design"
+date: "Edward Anders"
+output: pdf_document
+header-includes:
+  - \setlength{\footnotesep}{1em} % Adjusts the spacing between footnotes
+  - \setlength{\skip\footins}{2em} % Adds space between the main text and footnotes
+  - \usepackage{setspace}
+  - \setstretch{1.25} # Change the value to adjust line spacing
+citation_package: biblatex
+csl: harvard-cite-them-right.csl # Replace with your chosen .csl file
+link-citations: true
+bibliography: zotero_library.bib
+---
+
+## Research Project and Aims
+
+AI is being used to generate manipulative political information and deceitful deepfakes which can be used to incite hate and spread misinformation. Questions are therefore being raised on whether AI-generated content influences voting behaviour and election outcomes such that AI poses a threat to the trust and integrity of democratic political institutions. To better understand these concerns, my MPhil research question asks:
+
+\begin{quote}
+\textit{What are the causal effects of AI-generated news articles on voter attitudes of party and leader competence, issue ownership, and the economy?}
+\end{quote}
+
+My research also seeks to investigate the role AI plays on trust as this is a likely causal mechanism for the effects seen from AI exposure. The research focuses on the UK and aims to help us better understand whether technology can shape political discourse and threaten democratic institutions. This will help inform how we regulate, highlight, or restrict AI-generated news. I aim to investigate these effects through a simple between-subjects laboratory experiment. My experimental design is summarised in *Table 1*:
+
+```{r, echo=FALSE, results='asis'}
+
+library(knitr)
+library(kableExtra)
+
+# Table data with normal content
+table_data <- data.frame(
+  ` ` = c("Control", "Treatment"),
+  `True Articles` = c("Labeled as AI", "No label"),
+  `False Articles` = c("Labeled as AI", "No label"),
+  check.names = FALSE
+)
+
+# Create the table without using footnote()
+kable(table_data, align = "l", escape = FALSE, caption = "AI-generated News Control vs Treatment conditions.") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  add_header_above(c(" " = 1, "AI-generated News Articles" = 2), escape = FALSE) %>%  # Bold top header
+  row_spec(0, bold = TRUE) %>%  # Bold the "True" and "False" headers
+  column_spec(1, width = "4cm") %>%  # Widen the first column
+  column_spec(2, width = "4cm") %>%  # Widen "True" column
+  column_spec(3, width = "4cm")      # Widen "False" column
+
+# Manually add a LaTeX footnote below the table
+cat("\\begin{flushleft} \\footnotesize Note: Treatment variations to test for interaction effects of veracity, ideological stance, context, and source will be used. \\end{flushleft}")
+```
+
+## Draft Survey Questions
+
+These questions will be used to measure the effects of exposure to AI-generated news articles, relative to the control. Questions will be asked pre- and post-exposure to measure changes in attitudes.[^1]
+
+[^1]: An alternative 1-7 Likert Scale can also be used for numerical responses. This has been the case in related AI-based literature, but 0-10 scales are presented below as recommended by YouGov.
+
+## Pre- and post-Exposure Survey Questions
+
+| **No.**   | **Question**                                                                 | **Options**                                                                                           |
+|-----------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **1**     | **Party and Leader Competence**                                              |                                                                                                       |
+| 1.1       | How competent do you believe [Party Name] is at managing the country?         | Numeric scale: 0 (Not at all competent) – 10 (Extremely competent)                                     |
+| 1.2       | How competent do you believe [Party Leader Name] is at leading their party?   | Numeric scale: 0 (Not at all competent) – 10 (Extremely competent)                                                                                   |
+|           |                                                                               |                                                                                                       |
+| **2**     | **Issue Ownership**                                                          |                                                                                                       |
+| 2.1       | Which party do you trust most to handle the following issues? (Economy, etc.) | [Party A], [Party B], [Party C], None, Don’t know *(Multiple-choice for each issue)*                   |
+|           |                                                                               |                                                                                                       |
+| **3**     | **Economic Perception**                                                      |                                                                                                       |
+| 3.1       | How would you rate the current state of the UK economy?                      | Numeric scale: 0 (Very bad) – 10 (Very good)                                                           |
+|           |                                                                               |                                                                                                       |
+| **4**     | **Trust in Media and Democracy**                                             |                                                                                                       |
+| 4.1       | How much do you trust the news media to provide accurate information?        | Numeric scale: 0 (No trust at all) – 10 (Complete trust)                                               |
+| 4.2       | How much trust do you have in how democracy functions in the UK?             | Numeric scale: 0 (No trust at all) – 10 (Complete trust)                                                                                   |
+|           |                                                                               |                                                                                                       |
+| **5**     | **Trust in AI Technologies**                                                |                                                                                                       |
+| 5.1       | How much do you trust AI technologies to provide accurate information?       | Numeric scale: 0 (No trust at all) – 10 (Complete trust)                                               |
+
+
+## Additional Post-Exposure Survey Questions
+
+| **No.**   | **Question**                                                                 | **Options**                                                                                           |
+|-----------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **6**     | **Article Credibility and Influence**                                         |                                                                                                       |
+| 6.1       | How trustworthy did you find the news article you read?                      | Numeric scale: 0 (Not trustworthy at all) – 10 (Extremely trustworthy)                                 |
+| 6.2       | How accurate is the claim in the above headline?                             | Numeric scale: 0 (Certainly false) – 10 (Certainly true)                                               |
+| 6.3       | Has the article changed your opinion on the topic?                           | Yes, positively; Yes, negatively; No change; Don’t know                                                |
+
+| **No.**   | **Question**                                                                 | **Options**                                                                                           |
+|-----------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **7**     | **Perceived Bias in the Article**                                            |                                                                                                       |
+| 7.1       | Do you think the article you read was biased towards or against a political party? | Yes, towards a party; Yes, against a party; No bias; Don’t know  |

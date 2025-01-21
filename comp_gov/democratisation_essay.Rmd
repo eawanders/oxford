@@ -1,0 +1,87 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "18-11-1997"
+output: pdf_document
+zotero: true
+link-citations: true
+csl: harvard-cite-them-right.csl
+bibliography: references.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}  # Adjust the number for desired line spacing
+---
+
+## How useful is the metaphor of “waves” for understanding processes of democratisation and democratic breakdown?
+
+Democratisation and democratic breakdowns have been central political themes of the past two centuries. Global regime changes often appear interconnected, temporal, and parallel, leading Huntington (1993) to characterise them as "waves" of democratisation. This essay aims to evaluate the usefulness of this wave metaphor in understanding the processes of regime change. For Huntington's characterisation to be an effective metaphor, oscillating waves of change must be observed and then used to explain and predict regime change. The two necessary conditions therefore follow.
+
+(a) waves of regime change must be clearly observable, interconnected and cyclical in order to draw causal inferences and identify predicable processes, and
+
+(b) waves of regime change are themselves the casual mechanism through which the spread of democratisation and democratic breakdown occurs.
+
+After outlining key concepts and definitions, this essay evaluates each of the above hypotheses in turn. Firstly, I argue that waves inaccurately describe regime change. Issues in classifying, conceptualising, and measuring regime transitions mean waves are easily misrepresented and appear arbitrary. Secondly, I demonstrate that the underlying mechanism of regime change through waves - transnationalism and diffusion - fails to fully explain processes of regime transition. Consequently, I make the principle argument that the metaphor of waves is *not* useful for understanding the processes of democratisation nor democratic breakdowns. Instead, I propose an alternative "domino effect" metaphor to better explain how regime changes, with enough momentum can catalyse further change elsewhere when conditions are right.
+
+### Definitions & Concepts
+
+For clarity and consistency, I start by highlighting the key concepts of democratisation, democratic breakdown, and waves. Whilst contested ideas of democracy persist - an issue I revisit later - Schumpeter (1942) defines *democratic method* as ‘an institutional arrangement for arriving at political decisions in which individuals acquire the power to decide’ is widely used. Dahl (1971) expands on Schumpeter's conceptualisation by defining democratisation through two dimensions: state-provided *contestation* and citizens' right to *participation*. Dahl (1998) further argues that democratisation develops as the state ensures effective participation, voting equality, enlightened understanding, control of the agenda, and adult inclusion.
+
+Democratic breakdown (or backsliding) is the deterioration of democratic governance, often conducted by autocrats who undermine and erode institutional power (Haggard and Kaufman, 2021; Little and Meng, 2024). Huntington (1993) describes waves of democratisation and democratic breakdown as groups of regime transitions ‘that occur within a specified period of time and that significantly outnumber transitions in the opposite direction during that period.’ With these definitions, I next demonstrate that grouping regime changes through the metaphor of waves is not useful for understanding regime transitions.
+
+### Identifying Waves
+
+Huntington’s (1993) seminal work defines three distinct waves of democratisation, as well as two waves of democratic breakdown based on whether countries move towards or away from electoral contestation and participation. For example, Latin America saw significant advancements towards democratisation during and after WWII, before near unanimous regime reversals back to authoritarianism in the 1960s. These Latin American regime changes provide a *prima facie* substantiation of Huntington’s metaphor of waves by demonstrating their interconnected, cyclical behaviour. Yet, two rebuttals to the identification of waves need exploring.
+
+The first criticism is the arbitrary definition of when a wave starts and ends. Schmitter (1993) challenges the 100-year span of Huntington’s first wave of democratisation, arguing there is no clear link between countries democratising in the 18th and 19th centuries, and that two separate waves would be more appropriate. This exposes a key flaw in using waves as a metaphor: if waves are not distinct, interconnected, and cyclical, they fail to enhance our understanding of regime change. To provide isolated analysis of a wave’s effect and explain *how* and *why* regimes democratise or centralise, an accurate categorisation of waves is crucial. Instead, using arbitrarily defined waves introduces specification bias, undermining our understanding of processes of democratisation and democratic breakdown.
+
+The second, and more damning, argument against the accurate identification of waves is that scholars struggle to agreeably define, classify, or conceptualise the process of democratisation and its breakdown, resulting in significant measurement errors when waves are used to explain processes of regime change. Coppedge et al. (2011) argue that there is no singular, strong concept of democracy, with both Dahl (1971) and Haggard and Kaufman (2021) highlighting that transitions towards and away from democratisation are often staggered. Consequently, measuring regime change inevitably varies by country, depending on pre-existing levels of democratisation, and the inclusiveness of the definition of democracy used. The latter is especially problematic. With the lack of universal indicators for when democratisation occurs, Huntington’s use of a dichotomous measure of democratisation, rather than a continuous one, is flawed as each regime’s process, stage and rate of democratisation differs (Doorenspleet, 2000). An understanding of these differences in how regimes democratise or breakdown is now lost. It is either a democracy at $t_i$ or it is not, which is not what is observed in reality. Moreover, by re-assessing Huntington’s measurement error of regime change, Doorenspleet (2000) finds that the proposed oscillation of democratisation does not actually occur. In fact, the second reverse wave did not occur and is better characterised as a plateau, casting further doubt on the usefulness of the waves metaphor. Whilst some oscillation between democratisation and centralisation provides limited support for the metaphor, the inherent measurement errors weaken its explanatory power.
+
+### Using Waves to Explain Regime Change
+
+For waves to be a useful metaphor for understanding processes of democratisation and democratic breakdown, the wave itself should act as the causal mechanism explaining further regime change. Markoff (1996) describes this causal mechanism to be one of ‘transnationalism’ and ‘diffusion’, caused at the high level through political and social movements which cross national boundaries. Transnational impulses of intellectual exchange often occur from hegemonic shocks that travel like a wave from one country to the next (Gunitsky, 2014; Capoccia and Ziblatt, 2010). Brinks and Coppedge (2006) found “strong support for a pattern of diffusion in which countries tend to become more like their immediate geographic neighbors over time’, and the fall of communist regimes across East Germany, Poland, Czechoslovakia, Hungary, Romania and Bulgaria in 1989 were clear examples of this diffusion taking place. Political movements used the availability and representativeness heuristics formed by the Soviet collapse to make bold changes, helping explain how the wave of regime change had its own causal effect (Markoff, 2015; Weyland, 2014).
+
+However, such a ‘cause and effect’ argument is hard to make as isolating solely the transitional diffusion effects is complex. Instead, despite acknowledging international ‘norms and narratives’ affecting regime change through diffusion, Riaz and Rana (2024) identify how ‘multiple causes trigger multiple streams and mechanisms which might sometimes overlap’. Many of these competing variables come from structural vulnerabilities, political manipulation and polarisation (Linz, 1978; Przeworski, 2019). For example, Ansell and Samuels (2014) argue much of historical democratisation came from struggles of elites to remove authoritarian actors who threaten to redistribute wealth and patronage. This, along with multiple other competing inputs shows how there are too many simultaneous contributing factors which cause regimes to democratise or breakdown for us to concretely determine the effects of the spread of change itself. Without such deterministic value, waves cannot be a useful metaphor for improving our understanding of democratisation and democratic breakdown.
+
+### The metaphor of the “domino effect”
+
+I have argued that weak definitions of democracy cause misspecification and measurement error in identifying waves of regime change, and shown that waves cannot identifiably explain *why* and *how* a country’s political and governance structures shift. As a result “waves” do *not* offer much useful help in understanding the process of democratisation and democratic breakdown. This somewhat inevitable conclusion is also arrived at by Schmitter (1993) who notes that it would be wrong to assume much interrelation between regime changes many decades apart and across continents. The shortcomings of the waves metaphor means we have a weaker explanation of regime change than thought. Therefore a final contribution is a brief proposal of a more suitable metaphor of a *domino effect* for understanding democratisation and its breakdown. With a domino effect, the initial fall of a domino (the change of one regime), will hit into the next nearby domino and knock it over (create momentum to bring the next regime with it). The next domino will only fall if the first has enough power (i.e., a large enough hegemonic shock) and the domino being hit is free to move (e.g., pre-existing political movement and malleable institutions). With this metaphor, the hegemonic shock of changing regimes is independent in space and time to another regime, but under the right conditions the shock can spread and have impact on vulnerable neighbours elsewhere, providing a clearer metaphor of the processes of why and how polities democratise and breakdown.
+
+## Bibliography
+
+Ansell, B.W. and Samuels, D.J. (2014) *Inequality and Democratization: An Elite-Competition Approach*, Cambridge: Cambridge University Press.
+
+Brinks, D. and Coppedge, M. (2006) ‘Diffusion Is No Illusion: Neighbor Emulation in the Third Wave of Democracy’, *Comparative Political Studies*, 39 (4), pp. 463–489.
+
+Capoccia, G. and Ziblatt, D. (2010) ‘The Historical Turn in Democratization Studies: A New Research Agenda for Europe and Beyond’, *Comparative Political Studies*, 43 (8–9), pp. 931–968.
+
+Coppedge, M. et al. (2011) ‘Conceptualizing and Measuring Democracy: A New Approach’, *Perspectives on Politics*, 9 (2), pp. 247–267.
+
+Dahl, R. (1971) *Polyarchy: participation and opposition*. New Haven: Yale University Press.
+
+Dahl, R. (1998) *On Democracy*. New Haven: Yale University Press.
+
+Doorenspleet, R. (2000) ‘Reassessing the Three Waves of Democratization’, *World Politics*, 52 (3), pp. 384–406.
+
+Gunitsky, S. (2014) ‘From Shocks to Waves: Hegemonic Transitions and Democratization in the Twentieth Century’, *International Organization*, 68 (3), pp. 561–597.
+
+Haggard, S. and Kaufman, R. (2021) ‘Backsliding: Democratic Regress in the Contemporary World’, *Elements in Political Economy* [Preprint].
+
+Huntington, S.P. (1993) *The Third Wave: Democratization in the Late Twentieth Century*, London: University of Oklahoma Press.
+
+Linz, J.J. (1978) *The Breakdown of Democratic Regimes*. Baltimore: Johns Hopkins University Press.
+
+Little, A.T. and Meng, A. (2024) ‘Measuring Democratic Backsliding’, *Political Science & Politics*, 57 (2), pp. 149–161.
+
+Markoff, J. (2015) *Waves of Democracy: Social Movements and Political Change*, Second Edition, Routledge.
+
+Markoff, John. (1996) *Waves of Democracy: Social Movements and Political Change*, Thousand Oaks: Sage.
+
+Przeworski, A. (2019) *Crises of Democracy*, 1st Edition, Cambridge: Cambridge University Press.
+
+Riaz, A. and Rana, M.S. (2024) *How Autocrats Rise: Sequences of Democratic Backsliding*, Singapore: Springer Nature.
+
+Schmitter, P.C. (1993) ‘Democracy’s Third Wave’, *The Review of Politics*, 55 (2), pp. 348–351.
+
+Schumpeter, J. A. (1947) *Capitalism, Socialism, and Democracy*. New York: Harper.
+
+Weyland, K. (2014) *Making Waves: Democratic Contention in Europe and Latin America since the Revolutions of 1848*, Cambridge: Cambridge University Press.

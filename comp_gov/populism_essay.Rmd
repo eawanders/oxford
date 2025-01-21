@@ -1,0 +1,63 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "25-11-2024"
+output: pdf_document
+zotero: true
+link-citations: true
+csl: harvard-cite-them-right.csl
+bibliography: references.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}  # Adjust the number for desired line spacing
+---
+
+## Any explanation for populism must consider the agency of politicians from mainstream political parties.
+
+The rise of populism has become a significant threat to democracy. Populism is itself an eroded form of democracy that criticises the state of the world under mainstream elected parties (Müller, 2016). But are these parties - particularly incumbents - and the agency of their politicians, entirely responsible for the rise of populist challengers? For brevity, I do not address the growth of populism’s electoral success, nor case-specific causes. Arguments of party competition, electoral permissiveness, and charismatic linkages are therefore excluded. To capture all cases, I use a minimalist definition of populism where ‘populists are critical of elites … are always antipluralist … [and] represent the people’ through rhetoric claiming their general will (Müller, 2016; Roberts, 2017; Mudde, 2017; Norris and Inglehart, 2019). Consequently, this essay examines the causes of populism by categorising *all* central causes into structural and political failures. Firstly, I show how explanations of growing economic inequality and lost socio-cultural identity can be explained by structural factors of globalisation, economic liberalism, and international integration. While these structural changes are seemingly exogenous of political agency, it is argued that they in fact stem from voluntarist political failure. Politicians have mismanaged globalisation and integration, contributing to alienated voters and increased inequality. Secondly, self-serving, corrupt and incompetent mainstream parties have failed to meet democratic expectations through decisions of their own agency. This betrayal by mainstream parties of their elected mandate results in a disenfranchised, untrusting and angry electorate seeking a populist alternative. Therefore, this essay’s central argument is that *all* structural and political causes of populism ultimately originate from the misused agency of mainstream politicians.
+
+### The Structural Case for Populism
+
+Arguments for ‘*why* *populism*’ can be divided into structural and political causes. From a structuralist perspective, I argue populist sentiments of lost social identity, economic abandonment, and political powerlessness arise from poor governance by mainstream parties in response to global and economic changes. Globalisation, economic liberalism and integration have driven the structuralist case, felt both economically and socio-culturally (Cox, 2017). Global neoliberal policies favouring firms and flexible labour markets, have resulted in low productivity, stagnant wages and growth (Montier and Pilkington, 2017). The medium-term structural changes to division of labour, trade liberalisation and technology in a post-industrial era have led to outsourcing jobs and manufacturing, unemployment, and industrial decline, causing inequality and middle-class stagnation (Norris and Inglehart, 2019; Berman, 2021). This leaves many workers feeling economically left behind, seemingly to the result of structural developments of profit-maximising firms rather than political agency. Neoliberalism has fragmented Durkheim’s (1893) “mass society,” which has become a ‘splintered and atomized workforce without powerful unions to reinforce a new sense of class identity’ (Hawkins et al., 2017). Increased immigration under a structurally open society is linked to disconnected identities, weakening social bonds, declining traditional values and a normlessness society without community, described as *anomie* (Durkheim, 1893; Berman, 2021). These structural shifts - and the resulting conditions for populism’s rise - may be out of the control of politicians of mainstream parties. Converging economic crises and security threats, along with mass communication activates populist responses from a society feeling politically powerless socially disconnected (Brubaker, 2017).
+
+These economic and socio-cultural structural arguments for populism assume that shifts in society driven by globalisation occur autonomously. However, I argue that global neoliberal shifts, and the outcomes that follow, are *not* independent of agency of politicians from mainstream political parties. Regardless of normative judgement, political actors have directly accelerated globalisation and neoliberalism. For instance, Margaret Thatcher’s privatisations and weakening of trade unions, followed by Tony Blair’s promotion of an open, global UK supporting EU integration and immigration, directly increased both inequality and immigration. Even if globalisation is a natural catalyst to economic and social disillusionment, political inaction from mainstream parties to address the negative effects of a more open, globalised and economically liberal world has played a significant role in populism’s rise. In other words, populism is not a direct consequence of a globalised, open, liberal world but of political failures to provide guidance, connection, and resources to those left behind. As industries decline and workers are displaced, the agency of political actors can provide re-skilling. As borders are opened, clearer immigration policies can be introduced. As wealth accumulates, it can be redistributed through the welfare state. Many of these actions have been broadly neglected, suggesting the causal mechanism of populism rises from mainstream political parties failing to mitigate the economic and socio-cultural implications, not as a response to structural globalisation.
+
+### The Political Case for Populism
+
+Not only have politicians mismanaged globalisation and integration, they have alienated the electorate through weak governance, corruption and incompetence. As highlighted by Hawkins et al. (2017), ‘populism is a response to long-term problems of weak democratic governance, especially corruption.’ Corruption often arises when mainstream parties operate as cartels, using their power to centralise control and distribute state resources through quid pro quo arrangements (Roberts, 2017). These tactics are particularly common in agricultural sectors. For example, the EU’s Common Agricultural Policy funds are disproportionately shared by leaders to wealthy landowners via self-serving clientelistic linkages who exchange electoral support in return. However,When voters observe such practices, their trust erodes, driving them toward anti-establishment alternatives. Additionally, elected mainstream parties often fail to deliver on their policy promises. As shown with the economic grievances of unsolved inequality, voters view incumbents as incompetent, and confidence in their abilities is quickly lost. Politicians are often excellent communicators and campaigners, but lack governing experience. Usually without expertise, and faced with the complexity of global governance, mainstream politicians are quickly exposed for their incompetence. Consequently, politicians seek aid of unelected technocrats who only fuel public anger towards elites. The accountability of mainstream politicians is under greater scrutiny when they provide little response or representation to policy preferences of voters. This failure of agency to move to voter preferences is a failure of programmatic linkages (Kitschelt, 2000; Roberts, 2017). Instead, according to Downsian rational choice theory, when parties lack insight into the median voter’s preferences, they default to the views of their unrepresentative membership (Lindvall et al., 2023). This leaves many voters feeling unrepresented, pushing them towards populist alternatives which, as with corruption and incompetence, is a direct result of the agency and decisions of mainstream politicians.
+
+These arguments assume that politicians have the decision-making agency to set policy, respond to crises, and position themselves strategically. Rational choice theorists would agree that all political decisions are made with vote-, office-, or policy-seeking motivations (Strom, 1990). However, acknowledging bounded rationality, it may be more realistic to recognise that decisions are often made with incomplete information and limited understanding of outcomes, leading to satisficing and imperfect choices. Some may argue that bounded rationality would therefore remove full agency of politicians of mainstream parties as their actions are constrained by their environment, making populist outcomes not solely their responsibility. Yet, decisions of politicians remain intentional despite their environment’s limitations. Even under uncertainty, elected officials retain accountability and must be presumed to act with agency, thus rebutting the argument that bounded rationality removes political agency.
+
+### Responding to Populism
+
+This essay has presented two key arguments: structural causes of populism stem from decisions made by mainstream politicians, and political factors of corruption and incompetence also arise from the discretion of decision making. As a result, it is concluded that any explanation for populism - either structural or political - must attribute agency to politicians from mainstream political parties. This provides a sobering reality for mainstream politicians: they are the architects of their own challengers. These politicians must therefore be mindful of how they attempt to overcome populist challengers. Abou-Chadi and Krause (2020) have shown mainstream parties often respond to populists by adopting policy positions similar to radical-right populists, which risks amplifying populism rather than mitigating it. While this strategy may secure votes, it also fuels divisive, simplistic politics that could accelerate democratic backsliding and erode trust in political systems
+
+## References
+
+Abou-Chadi, T. and Krause, W. (2020) ‘The Causal Effect of Radical Right Success on Mainstream Parties’ Policy Positions: A Regression Discontinuity Approach’, *British Journal of Political Science*, 50(3), pp. 829–847.
+
+Berman, S. (2021) ‘The Causes of Populism in the West’, *Annual Review of Political Science*, 24, pp. 71–88.
+
+Brubaker, R. (2017) ‘Why populism?’, *Theory and Society*, 46(5), pp. 357–385.
+
+Cox, M. (2017) ‘The Rise of Populism and the Crisis of Globalisation: Brexit, Trump and Beyond’, *Irish Studies in International Affairs*, 28, pp. 9–17.
+
+Durkheim, É. (1997) *The Division of Labor in Society*. New York: The Free Press.
+
+Hawkins, K., Read, M. and Pauwels, T. (2017) ‘Populism and Its Causes’, in C.R. Kaltwasser et al. (eds) *The Oxford Handbook of Populism*. Oxford: Oxford University Press.
+
+Kitschelt, H. (2000) ‘Linkages between Citizens and Politicians in Democratic Polities’, *Comparative Political Studies*, 33(6–7), pp. 845–879.
+
+Lindvall, J., Rueda, D. and Zhai, H. (2023) ‘When Parties Move to the Middle: The Role of Uncertainty’, *British Journal of Political Science*, 53(4), pp. 1208–1229.
+
+Montier, J. and Pilkington, P. (2017) ‘The Deep Causes of Secular Stagnation and the Rise of Populism’, *Advisors Perspectives* [Preprint].
+
+Müller, J.-W. (2016) *What Is Populism?* University of Pennsylvania Press.
+
+Mudde, C. (2017) ‘Populism: An Ideational Approach’, in C.R. Kaltwasser et al. (eds) *The Oxford Handbook of Populism*. Oxford: Oxford University Press.
+
+Norris, P. and Inglehart, R. (2019) *Cultural Backlash: Trump, Brexit, and Authoritarian Populism*. Cambridge: Cambridge University Press.
+
+Roberts, K.M. (2017) ‘Populism and Political Parties’, in C.R. Kaltwasser et al. (eds) *The Oxford Handbook of Populism*. Oxford: Oxford University Press.
+
+Strom, K. (1990) ‘A Behavioral Theory of Competitive Political Parties’, *American Journal of Political Science*, 34(2), pp. 565–598.

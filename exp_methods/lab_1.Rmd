@@ -1,0 +1,105 @@
+---
+title: "Experimental Design - Lab 1"
+author: "Edward Anders"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r data, include=FALSE}
+
+
+lab_one_data <- read.csv("young19.csv")
+summary(lab_one_data)
+head(lab_one_data)
+glimpse(lab_one_data) # This is a good use of the tidyverse package
+
+
+```
+
+```{r setup, echo=FALSE}
+
+# Load the necessary packages.
+# Install pacman if not already installed
+if (!require("pacman")) install.packages("pacman")
+
+# Load and install required packages using pacman for efficient package management
+pacman::p_load(tidyverse)
+
+```
+
+```{r data-of-interest, echo=FALSE}
+
+# Generate a cross-tabulation of the variables of interest
+
+cross_tab <- table(lab_one_data$female)
+
+# Generate a proportion table of the variables of interest
+
+prop_table <- prop.table(cross_tab)
+
+# Summary statistics for the variables of interest
+# Using tidyverse methods
+
+lab_one_data %>%
+  group_by(treat_assign) %>%
+  summarise(mean_age = mean (age, na.rm = TRUE),
+            sd_age = sd(age, na.rm = TRUE),
+            min_age = min(age, na.rm = TRUE),
+            max_age = max(age, na.rm = TRUE))
+
+lab_one_data %>%
+  group_by(female) %>%
+  summarise(mean_age = mean (age, na.rm = TRUE),
+            sd_age = sd(age, na.rm = TRUE),
+            min_age = min(age, na.rm = TRUE),
+            max_age = max(age, na.rm = TRUE))
+
+```
+
+```{r tibble, echo=FALSE}
+
+# Use a tibble which is a type of data frame
+  # Fundamental data structure in the tidyverse
+
+lab_one_data_tibble 
+
+```
+
+```{r testing-covariates, echo=FALSE}
+
+# We want to test for whether the control group and the treatment group are different
+# Testing for randomisation looks at whether there is a meaningful difference between groups
+
+# We can use a t-test when we have continuous data
+# We can use a chi-squared test when we have categorical data
+# When we have many covariates we can do multivariate regression (there is a better method for this that is looked at in the third lab)
+# You take the treatment as the outcome and the covariates as the predictors to see whether each predicts the treatment
+
+```
+
+```{r experimental-design, echo=FALSE}
+
+# Outcome measures are index of propensity to dissent and behavioural measures of selected poltiical wristband
+
+# We want to measure the Average Treatment Effect (ATE)
+
+# T0 = baseline; describe a relaxing scenario (leisure activities)
+# T1 = treatment; describe fears around politics and elections
+# T2 = treatment; describe general fears (e.g., snakes)
+
+class(lab_one_data$treat_assign)
+
+# Regress dissent hypothetical behaviour on the treatment conditions
+
+treatmeant_1 <- lm(formula = prob_act_st ~ treat_assign, data = lab_one_data)
+summary(treatmeant_1)
+
+# The intercept gives the mean of the control group
+# The coefficient gives the difference between the treatment and control group
+
+treatmeant_2 <- lm(prob_act_st ~ treat_assign, data = lab_one_data)
+summary(treatmeant_2)
+
+
+
+```
