@@ -9,9 +9,9 @@ header-includes:
   - \usepackage{setspace}
   - \setstretch{1.25} # Change the value to adjust line spacing
 citation_package: biblatex
-csl: harvard-cite-them-right.csl # Replace with your chosen .csl file
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
 link-citations: true
-bibliography: zotero_library.bib
 ---
 
 ## Research Project and Aims
