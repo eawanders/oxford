@@ -270,22 +270,23 @@ View the first 6 rows of this data. What is the unit of observation?
 
 ```{r}
 
-setwd("")
+setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/Week 1")
 data <- read.csv("fishdata.csv")
+# view(data)
 
-# head(f)
+head(data)
 
 # What about glimpse?
 
-# glimpse(f)
+glimpse(data)
 
 # What about str?
 
-# str(f)
+str(data)
 
 # What about view?
 
-# view(f)
+# view(data)
 
 ```
 
@@ -299,6 +300,8 @@ _Taking subsets and summarizing variables_
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+sum(data$MUSLIM)
+table(data$MUSLIM)
 
 ```
 
@@ -316,6 +319,8 @@ What if countries were in the dataset >1 times?
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+length((unique(data$COUNTRY, data$MUSLIM == 1)))
+
 
 ```
 
@@ -325,6 +330,7 @@ What if countries were in the dataset >1 times?
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+sum(data$MUSLIM)/length(data$MUSLIM)
 
 ```
 
@@ -334,6 +340,7 @@ What if countries were in the dataset >1 times?
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+length(data$GDP90LGN[data$GDP90LGN > 3.0])
 
 ```
 
@@ -343,6 +350,9 @@ What if countries were in the dataset >1 times?
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+length(data$MUSLIM[data$MUSLIM == 1 & data$BRITCOL == 1])
+# length works here as each row is a unique country
+# No comma needed as we are only looking at one column
 
 ```
 
@@ -352,6 +362,8 @@ What if countries were in the dataset >1 times?
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+length(data$GRW7598P[data$GRW7598P > 0.6 | data$GDP90LGN > 2.5])
+# | is the 'or' operator
 
 ```
 
@@ -362,6 +374,8 @@ What if countries were in the dataset >1 times?
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+data_muslim_opec <- data[data$MUSLIM == 1 & data$OPEC == 1, ]
+# When you need to analyse multiple rows and columns you need to include the comma after the condition
 
 ```
 
@@ -374,7 +388,13 @@ What is the difference in mean Freedom House score between Muslim and Non-Muslim
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+mean(data$FHREVERS[data$MUSLIM == 1]) - mean(data$FHREVERS[data$MUSLIM == 0]) # This is the estimated average treatment effect
 
+# Using the tidyverse
+means <- data %>%
+  group_by(MUSLIM) %>%
+  summarise(mean_FHREVERS = mean(FHREVERS))
+means
 
 ```
 
@@ -388,6 +408,8 @@ Conduct a t-test for the difference in means calculated above using the `t.test(
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+# Null hypothesis is that there is no difference in means between Muslim and non-Muslim countries
+t.test(data$FHREVERS[data$MUSLIM == 1], data$FHREVERS[data$MUSLIM == 0])
 
 ```
 
@@ -398,6 +420,16 @@ Conduct the t-test again, this time coding it by hand. Confirm that your answer 
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+# Calculating the t-statistic by hand
+mean1 <- mean(data$FHREVERS[data$MUSLIM == 1])
+mean0 <- mean(data$FHREVERS[data$MUSLIM == 0])
+n1 <- length(data$FHREVERS[data$MUSLIM == 1])
+n0 <- length(data$FHREVERS[data$MUSLIM == 0])
+sd1 <- sd(data$FHREVERS[data$MUSLIM == 1])
+sd0 <- sd(data$FHREVERS[data$MUSLIM == 0])
+
+t_stat <- (mean1 - mean0) / sqrt((sd1^2/n1) + (sd0^2/n0))
+t_stat
 
 ```
 
@@ -408,6 +440,7 @@ Calculate:
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+length(data$MUSLIM[data$MUSLIM == 1 & data$BRITCOL == 1])/length(data$MUSLIM[data$MUSLIM == 1])
 
 ```
 
@@ -417,6 +450,7 @@ Calculate:
 
 # WHERE CODE DREAMS COME TRUE
 
+
 ```
 (Note that steps 1 and 2 are akin to measuring the correlation between being a Muslim country and being a former British colony. We do it this way because a correlation coefficient is defined only for two continous variables, and these are both binary.)
 
@@ -425,6 +459,8 @@ Calculate:
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+summary(lm(FHREVERS ~ BRITCOL + MUSLIM, data = data))
+summary(lm(FHREVERS ~ MUSLIM, data = data))
 
 ```
 
@@ -438,12 +474,19 @@ Repeat task 2.6 for `OPEC`, `GRW7598P` and `GDP90LGN`. For `GRW7598P` and `GDP90
 
 ```{r}
 # OPEC
-  
-  
+length(data$MUSLIM[data$MUSLIM == 1 & data$OPEC == 1])/sum(data$MUSLIM) # Percentage of Muslim countries that are OPEC members  
+length(data$MUSLIM[data$MUSLIM == 0 & data$OPEC == 1])/ length(data$MUSLIM) - sum(data$MUSLIM) # Percentage of non-Muslim countries that are OPEC members
+
+summary (lm(FHREVERS ~ OPEC + MUSLIM, data = data)) # Correlation between being an OPEC member and Freedom House score, controlling for being Muslim
+
+
 # GRW7598P
- 
+cor(data$GRW7598P, data$MUSLIM) # Correlation between average annual economic growth and being Muslim
+summary(lm(FHREVERS ~ GRW7598P + MUSLIM, data = data)) # Correlation between average annual economic growth and Freedom House score, controlling for being Muslim
   
 # GDP90LGN
+cor(data$GDP90LGN, data$MUSLIM) # Correlation between GDP in 1990 and being Muslim
+summary(lm(FHREVERS ~ GDP90LGN + MUSLIM, data = data)) # Correlation between GDP in 1990 and Freedom House score, controlling for being Muslim # nolint
  
 ```
 
@@ -453,6 +496,7 @@ Now estimate a regression of `FHREVRERS` on `MUSLIM`, `BRITCOL`, `OPEC` and `GRW
 ```{r}
 
 # WHERE CODE DREAMS COME TRUE
+summary(lm(FHREVERS ~ MUSLIM + BRITCOL + OPEC + GRW7598P,  data = data))
 
 ```
 
