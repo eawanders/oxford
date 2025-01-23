@@ -1,0 +1,458 @@
+---
+title: "Week 1: Introduction to Causal Inference"
+date: HT 2025
+author: Replace with your name
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+
+## Let's get started! 
+## Uncomment lines as needed:
+
+## Clear working environment:
+#rm(list=ls()) 
+
+## Set global options for code chunks:
+#knitr::opts_chunk$set(cache = TRUE, warning = FALSE, message = FALSE, echo = TRUE) 
+
+## The following lines use pacman to check and install all packages needed 
+## + also load them into our environment:
+# install.packages("pacman") 
+library(pacman) 
+## Load (and install) packages needed for the analyses
+pacman::p_load(tidyverse,  # Cleaning data, plotting plots
+               ggalt,      # For dumbbell plots
+               reshape2,   # Wrangling datasets
+               rstudioapi, # Setting WD to file path
+                knitr,     # For including images
+                lintr)     # For linting
+
+
+```
+
+# Introduction
+
+## Causality
+
+* This week's lecture delved into the concepts of causality and the potential outcomes framework. It discussed causality as the relationship between two sets of events: one (the effects) being a direct consequence of the other (the causes). 
+
+* Our discussion then shifted to the logic of counterfactuals, framed in the context of "If X had or had not occurred, Y would or would not have ensued." This highlights that constructing counterfactuals is essential for making valid causal claims.
+
+* Another key point we covered was the issue of omitted variable bias, which can occur even when some covariates are controlled for. This bias arises from our inability to control for confounders when we lack data on them.
+
+
+## Potential Outcomes
+
+* We also took an in-depth look at the Potential Outcomes Framework. Central to our discussion was *The Fundamental Problem of Causal Inference*, which describes the impossibility of observing different treatment outcomes for the same unit simultaneously. 
+
+* We further examined various estimands, including the average treatment effect (ATE) and the average treatment effect on the treated (ATT).
+
+* The lecture also addressed selection bias, specifically relating to the pre-treatment differences in outcomes between treated and control groups.
+
+* For this week’s practical session, we will revisit some of the core principles of the “potential outcomes” framework and introduce basic applications using R.  
+
+
+**Before we proceed further:**
+
+1. Create a folder called `lab1`.
+
+2.  Download the data and the empty RMarkdown file (both available on Canvas).
+
+3.  Save both in this `lab1` folder.
+
+4.  Open the Rmd file.
+
+5.  Set `lab1` as the working directory using the `setwd()` function or by clicking on \"More\".  
+
+# R Markdown Refresher
+
+If you are struggling to remember how R works since the last time you used it (which is reasonable: coding is like foreign language acquisition, if you don’t use it you lose it), then you might want to check out chapters 1-4 of [this R refresher](https://bookdown.org/ripberjt/labbook/introduction-to-r-rstudio-and-r-markdown.html). More resources are provided in this week's worksheet.  
+
+`Markdown` is a tool for converting plain text into formatted text. `R Markdown` utilizes the markdown syntax in order to combine formatted text with code in a single document.
+
+Within RStudio, R Markdown is a specific type of file format for making dynamic documents. It allows you to simultaneously
+
+1. save and execute code, and 
+2. produce high quality documents that include both code and text
+
+For the purposes of our labs, R Markdown allows us to include code chunks and the text that helps explain them in an easy-to-read manner. You will use R Markdown to write your assignments and the final exam, so it's important that you feel comfortable using the software. 
+
+### Headers
+
+Section headers by using a `#`, for example, `# Section`. Under each of these, you can create subsections, like `## Subheader`, or sub-sub sections, like `### Sub-sub header`. 
+
+### Emphasis
+
+You can add emphasis by making text **bold** or _italic_. To bold text, add two asterisks or underscores before and after a word or phrase. To bold the middle of a word for emphasis, add two asterisks without spaces around the letters. Typing `I just love **bold text**` will produce: I just love **bold text**. To italicize text, add one asterisk or underscore before and after a word or phrase. To italicize the middle of a word for emphasis, add one asterisk without spaces around the letters: `*italicized text*` shows up as *italicized text* in your output file.
+
+To emphasize text with bold and italics at the same time, add three asterisks or underscores before and after a word or phrase. To bold and italicize the middle of a word for emphasis, add three asterisks without spaces around the letters. If you want to say something `***really important***`, it'll show up as ***really important***! 
+
+### Basic blockquotes
+
+`>` To create a blockquote, add a `>` in front of a paragraph like we did here:
+
+> I added the > at the beginning of this paragraph, and got a blockquote :) 
+
+### Multi-paragraph Blockquotes
+
+> The rubber duck, with a sparkle in its eye and a causal inference textbook twice its size, was ready to dive into a world where 'cause' and 'effect' were more than just words in a dictionary.
+>
+> It wasn't the brightest bulb in the chandelier, often confusing correlation with causation, but its enthusiasm could light up the entire department. 
+ 
+### Figures
+
+**Insert an image**
+
+In a new line, type `![Caption for the image](path/to/image.png)`. You can also use `knitr::include_graphics()` within a code chunk, for example:
+
+```{r inserting, echo=TRUE, fig.align="center", fig.cap="A rubber duck doing statistics for me", out.width = '50%'}
+knitr::include_graphics("figures/rubber_duck_doing_stats.png")
+```
+
+
+**Insert a figure from data**
+
+You can also include figures directly from analysis done within code chunks: 
+
+```{r this-is-a-chunk-label, echo=T, fig.align="center", out.width="100%"}
+
+# Data
+i <- c(1:4)
+Y_i <- c(88, 93, 70, 65)
+D_i <- c(1, 1, 0, 0)
+Y1_i <- c(88, 93, 67, 65)
+Y0_i <- c(91, 98, 70, 65)
+
+# Create a data frame
+data <- data.frame(i, Y_i, D_i, Y1_i, Y0_i)
+
+# Create the dumbbell plot
+plot <- ggplot(data) +
+  geom_segment(aes(y = as.factor(i), x = Y0_i, xend = Y1_i, yend = as.factor(i)), 
+               color = "#aeb6bf", linewidth = 1.5, alpha = 0.5) +
+  geom_point(aes(x = Y0_i, y = as.factor(i), color = as.factor(D_i), shape = "Y0"), size = 4) +
+  geom_point(aes(x = Y1_i, y = as.factor(i), color = as.factor(D_i), shape = "Y1"), size = 4) +
+  scale_color_manual(values = c("#009688", "#762a83"), name = "Treatment Status") +
+  scale_shape_manual(name = "Potential Outcome", values = c(17, 16), labels = c("Y0", "Y1")) +
+  labs(x = "Test Score", y = "i") +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 14),         
+    axis.text = element_text(size = 12),          
+    legend.title = element_text(size = 14),       
+    legend.text = element_text(size = 12)         
+  )
+
+plot
+
+```
+
+
+# Potential Outcomes Recap
+The following questions are designed to help you get familiar with the potential outcomes framework for causal inference that we discussed in the lecture.
+
+## Task 1.1
+Explain the notation $Y_{0i}$.
+## Answer
+The notation $Y_{0i}$ represents the potential outcome for unit $i$ had the unit not recieved the treatment, regardless of the actual treatment assignment. This is the outcome that would be observed for unit $i$ if it were not treated.
+
+## Task 1.2
+Explain the notation $Y_{1i}$.
+## Answer
+The notation $Y_{1i}$ represents the potential outcome for unit $i$ under the treatment condition. This is the outcome that would be observed for unit $i$ if it were treated.
+
+## Task 1.3  
+What is the difference between $Y_{0i}$ and $Y_{i}$? 
+## Answer
+$Y_{0i}$ is the potential outcome for unit $i$ under the control condition, while $Y_{i}$ is the observed outcome for unit $i$. The difference between the two is that $Y_{0i}$ is the outcome that would be observed for unit $i$ if it were not treated, while $Y_{i}$ is the actual outcome observed for unit $i$.
+For every unit $i$, we can only observe one of the potential outcomes, either $Y_{0i}$ or $Y_{1i}$, but not both.
+The ones which are observed are the ones which recive he treatment. $Y_i$ is always obsserved.
+
+## Task 1.4
+Can we observe both $Y_{0i}$ and $Y_{1i}$ for any individual unit at the same time?
+## Answer
+No we cannot. This is the fundamental problem of causal inference. We can only observe one of the potential outcomes for each unit, depending on whether the unit receives the treatment or not.
+
+## Task 1.5 
+If $D_{i}$ is a binary variable that gives the treatment status for subject $i$ (1 if treated, 0 if control), what is the meaning of  $E[Y_{0i}|D_{i}=1]$?
+## Answer
+The expected potnetial outcome for the control condition for all units $i$ who were assigned the treatment.
+You won't be able to observe it in the real world as this is the counterfactual.
+
+
+
+## Task 1.6
+The table below contains the potential outcomes ($Y_{1i}$ and $Y_{0i}$) and the treatment indicator ($D_{i}$) from a hypothetical experiment with 6 units. 
+
+| $Unit$ | $Y_{1i}$ | $Y_{0i}$ | $D_{i}$ |
+|--------|----------|----------|---------|
+| 1      | 2        | 2        | 1       |
+| 2      | 3        | -1       | 1       |
+| 3      | -1       | 9        | 1       |
+| 4      | 17       | 8        | 0       |
+| 5      | 12       | 9        | 0       |
+| 6      | 9        | 1        | 0       |
+
+Complete the following calculations by hand:
+
+1. List the observed outcomes ($Y_{i}$) for the experiment based on the table above. 
+## Answer
+We observe units 1-3 for the treatment group and units 4-6 for the control group because $D_{i}$ is 1 for units 1-3 and 0 for units 4-6.
+  
+```{r}
+
+# YOUR ANSWER HERE
+
+Y1 <- c(2, 3, -1, 17, 12, 9) # Potential outcomes for the treatment group
+Y0 <- c(2, -1, 9, 8, 9, 1) # Potential outcomes for the control group
+D <- c(1, 1, 1, 0, 0, 0) # Treatment indicator
+
+# Listibng the observed outcomes
+Y <- ifelse(D == 1, Y1, Y0)
+
+```
+
+
+2. Calculate the “true” average treatment effect (ATE) based on the potential outcomes.
+  
+```{r}
+
+# YOUR ANSWER HERE
+ATE = mean(Y1 - Y0)
+ATE
+
+```
+
+
+3. Calculate the “true” average treatment effect on the treated (ATT) based on the potential outcomes.
+
+```{r}
+
+# YOUR ANSWER HERE
+# The true ATT is the difference between the potential outcomes for the treatment group and the control group for the units that received the treatment.
+ATT <- mean(Y1[D == 1] - Y0[D == 1])
+ATT
+
+```
+
+
+4. Calculate the “estimated” average treatment effect based on the naive difference in group means for treatment and control conditions from the observed outcomes. Explain the difference between this estimate and the “true” average treatment effect. 
+
+```{r}
+
+# YOUR ANSWER HERE
+# Estimated ATE is what you view in the real world. It is the difference in the observed outcomes for the treatment and control groups.
+# The difference between the estimated ATE and the true ATE is that the estimated ATE is based on the observed outcomes, while the true ATE is based on the potential outcomes that we cannot observe and is therefore a biased outcome.
+ATE_est <- mean(Y[D == 1]) - mean(Y[D == 0])
+ATE_est
+
+```
+
+
+
+#  Islam and Authoritarianism
+
+In a famous paper titled “Islam and Authoritarianism,” Steven Fish (2002) asks whether Muslim societies are less democratic. He runs a series of cross-sectional regressions of countries’ *Freedom House scores* (an indicator of the level of a country’s democracy) on characteristics of the countries, including whether they are predominantly Muslim. 
+
+The paper’s dataset is in the spreadsheet `fishdata.csv`, which you can download from Canvas. You should load the data using the `read.csv()` function. This data contains the following variables (among others):
+
+- `FHREVERS` - Freedom House scores, a measure of democracy where higher values indicate that a country is more democratic and lower values indicate greater authoritarianism
+- `MUSLIM` - 1 if a country is predominantly Muslim, 0 otherwise
+- `GDP90LGN` - the country’s GDP in 1990
+- `GRW7598P` - the country’s average annual economic growth from 1975-98, in percent
+- `BRITCOL` - 1 if the country was a British colony, 0 otherwise
+- `OPEC` - 1 if the country is a member of the OPEC group of oil-exporting countries, 0 otherwise
+
+## Task 2.0
+View the first 6 rows of this data. What is the unit of observation?
+
+```{r}
+
+setwd("")
+data <- read.csv("fishdata.csv")
+
+# head(f)
+
+# What about glimpse?
+
+# glimpse(f)
+
+# What about str?
+
+# str(f)
+
+# What about view?
+
+# view(f)
+
+```
+
+## Task 2.1 
+_Taking subsets and summarizing variables_
+(Hint: Use square brackets to denote subsets of a variable or dataset. You’ll also need the `length()` function.)
+
+
+1. How many countries are predominantly Muslim?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+What if the 0s were 2s instead?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+What if countries were in the dataset >1 times?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+2. What percentage of countries are predominantly Muslim?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+3. How many countries have a GDP of above 3.0 in 1990?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+4. How many countries are both Muslim and a former British colony?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+5. How many countries have either an average economic growth from 1975-98 of above 0.6% or a GDP in 1990 of above 2.5?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+
+6. Create a new dataset consisting only of countries that are both Muslim and a member of OPEC.
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+
+
+## Task 2.2
+What is the difference in mean Freedom House score between Muslim and Non-Muslim countries? Calculate it both by hand and using a regression, verifying that your answers are identical.
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+
+```
+
+
+## Task 2.3
+Is the difference in means calculated above likely to be biased? If so, in which direction and why?
+
+## Task 2.4
+Conduct a t-test for the difference in means calculated above using the `t.test()` function. Is the difference statistically significant?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+## Task 2.5
+Conduct the t-test again, this time coding it by hand. Confirm that your answer is identical to the answer you calculated in the question above.
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+## Task 2.6
+Calculate:
+
+1. The percentage of Muslim countries that are former British colonies
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+
+2. The percentage of non-Muslim countries that are former British colonies
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+(Note that steps 1 and 2 are akin to measuring the correlation between being a Muslim country and being a former British colony. We do it this way because a correlation coefficient is defined only for two continous variables, and these are both binary.)
+
+
+3. The correlation between being a former British colony and Freedom House score, controlling for being Muslim.
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+
+Use these results to explain the impact that controlling for BRITCOL has on the estimated effect of MUSLIM
+
+Estimate a linear regression with `FHREVERS` as the dependent variable and `MUSLIM` as the independent variable. How do the results from your regression relate to the difference-in-means that you calculated in question 2?
+
+
+## Task 2.7
+Repeat task 2.6 for `OPEC`, `GRW7598P` and `GDP90LGN`. For `GRW7598P` and `GDP90LGN`, simply calculate the correlation between each one and `MUSLIM` and don't estimate the percentages like in steps (i) and (ii).
+
+```{r}
+# OPEC
+  
+  
+# GRW7598P
+ 
+  
+# GDP90LGN
+ 
+```
+
+## Task 2.8
+Now estimate a regression of `FHREVRERS` on `MUSLIM`, `BRITCOL`, `OPEC` and `GRW7598P`. Again, do the results make sense?
+
+```{r}
+
+# WHERE CODE DREAMS COME TRUE
+
+```
+

@@ -7,6 +7,8 @@ output: html_document
 
 ```{r data, include=FALSE}
 
+# Set the working directory
+setwd("/Users/edwardanders/Documents/GitHub/oxford/exp_methods")
 
 lab_one_data <- read.csv("young19.csv")
 summary(lab_one_data)
@@ -22,7 +24,7 @@ glimpse(lab_one_data) # This is a good use of the tidyverse package
 # Install pacman if not already installed
 if (!require("pacman")) install.packages("pacman")
 
-# Load and install required packages using pacman for efficient package management
+# Load and install required packages using pacman for efficient package management # nolint: line_length_linter.
 pacman::p_load(tidyverse)
 
 ```
@@ -42,14 +44,14 @@ prop_table <- prop.table(cross_tab)
 
 lab_one_data %>%
   group_by(treat_assign) %>%
-  summarise(mean_age = mean (age, na.rm = TRUE),
+  summarise(mean_age = mean(age, na.rm = TRUE),
             sd_age = sd(age, na.rm = TRUE),
             min_age = min(age, na.rm = TRUE),
             max_age = max(age, na.rm = TRUE))
 
 lab_one_data %>%
   group_by(female) %>%
-  summarise(mean_age = mean (age, na.rm = TRUE),
+  summarise(mean_age = mean(age, na.rm = TRUE),
             sd_age = sd(age, na.rm = TRUE),
             min_age = min(age, na.rm = TRUE),
             max_age = max(age, na.rm = TRUE))
@@ -59,27 +61,28 @@ lab_one_data %>%
 ```{r tibble, echo=FALSE}
 
 # Use a tibble which is a type of data frame
-  # Fundamental data structure in the tidyverse
+# Fundamental data structure in the tidyverse
 
-lab_one_data_tibble 
+lab_one_data_tibble
 
 ```
 
 ```{r testing-covariates, echo=FALSE}
 
-# We want to test for whether the control group and the treatment group are different
-# Testing for randomisation looks at whether there is a meaningful difference between groups
+# We want to test for whether the control group and the treatment group are different # nolint: line_length_linter. # nolint: line_length_linter.
+# Testing for randomisation looks at whether there is a meaningful difference between groups # nolint: line_length_linter. # nolint: line_length_linter.
 
 # We can use a t-test when we have continuous data
 # We can use a chi-squared test when we have categorical data
-# When we have many covariates we can do multivariate regression (there is a better method for this that is looked at in the third lab)
-# You take the treatment as the outcome and the covariates as the predictors to see whether each predicts the treatment
+# When we have many covariates we can do multivariate regression (there is a better method for this that is looked at in the third lab) # nolint: line_length_linter.
+# You take the treatment as the outcome and the covariates
+# as the predictors to see whether each predicts the treatment
 
 ```
 
 ```{r experimental-design, echo=FALSE}
 
-# Outcome measures are index of propensity to dissent and behavioural measures of selected poltiical wristband
+# Outcome measures are index of propensity to dissent and behavioural measures of selected poltiical wristband # nolint: line_length_linter.
 
 # We want to measure the Average Treatment Effect (ATE)
 
@@ -99,7 +102,4 @@ summary(treatmeant_1)
 
 treatmeant_2 <- lm(prob_act_st ~ treat_assign, data = lab_one_data)
 summary(treatmeant_2)
-
-
-
 ```
