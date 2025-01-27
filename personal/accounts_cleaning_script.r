@@ -106,5 +106,11 @@ combined_data <- combined_data %>%
         `Transaction Date` = Transaction.Date
     )
 
+# 3.1.2 Mutate the 'Transaction Date' column to be in the format 'YYYY-MM-DD'
+combined_data <- combined_data %>%
+    mutate(
+        `Transaction Date` = as.Date(`Transaction Date`, "%d/%m/%Y")
+    )
+
 # 4 Write combined data to CSV
 write_csv(combined_data, "/Users/edwardanders/Desktop/combined_finance_data.csv")
