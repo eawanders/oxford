@@ -3,7 +3,7 @@
 # Script setup
 # Install Packages using Pacmans
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(dplyr, tidyr)
+pacman::p_load(dplyr, tidyr, readr)
 
 # Steps Required:
 
@@ -45,6 +45,18 @@ halifax_data <- halifax_data %>%
 
 # View(halifax_data)
 
+# 1.2 Add 'Payment Account' column to Halifax data
+halifax_data <- halifax_data %>%
+    mutate(
+        `Payment Account` = "Halifax"
+    )
+
+# 1.3 Add 'Income/Expense' column to Halifax data
+halifax_data <- halifax_data %>%
+    mutate(
+        `Income/Expense` = ifelse(Amount > 0, "Income", "Expense")
+    )
+
 # 2. Load American Express data
 
 amex_data <- read.csv("/Users/edwardanders/Desktop/amex.csv")
@@ -54,7 +66,7 @@ amex_data <- read.csv("/Users/edwardanders/Desktop/amex.csv")
 amex_data <- amex_data %>%
     rename(
         Transaction.Date = Date,
-        Transaction = Description,
+        Transaction = Description
     )
 
 # 2.1.2 Modify 'Amount' column to be negative for 'Debit' and positive for 'Credit'
@@ -66,10 +78,22 @@ amex_data <- amex_data %>%
 
 # 2.1.3 Ensure 'Amount' column is numeric
 amex_data <- amex_data %>%
-    mutate(across(c(Amount, Amount), ~ ifelse(. %in% c("Invalid Number", NA), 0, .))) %>%
-    mutate(across(c(Amount, Amount), as.numeric))
+    mutate(across(Amount, ~ ifelse(. %in% c("Invalid Number", NA), 0, .))) %>%
+    mutate(across(Amount, as.numeric))
 
 # View(amex_data)
+
+# 2.2 Add 'Payment Account' column to American Express data
+amex_data <- amex_data %>%
+    mutate(
+        `Payment Account` = "American Express"
+    )
+
+# Add 'Income/Expense' column to American Express data
+amex_data <- amex_data %>%
+    mutate(
+        `Income/Expense` = ifelse(Amount > 0, "Income", "Expense")
+    )
 
 # 3. Combine both datasets
 
@@ -77,10 +101,10 @@ combined_data <- rbind(halifax_data, amex_data)
 
 # 3.1 Clean combined data
 # 3.1.1 Rename 'Transaction.Date' column
+combined_data <- combined_data %>%
+    rename(
+        `Transaction Date` = Transaction.Date
+    )
 
-
-View(combined_data)
-
-# 4. Export the combined data
-
+# 4 Write combined data to CSV
 write_csv(combined_data, "/Users/edwardanders/Desktop/combined_finance_data.csv")
