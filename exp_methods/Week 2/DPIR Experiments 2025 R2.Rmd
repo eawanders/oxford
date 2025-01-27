@@ -1,0 +1,660 @@
+---
+title: "DPIR - Experimental Methods 2025 - R Lab 2"
+author: ""
+date: "2025-01-27"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = T,  warning = F, message = F)
+
+```
+
+## Recap
+
+In this week's lecture, we have covered the following:
+
+- Hypotheses testing
+- Uncertainty of point estimates
+- Randomization inference as example of re-sampling method for calculating
+  p-values
+- Role of covariates
+- Block and cluster experimental designs
+
+## Lab Overview
+
+Primary objective is to reinforce theoretical concepts relevant for experimental
+work and build analytical skills to work with experimental data.
+
+This is the second lab session and, given your overall good familiarity with R,
+the content has been expanded. We will cover the following:
+
+- Balanced on covariates
+- Inverse Probability Weights
+- Covariates-adjusted regression
+- Randomization inference
+- Corrections for multiple hypotheses testing
+
+We will cover those topics using the data from Spilker et al. (2016), Young
+(2019), and Duch et al. (2023).
+
+## Preliminaries
+
+Let's begin by setting up our working environment for the purpose of the lab.
+
+We want to keep our work in order:
+
+- create a new folder (e.g., "lab_2")
+- open a new R (or Markdown) file and save it in the folder just created
+
+Set your working directory to your lab folder.
+
+```{r}
+
+# setwd(/Users/edwardanders/Documents/GitHub/oxford/exp_methods)
+
+```
+
+We anticipate the need of the following packages:
+
+```{r results="hide"}
+
+library(tidyverse)
+
+# Used for Adaptive Shrinkage methods for multiple comparisons correction
+library(ashr)
+
+# Supplies various estimators and robust standard error calculations, particularly for linear models.
+library(estimatr)
+
+# Adds extra functionality to the 'mice' package,
+# facilitating multiple imputation tasks and data management.
+library(miceadds)
+
+# Enables reading and writing data in formats such as SAS, SPSS, and Stata.
+library(haven)
+
+# Provides tools for randomization inference
+library(ri2)
+
+# Part of base R and provides essential statistical functions like regressiona and probability distributions
+library(stats)
+
+library(ggplot2)
+
+library(ggpubr)
+
+# Provides tools to assess and visualize covariate balance; useful particularly when using methods such as
+# weighting, helping to confirm whether the weighting protocol has aligned the
+# distributions of covariates across groups
+library(cobalt)
+
+# Supplies various weighting methods to address selection bias or confounding in non-randomised studies
+library(WeightIt)
+```
+
+You can load the Young (2019)'s data from a local copy stored in your machine;
+else you can load them directly from GitHub:
+
+```{r}
+df.young_19 <- read.csv(
+  "https://raw.githubusercontent.com/rayduch/DPIR-Experimental-Methods-2023/main/Week%201/young19.csv"
+  )
+```
+
+Let's load the data of Duch et al. (2023) from the Harvard Dataverse (or
+locally).
+
+```{r}
+# This will load in our environment a dataset named "final_finalV2"
+load(url("https://dataverse.harvard.edu/api/access/datafile/7337617"))
+```
+
+Let's load the data of Spilker et al. (2016) from the Harvard Dataverse (or
+locally).
+
+```{r}
+# Load the data from Spilker et al. (2016)
+df.viet <- read_dta("Vietnam.dta") %>% as.data.frame()
+```
+
+## Covariates-adjusted linear regression
+
+In principle, the mechanism of random assignments to treatment conditions
+guarantees... Why adding covariates to our regression model then?
+
+We already know the design of Young (2019). Recall:
+
+- Objective of that experiment is to test quantitatively the causal effect of
+  emotions on dissent decisions in autocracy
+- Three experimental conditions
+  - C = describe a relaxing scenario (leisure activities)
+  - TP = describe fears around politics and elections
+  - TG = describe general fears (e.g., snakes?)
+- Outcome (dissent) is measured with two strategies
+  - hypothetical measure: index of propensity to dissent in hypothetical
+    scenarios
+  - behavioral measure: selected political wristband
+
+```{r}
+# For convenience, subset the wristband days
+datw <- subset(df.young_19, df.young_19$wristband_real == 1)
+```
+
+Estimate effect of TG on hypothetical dissent
+
+```{r}
+# Note that the model includes weights as 1/p, where p is probability of assignment
+# to treatment condition, accounting for the fact that treatment
+# groups are of unequal size
+
+mod1g <- lm(prob_act_st ~ treat_assign, data = df.young_19[df.young_19$treat_assign != "TP", ],
+            weights = df.young_19$TG_inv[df.young_19$treat_assign != "TP"])
+
+summary(mod1g)
+```
+
+Weighting by the inverse of the treatment assignment probability helps ensure
+that each observation represents an equivalent “slice” of the population, even
+when the experimental design uses unequal probabilities for assigning
+participants to different conditions. By giving greater weight to participants
+who were less likely to be assigned to a particular group (and conversely less
+weight to those who were more likely), the analysis corrects for any imbalance
+stemming from these unequal assignment chances.
+
+Similarly, we could estimate the effect of TP on wristband collection.
+
+```{r}
+mod2p <- lm(wristband ~ treat_assign, data = datw[datw$treat_assign != "TG", ],
+            weights = datw$TP_inv[datw$treat_assign != "TG"])
+
+summary(mod2p)
+```
+
+How do we run the same linear regression model adjusting for pre-test
+covariates? Assume that you are interested in the covariates `female` and
+`education`. What do we expect?
+
+```{r}
+mod2p_cov <- lm(wristband ~ treat_assign + female + education, data = datw[datw$treat_assign != "TG", ],
+            weights = datw$TP_inv[datw$treat_assign != "TG"])
+
+summary(mod2p_cov)
+```
+
+Why we might want to do that?
+
+1. If female or education differ across treatment groups (i.e. the groups are
+   not perfectly balanced on these characteristics), then part of the observed
+   difference in the outcome (wristband) could be due to these baseline
+   differences rather than the treatment itself.
+2. Covariates that meaningfully explain variation in the outcome can reduce
+   residual variance. This often leads to tighter confidence intervals and
+   smaller standard errors for the treatment effect, improving the precision of
+   the estimates.
+
+How do we interpret the regression coefficients now?
+
+## Balanced on covariates
+
+### The problem
+
+In expectation, randomization in controlled experiments allows for unbiased
+estimates of treatment effects. Practically, a common threat to the validity of
+our causal inferences is attrition. This is particularly true in online and/or
+field experiments. Attrition generates a missing data problem for a subset of
+the sample. What we want to know is whether the missing data are independent of
+potential outcomes and not systematically related to them. In other words, we
+want to know whether participants with missing outcomes have, on average, the
+same potential outcomes of participants with observed outcomes. One circumstance
+where this is not true is when differential attrition occurs, i.e. attrition
+varies systematically based on treatment status.
+
+A diagnostic tool at our disposal is to check for balance of treatment
+assignments on covariates across different phases of the data collection (e.g.,
+stages of a survey experiment or repeated measures of a longitudinal study).
+
+### The cobalt package
+
+This package provides:
+
+- standardized measures that are consistent across all conditioning packages
+- flexibility in the calculation and display of balance measures
+- default adoption of methodological recommendations in the assessment of
+  balance
+- strong plotting capabilities
+
+It can be particularly useful for diagnosing the quality of the adjustments made
+to address selection bias, and it provides various metrics and plots to ensure
+that covariate distributions are similar between treated and control groups.
+
+(For the official documentation, see https://ngreifer.github.io/cobalt/)
+
+Before we check balance on covariates, we need a few preliminary steps to
+prepare the data of Duch et al. (2023).
+
+```{r x_data}
+# Preliminaries
+working_final = final_finalV2
+
+# Rename variables
+working_final$HHSize = working_final$Q141
+working_final$NonFood = working_final$Q145
+working_final$Employment = working_final$Q143
+working_final$Employment = as.factor(working_final$Employment)
+working_final$Children = working_final$Q142
+working_final$Finance = working_final$Q146
+working_final$Gender = as.factor(working_final$Gender)
+
+file1 = working_final[,c("individual_treatment",
+                         "Age","Gender","HHSize",
+                         "Children","Employment","Income",
+                         "NonFood","Finance", "Attended")]
+
+dim(file1)
+dim(na.omit(file1))
+file1 = na.omit(file1)
+dim(file1)
+```
+
+First, let's check the covariate balance before any adjustment. We can use the
+`bal.tab` function to generate a table of balance statistics.
+
+```{r x_data}
+# Bal Tab no. 1:
+# Balance summary across all treatment pairs
+
+bal.tab(
+
+  # Formula
+  individual_treatment ~ Age + Gender + HHSize +
+    Children + Employment + Income +
+    NonFood + Finance + Attended,
+
+  # Dataset containing the variables
+  data = file1,
+
+  # Whether to see raw or standardized mean differences for
+  # binary and continuous variables
+  binary = "std", continuous = "std"
+
+  )
+```
+
+The table displays each covariate (e.g. “Age”, “Gender_Male”, etc...) along with
+metrics indicating how well-balanced they are across the treatment groups before
+any adjustment.
+
+Max.Diff.Un: standardised maximum difference in means (for continuous variables)
+or proportions (for binary variables) across all pairs of treatment groups in
+the unadjusted data. A higher difference suggests greater imbalance among
+groups.
+
+```{r x_data}
+# Balance tables with mean differences, variance ratios, and
+# statistics for the unadjusted sample
+
+bal.tab(
+
+  individual_treatment ~ Age + Gender + HHSize +  Children +
+    Employment + Income + NonFood + Finance + Attended,
+
+  data = file1,
+
+  # Which *sample* statistics to be displayed
+  disp = c("means", "sds"),
+
+  # Whether the statistics to be displayed should be
+  # displayed for the unadjusted group
+  un = TRUE,
+
+  # Which *balance* statistics to be displayed - e.g.
+  # standardized mean differences
+  # variance ratios (further check shape of the covariate distributions;
+  # when close to 1 indicative of group balance)
+  stats = c("mean.diffs", "variance.ratios"),
+
+  # Whether interactions should also be displayed
+  # We look at the combined distribution of two covariates
+  int = TRUE
+
+  )
+```
+
+Max.V.Ratio.Un: The maximum variance ratio among all pairwise comparisons of the
+treatment groups, in the unadjusted sample. A value close to 1 suggests similar
+variances across groups; a large departure from 1 points to variance imbalance.
+
+Next, let's generate propensity score weights for the ATT (Average Treatment
+effect on the Treated)
+
+```{r x_data}
+W.out <- WeightIt::weightit(
+
+  individual_treatment ~ Age + Gender + HHSize +  Children + Employment +
+                          Income + NonFood + Finance + Attended,
+  data = file1,
+
+  # Propensity score estimation method:
+  # estimating propensity scores weights with generalized linear model
+  # For binary/multinomial treatments, a binomial/multinomial regression model
+  # estimates the propensity scores as predicted probability of being in
+  # each treatment given the covariates.
+  method = "ps"
+
+  )
+
+W.out
+
+bal.tab(W.out)
+```
+
+When estimating propensity score weights, each unit receives a weight indicating
+how much it should count in order to make the treated and comparison groups
+comparable on their covariates. To apply these weights when estimating treatment
+effects, you use them directly in a regression model, passing them to the
+weights argument (see previous example).
+
+```{r x_data}
+# Assessing balance for each pair of treatments with means
+
+bal.tab(
+  W.out.mn,
+  un = TRUE,
+
+  # Alternative syntax to ask for *sample* means to be displayed
+  disp.means = TRUE,
+
+  # Which treatments should be displayed in the output
+  # A subset can be specified as vector c("T1", "T2")
+  which.treat = .all
+
+  )
+```
+
+```{r x_data}
+# Summarizing balance in a Love plot
+
+love.plot(
+  W.out.mn,
+
+  # Adds a vertical line at 0.1 on the Love plot.
+  # This line represents the threshold for standardized mean differences,
+  # commonly set at 0.1 to indicate acceptable balance.
+  thresholds = c(m = .1),
+
+  binary = "std",
+  which.treat = .all,
+  abs = FALSE
+  )
+```
+
+## Randomization inference
+
+A debated technique:
+
+- Uninteresting because testing a `H_0` which is too restrictive
+  - Effects are likely to be heterogeneous
+- Useful for assessing if any treatment effect occurred (preliminary step to
+  determine whether further analysis is warranted (Imbens & Rubin, 2015))
+- Preferable to shortcomings of parametric methods
+  - sensitivity to assumptions about tail behavior of outcomes (Rosenbaum, 2010)
+  - in small samples, increased vulnerability to outliers, which translates to
+    an increased risk of over-rejection of the null hypothesis (Type I error or
+    False Positive)
+  - inability to account for complex treatment assignments (Ho & Imai, 2006)
+  - `RI` allows us to use literally any scalar statistic that we can get from a
+    dataset without assuming a particular distribution function for its
+    estimator. Examples are quantile statistics (such as the median) or ranking
+    statistics.
+
+### Randomization Inference Routine
+
+The common procedure involves the following steps:
+
+- Specify `H_0`
+  - Previously, we have seen it in the form `H0 : E[Yi(1)] - E[Yi(0)] = 0`
+  - For `RI`, `H0 : i = Y_i(0) - Y_i(1) = 0 for all i`
+  - This formulation allows to fill in the missing potential outcomes of our
+    data
+- Specify the null distribution of `t(Z, Y)`
+  - Known exactly, as all missing potential outcomes can be inputted under the
+    sharp `H_0`
+  - Value of all test statistics `t(z, Y(z))` is known for all possible `z`,
+    where the distribution of `Z` is known (because controlled by the
+    experimenter)
+- Choose test statistic `t(Z, Y)`, which is a function of `Z` (treatment
+  assignment) and `Y` (outcome)
+  - One- or two-sided?
+- Permutation stage
+  - How many permutations should we do? Ideally, we should obtain all the
+    possible permutations in order to get an exact representation of the test
+    statistic distribution under the sharp null
+
+The R implementation of the routine is simplified by the `ri2` package. Let's
+start with some toy data.
+
+```{r}
+# Gerber and Green (2012), Ch 3, Table 2.2: one possible outcome of a
+# simplified version of Chattopadhyay and Duflo (2004)
+table_2_2 <- data.frame(Z = c(1, 0, 0, 0, 0, 0, 1),
+                        Y = c(15, 15, 20, 20, 10, 15, 30))
+
+table_2_2
+```
+
+We could perform the routine outlined above step by step. The `ri2` package was
+written so that you don’t have to.
+
+```{r}
+# Declare randomization procedure
+# We want 7 units in each of two treatment arms
+declaration <- declare_ra(N = 7, m = 2)
+
+declaration
+```
+
+We can then conduct `RI` using `conduct_ri()`, which takes the following
+arguments:
+
+- Formula: test statistic, specifiable using standard syntax in R
+- Declaration: randomization procedure defined with `declare_ra`
+- Sharp `H_0`
+- Data set of observed outcomes
+
+```{r}
+ri2_out <- conduct_ri(
+  formula = Y ~ Z,
+  declaration = declaration,
+  sharp_hypothesis = 0,
+  data = table_2_2
+)
+```
+
+The function `conduct_ri()` return an object that can be passed to `summary()`
+for inspection
+
+```{r}
+summary(ri2_out)
+```
+
+and to the package's function `plot()` for plotting (this returns a ggplot2
+object).
+
+```{r}
+plot(ri2_out)
+```
+
+What if we are working with experimental data generated by more complex
+randomization protocol?
+
+```{r}
+dat_block <- data.frame(
+  Y = c(8, 6, 2, 0, 3, 1, 1, 1, 2, 2, 0, 1, 0, 2, 2, 4, 1, 1),
+  Z = c(1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0),
+  cluster = c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9),
+  block = c(rep(1, 4), rep(2, 6), rep(3, 8))
+)
+```
+
+We can look at the output by running:
+
+```{r}
+with(dat_block, table(block, Z))
+```
+
+The call to `conduct_ri()` is the same as it was before, but we need to change
+the random assignment declaration.
+
+```{r}
+block_m <- with(dat_block, tapply(Z, block, sum) / 2)
+
+declaration <-
+  with(dat_block,{
+    declare_ra(
+      blocks = block,
+      clusters = cluster,
+      block_m = block_m)
+  })
+
+declaration
+```
+
+This example is of particular interest because illustrate a scenario in which
+the probabilities of assignment to treatment are not constant across units. How
+does this impact our analytic strategy?
+
+```{r}
+ri2_out <- conduct_ri(
+  Y ~ Z,
+  sharp_hypothesis = 0,
+  declaration = declaration,
+  data = dat_block
+)
+
+summary(ri2_out)
+```
+
+We must somehow account for differential probabilities of treatment assignments.
+A common way of doing this is using inverse probability weights i.e., units are
+weighted by the inverse of the probability that the unit is in the condition
+that it is in. The function `conduct_ri()` is so kind that it does it for you.
+To switch this functionality off and provide your own weights, set the argument
+`IPW = FALSE`.
+
+## Multiple Hypotheses Testing
+
+We already know fairly well two methods to correct for multiple hypotheses
+testing:
+
+- Bonferroni Correction (control for probability of making at least one Type I
+  error across all tests)
+- Benjamini-Hochberg Correction (control for expected proportion of rejected
+  null hypotheses that are actually false positives)
+
+Those can be implemented straightforwardly using `p.adjust()` from the `stats`
+package.
+
+```{r}
+# The argument p is a vector of p-values
+# The argument n is the number of comparisons (at least length(p))
+p <- c(0.001, 0.05, 0.025)
+p_bon <- p.adjust(p, method = 'bonferroni', n = length(p))
+p_bon
+
+p_bh <- p.adjust(p, method = 'BH', n = length(p))
+p_bh
+```
+
+What happened to the p-values we have started from?
+
+A recent addition to our toolkit is the adaptive shrinkage method, an Empirical
+Bayes approach intended for handling large-scale multiple hypothesis testing,
+including estimating false discovery rates. Conceptually:
+
+1. It assumes that the effects are independent and identically distributed from
+   some unimodal distribution (with mode equal to 0 by default). This prior
+   results in shrinkage estimation.
+2. It incorporates two numbers, i.e. effect sizes and their standard errors (not
+   only p-values or z-scores, as in other methods) to summarize each
+   measurement, thus better accounting for variation in measurement precision.
+   The shrinkage is then adaptive with respect to both type of information.
+
+This method is implemented by the package `ashr`. We illustrate it by using part
+of the replication material from Liu & Shiraito (2023), which starts from
+replicating Spilker et al. (2016). The latter asked what are the effects of
+Military Ally and Environmental Protection on the probability of a country of
+being preferred as trading partner in Vietnam.
+
+```{r}
+# Load the data from Spilker et al. (2016)
+df.viet <- read_dta("Vietnam.dta") %>% as.data.frame()
+
+
+##  Replicate original analysis from Spilker et al. (2016)
+viet <- lm.cluster(df.viet,
+				   country ~ as.factor(distance) + as.factor(econ_size) +
+				   			 as.factor(culture) + as.factor(religion) +
+                      		 as.factor(democracy) + as.factor(military) +
+                      		 as.factor(env) + as.factor(labor),
+                      cluster = "respondent")
+sum.viet <- summary(viet)
+
+# Remove intercept and subset beta coefficients and SEs
+sum.viet <- sum.viet[-1, 1:2]
+
+amce.mat <- sum.viet[c(2:1, 4:3, 5, 8:6, 10:9, 11, 13:12, 15:14),]
+
+var.names <- c("10000 km", "5000 km",
+               "Larger size", "Similar size",
+               "Different",
+               "Buddhist", "Christian", "Diverse",
+               "Democratic", "Semi-democratic",
+               "Not ally",
+               "Higher", "Similar",
+               "Higher", "Similar")
+
+rownames(amce.mat) <- var.names
+
+## Get point estimates and SE
+beta <- amce.mat[,1]
+beta.se <- amce.mat[,2]
+names(beta) <- var.names
+names(beta.se) <- var.names
+
+## Get BH results
+bh.sum <- summary(viet)
+pVal <- bh.sum[,4][-1]
+names(pVal) <- var.names
+
+p.bh <- p.adjust(pVal, "fdr")
+p.bh <- ifelse(p.bh<=0.05, 1, 0)
+
+## Compute ASH results
+ashR.unif <- ash(beta, beta.se, mixcompdist = "uniform")
+postBeta.unif <- ashR.unif$result[,9]
+postBeta.sd.unif <- ashR.unif$result[,10]
+
+ashR.norm <- ash(beta, beta.se, mixcompdist = "normal")
+postBeta.norm <- ashR.norm$result[,9]
+postBeta.sd.norm <- ashR.norm$result[,10]
+
+## Set threshold
+alpha <- 0.05
+
+test.num <- nrow(sum.viet)
+
+
+## Subset coefficients for Military Ally ##
+beta_milAlly <- beta[c(11:13)]
+beta.se_milAlly <- beta.se[c(11:13)]
+
+p.bh_milAlly <- p.bh[c(11:13)]
+
+postBeta.unif_milAlly <- ashR.unif$result[c(11:13), 9]
+postBeta.sd.unif_milAlly <- ashR.unif$result[c(11:13), 10]
+
+postBeta.norm_milAlly <- ashR.norm$result[c(11:13), 9]
+postBeta.sd.norm_milAlly <- ashR.norm$result[c(11:13), 10]
+```
