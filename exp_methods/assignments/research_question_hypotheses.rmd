@@ -1,0 +1,29 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: pdf_document
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}
+---
+
+# Reseseach Question
+
+# Theoretical and Empirical Motivations
+
+# Hypothesis to be Tested
+
+\newpage
+
+# Bibliography
+
+```{r open-doc}
+
+
+
+```
