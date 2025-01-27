@@ -6,9 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-
-knitr::opts_chunk$set(echo = T,  warning = F, message = F)
-
+knitr::opts_chunk$set(echo = T, warning = F, message = F)
 ```
 
 ## Recap
@@ -51,14 +49,18 @@ We want to keep our work in order:
 Set your working directory to your lab folder.
 
 ```{r}
-
-# setwd(/Users/edwardanders/Documents/GitHub/oxford/exp_methods)
-
+setwd("/Users/edwardanders/Documents/GitHub/oxford/exp_methods/Week 2")
 ```
 
 We anticipate the need of the following packages:
 
 ```{r results="hide"}
+# Specify a CRAN mirror
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+
+# Install packages using Pacman
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, estimatr, miceadds, haven, ri2, stats, ggplot2, ggpubr, cobalt, WeightIt, ashr)
 
 library(tidyverse)
 
@@ -88,6 +90,7 @@ library(ggpubr)
 # Provides tools to assess and visualize covariate balance; useful particularly when using methods such as
 # weighting, helping to confirm whether the weighting protocol has aligned the
 # distributions of covariates across groups
+
 library(cobalt)
 
 # Supplies various weighting methods to address selection bias or confounding in non-randomised studies
@@ -98,9 +101,7 @@ You can load the Young (2019)'s data from a local copy stored in your machine;
 else you can load them directly from GitHub:
 
 ```{r}
-df.young_19 <- read.csv(
-  "https://raw.githubusercontent.com/rayduch/DPIR-Experimental-Methods-2023/main/Week%201/young19.csv"
-  )
+df.young_19 <- read.csv("young19.csv")
 ```
 
 Let's load the data of Duch et al. (2023) from the Harvard Dataverse (or
@@ -149,8 +150,10 @@ Estimate effect of TG on hypothetical dissent
 # to treatment condition, accounting for the fact that treatment
 # groups are of unequal size
 
-mod1g <- lm(prob_act_st ~ treat_assign, data = df.young_19[df.young_19$treat_assign != "TP", ],
-            weights = df.young_19$TG_inv[df.young_19$treat_assign != "TP"])
+mod1g <- lm(prob_act_st ~ treat_assign,
+  data = df.young_19[df.young_19$treat_assign != "TP", ],
+  weights = df.young_19$TG_inv[df.young_19$treat_assign != "TP"]
+)
 
 summary(mod1g)
 ```
@@ -166,19 +169,23 @@ stemming from these unequal assignment chances.
 Similarly, we could estimate the effect of TP on wristband collection.
 
 ```{r}
-mod2p <- lm(wristband ~ treat_assign, data = datw[datw$treat_assign != "TG", ],
-            weights = datw$TP_inv[datw$treat_assign != "TG"])
+mod2p <- lm(wristband ~ treat_assign,
+  data = datw[datw$treat_assign != "TG", ],
+  weights = datw$TP_inv[datw$treat_assign != "TG"]
+)
 
 summary(mod2p)
 ```
 
 How do we run the same linear regression model adjusting for pre-test
 covariates? Assume that you are interested in the covariates `female` and
-`education`. What do we expect?
+`education`. What do we expect? (these covariates are defined characteristics which will not change pre- and post-treatment)
 
 ```{r}
-mod2p_cov <- lm(wristband ~ treat_assign + female + education, data = datw[datw$treat_assign != "TG", ],
-            weights = datw$TP_inv[datw$treat_assign != "TG"])
+mod2p_cov <- lm(wristband ~ treat_assign + female + education,
+  data = datw[datw$treat_assign != "TG", ],
+  weights = datw$TP_inv[datw$treat_assign != "TG"]
+) # This computes the weights for the TP group
 
 summary(mod2p_cov)
 ```
@@ -236,25 +243,27 @@ prepare the data of Duch et al. (2023).
 
 ```{r x_data}
 # Preliminaries
-working_final = final_finalV2
+working_final <- final_finalV2
 
 # Rename variables
-working_final$HHSize = working_final$Q141
-working_final$NonFood = working_final$Q145
-working_final$Employment = working_final$Q143
-working_final$Employment = as.factor(working_final$Employment)
-working_final$Children = working_final$Q142
-working_final$Finance = working_final$Q146
-working_final$Gender = as.factor(working_final$Gender)
+working_final$HHSize <- working_final$Q141
+working_final$NonFood <- working_final$Q145
+working_final$Employment <- working_final$Q143
+working_final$Employment <- as.factor(working_final$Employment)
+working_final$Children <- working_final$Q142
+working_final$Finance <- working_final$Q146
+working_final$Gender <- as.factor(working_final$Gender)
 
-file1 = working_final[,c("individual_treatment",
-                         "Age","Gender","HHSize",
-                         "Children","Employment","Income",
-                         "NonFood","Finance", "Attended")]
+file1 <- working_final[, c(
+  "individual_treatment",
+  "Age", "Gender", "HHSize",
+  "Children", "Employment", "Income",
+  "NonFood", "Finance", "Attended"
+)]
 
 dim(file1)
 dim(na.omit(file1))
-file1 = na.omit(file1)
+file1 <- na.omit(file1)
 dim(file1)
 ```
 
@@ -278,8 +287,7 @@ bal.tab(
   # Whether to see raw or standardized mean differences for
   # binary and continuous variables
   binary = "std", continuous = "std"
-
-  )
+)
 ```
 
 The table displays each covariate (e.g. “Age”, “Gender_Male”, etc...) along with
@@ -296,10 +304,8 @@ groups.
 # statistics for the unadjusted sample
 
 bal.tab(
-
-  individual_treatment ~ Age + Gender + HHSize +  Children +
+  individual_treatment ~ Age + Gender + HHSize + Children +
     Employment + Income + NonFood + Finance + Attended,
-
   data = file1,
 
   # Which *sample* statistics to be displayed
@@ -318,8 +324,7 @@ bal.tab(
   # Whether interactions should also be displayed
   # We look at the combined distribution of two covariates
   int = TRUE
-
-  )
+)
 ```
 
 Max.V.Ratio.Un: The maximum variance ratio among all pairwise comparisons of the
@@ -331,9 +336,8 @@ effect on the Treated)
 
 ```{r x_data}
 W.out <- WeightIt::weightit(
-
-  individual_treatment ~ Age + Gender + HHSize +  Children + Employment +
-                          Income + NonFood + Finance + Attended,
+  individual_treatment ~ Age + Gender + HHSize + Children + Employment +
+    Income + NonFood + Finance + Attended,
   data = file1,
 
   # Propensity score estimation method:
@@ -342,8 +346,7 @@ W.out <- WeightIt::weightit(
   # estimates the propensity scores as predicted probability of being in
   # each treatment given the covariates.
   method = "ps"
-
-  )
+)
 
 W.out
 
@@ -360,7 +363,7 @@ weights argument (see previous example).
 # Assessing balance for each pair of treatments with means
 
 bal.tab(
-  W.out.mn,
+  W.out.mn, # The data is missing here
   un = TRUE,
 
   # Alternative syntax to ask for *sample* means to be displayed
@@ -369,31 +372,30 @@ bal.tab(
   # Which treatments should be displayed in the output
   # A subset can be specified as vector c("T1", "T2")
   which.treat = .all
-
-  )
+)
 ```
 
 ```{r x_data}
 # Summarizing balance in a Love plot
 
 love.plot(
-  W.out.mn,
+  W.out,
 
   # Adds a vertical line at 0.1 on the Love plot.
   # This line represents the threshold for standardized mean differences,
   # commonly set at 0.1 to indicate acceptable balance.
   thresholds = c(m = .1),
-
   binary = "std",
   which.treat = .all,
   abs = FALSE
-  )
+)
 ```
 
 ## Randomization inference
 
 A debated technique:
 
+- Gives better significance when there is a small sample size, but the problem is that we are testing a very restrictive null hypothesis and we are not testing the hypothesis that we are interested in.
 - Uninteresting because testing a `H_0` which is too restrictive
   - Effects are likely to be heterogeneous
 - Useful for assessing if any treatment effect occurred (preliminary step to
@@ -438,8 +440,10 @@ start with some toy data.
 ```{r}
 # Gerber and Green (2012), Ch 3, Table 2.2: one possible outcome of a
 # simplified version of Chattopadhyay and Duflo (2004)
-table_2_2 <- data.frame(Z = c(1, 0, 0, 0, 0, 0, 1),
-                        Y = c(15, 15, 20, 20, 10, 15, 30))
+table_2_2 <- data.frame(
+  Z = c(1, 0, 0, 0, 0, 0, 1),
+  Y = c(15, 15, 20, 20, 10, 15, 30)
+)
 
 table_2_2
 ```
@@ -511,11 +515,12 @@ the random assignment declaration.
 block_m <- with(dat_block, tapply(Z, block, sum) / 2)
 
 declaration <-
-  with(dat_block,{
+  with(dat_block, {
     declare_ra(
       blocks = block,
       clusters = cluster,
-      block_m = block_m)
+      block_m = block_m
+    )
   })
 
 declaration
@@ -560,10 +565,10 @@ package.
 # The argument p is a vector of p-values
 # The argument n is the number of comparisons (at least length(p))
 p <- c(0.001, 0.05, 0.025)
-p_bon <- p.adjust(p, method = 'bonferroni', n = length(p))
+p_bon <- p.adjust(p, method = "bonferroni", n = length(p))
 p_bon
 
-p_bh <- p.adjust(p, method = 'BH', n = length(p))
+p_bh <- p.adjust(p, method = "BH", n = length(p))
 p_bh
 ```
 
@@ -594,51 +599,54 @@ df.viet <- read_dta("Vietnam.dta") %>% as.data.frame()
 
 ##  Replicate original analysis from Spilker et al. (2016)
 viet <- lm.cluster(df.viet,
-				   country ~ as.factor(distance) + as.factor(econ_size) +
-				   			 as.factor(culture) + as.factor(religion) +
-                      		 as.factor(democracy) + as.factor(military) +
-                      		 as.factor(env) + as.factor(labor),
-                      cluster = "respondent")
+  country ~ as.factor(distance) + as.factor(econ_size) +
+    as.factor(culture) + as.factor(religion) +
+    as.factor(democracy) + as.factor(military) +
+    as.factor(env) + as.factor(labor),
+  cluster = "respondent"
+)
 sum.viet <- summary(viet)
 
 # Remove intercept and subset beta coefficients and SEs
 sum.viet <- sum.viet[-1, 1:2]
 
-amce.mat <- sum.viet[c(2:1, 4:3, 5, 8:6, 10:9, 11, 13:12, 15:14),]
+amce.mat <- sum.viet[c(2:1, 4:3, 5, 8:6, 10:9, 11, 13:12, 15:14), ]
 
-var.names <- c("10000 km", "5000 km",
-               "Larger size", "Similar size",
-               "Different",
-               "Buddhist", "Christian", "Diverse",
-               "Democratic", "Semi-democratic",
-               "Not ally",
-               "Higher", "Similar",
-               "Higher", "Similar")
+var.names <- c(
+  "10000 km", "5000 km",
+  "Larger size", "Similar size",
+  "Different",
+  "Buddhist", "Christian", "Diverse",
+  "Democratic", "Semi-democratic",
+  "Not ally",
+  "Higher", "Similar",
+  "Higher", "Similar"
+)
 
 rownames(amce.mat) <- var.names
 
 ## Get point estimates and SE
-beta <- amce.mat[,1]
-beta.se <- amce.mat[,2]
+beta <- amce.mat[, 1]
+beta.se <- amce.mat[, 2]
 names(beta) <- var.names
 names(beta.se) <- var.names
 
 ## Get BH results
 bh.sum <- summary(viet)
-pVal <- bh.sum[,4][-1]
+pVal <- bh.sum[, 4][-1]
 names(pVal) <- var.names
 
 p.bh <- p.adjust(pVal, "fdr")
-p.bh <- ifelse(p.bh<=0.05, 1, 0)
+p.bh <- ifelse(p.bh <= 0.05, 1, 0)
 
 ## Compute ASH results
 ashR.unif <- ash(beta, beta.se, mixcompdist = "uniform")
-postBeta.unif <- ashR.unif$result[,9]
-postBeta.sd.unif <- ashR.unif$result[,10]
+postBeta.unif <- ashR.unif$result[, 9]
+postBeta.sd.unif <- ashR.unif$result[, 10]
 
 ashR.norm <- ash(beta, beta.se, mixcompdist = "normal")
-postBeta.norm <- ashR.norm$result[,9]
-postBeta.sd.norm <- ashR.norm$result[,10]
+postBeta.norm <- ashR.norm$result[, 9]
+postBeta.sd.norm <- ashR.norm$result[, 10]
 
 ## Set threshold
 alpha <- 0.05
