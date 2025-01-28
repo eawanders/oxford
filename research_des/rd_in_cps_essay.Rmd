@@ -65,7 +65,6 @@ The primary limitations of laboratory experiments are interconnected issues of v
 \clearpage
 
 ```{r Experiment Design, echo=FALSE, results='asis'}
-
 library(knitr)
 library(kableExtra)
 
@@ -80,11 +79,11 @@ table_data <- data.frame(
 # Create the table without using footnote()
 kable(table_data, align = "l", escape = FALSE, caption = "AI-generated News Control vs Treatment conditions.") %>%
   kable_styling(full_width = FALSE, position = "center") %>%
-  add_header_above(c(" " = 1, "AI-generated News Articles" = 2), escape = FALSE) %>%  # Bold top header
-  row_spec(0, bold = TRUE) %>%  # Bold the "True" and "False" headers
-  column_spec(1, width = "4cm") %>%  # Widen the first column
-  column_spec(2, width = "4cm") %>%  # Widen "True" column
-  column_spec(3, width = "4cm")      # Widen "False" column
+  add_header_above(c(" " = 1, "AI-generated News Articles" = 2), escape = FALSE) %>% # Bold top header
+  row_spec(0, bold = TRUE) %>% # Bold the "True" and "False" headers
+  column_spec(1, width = "4cm") %>% # Widen the first column
+  column_spec(2, width = "4cm") %>% # Widen "True" column
+  column_spec(3, width = "4cm") # Widen "False" column
 
 # Manually add a LaTeX footnote below the table
 cat("\\begin{flushleft} \\footnotesize Note: Treatment variations to test for interaction effects of veracity, ideological stance, context, and source will be used. \\end{flushleft}")
