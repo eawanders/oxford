@@ -1,0 +1,552 @@
+---
+title: "DPIR - Experimental Methods 2025 - R Lab 3"
+author: ""
+date: "2025-02-03"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T,  warning = F, message = F)
+```
+
+
+## Lab Overview
+
+In this third lab session we will focus on power analysis and cover the following:
+
+* Basics of power simulations
+* Power curves
+* Power simulation with covariates
+* Power analysis for conjoint designs
+
+
+## Preliminaries
+
+We anticipate the need of the following packages:
+
+```{r results="hide"}
+library(tidyverse)
+library(ggplot2)
+library(DeclareDesign)
+```
+
+
+## The problem
+
+Suppose that we have a simple experiment with two treatment groups, with assignment $D_i \in {1,0}$.
+
+For the sake of simplicity, let's assume a sample size of `n` units and simple
+randomization to groups. We can instruct R to create this scenario for us.
+
+```{r x_data}
+# Initialize a pseudo-random number generator for reproducibility
+set.seed(6)
+
+# Define the number of individuals
+n <- 20
+
+# Implement the random assignment to the groups using a coin flip
+dat <- data.frame(Z = rbinom(2 * n, 1, 0.5))
+
+# Let's have a quick look at the first row of the data frame
+head(dat, 10)
+```
+
+Let's now suppose that the outcome under the control arm ($Y_i(0)$) is distributed as the standard normal (i.e. a normal distribution with mean 0 and standard deviation 1.)
+
+We can now simulate the average effect of the treatment by assuming a *constant* treatment effect across units, `tau`, which increases the outcome in the treatment group by `0.05` (we could just as easily assume that it *decreases* the outcome).
+
+```{r y_data}
+# Define the magnitude of the treatment effect
+tau <- 0.05
+
+# Define the outcome's distribution in the control group
+dat$Y <- rnorm(2 * n)
+
+# Impose the treatment effect on units in the treatment arm
+dat$Y <- ifelse(dat$Z == 1, dat$Y + tau, dat$Y)
+
+head(dat)
+```
+
+We now want to know whether we can *detect* the true effect `tau = 0.05` that we have imposed on the data. Notice that we know that the effect exists, so the question is only whether our design is sensitive enough to detect that effect.
+
+As it is typical, we'll assume that we want to test the null hypothesis of no effect `H_0` at the $95\%$ significance level by setting `alpha = 0.05`. We can then run a basic bivariate regression and look at the p-value assigned to the coefficient of the treatment effect. If the p-value is smaller than our `alpha`, then we can reasonably reject `H_0`.
+
+```{r}
+# Define significance level
+alpha <- 0.05 
+
+# Run bivariate regression and recover a summary of the model
+m <- summary(lm(Y ~ Z, dat))
+
+# Extract the p-value of the treatment effect and check if the effect is significant
+m$coefficients["Z","Pr(>|t|)"] < alpha
+```
+
+In this case, we can reject the null hypothesis (if the output above returns FALSE for you, don't worry too much: this is likely due to differences in random number generating settings).
+
+This result might be quite surprising: with so few subjects in each treatment group (`n = 20`), and a small treatment effect (5% of the control group's standard deviation), we may expect not to be able to detect such an effect.
+
+Let's try to demonstrate this feature. We'll rerun the same code, but taking a new "sample" from the population.
+
+``` {r}
+dat_2 <- data.frame(Z = rbinom(2 * n, 1, 0.5))
+dat_2$Y <- rnorm(2 * n)
+dat_2$Y <- ifelse(dat_2$Z == 1, dat_2$Y + tau, dat_2$Y)
+
+m_2 <- summary(lm(Y ~ Z, dat_2))
+
+m_2$coefficients["Z","Pr(>|t|)"] < alpha
+
+```
+
+Now, just by taking a new random sample, we failed to reject `H_0` - even though, in this simulated example, we know that the null hypothesis is false(!)
+
+
+## Power
+
+Ideally, we need to estimate how likely it is that, *for a given experimental design and analytic strategy*, we would be able to detect an effect of a certain size if that effect is true.
+
+The **Power** of an experiment indicates the probability of correctly rejecting the null, i.e. finding a statistically significant effect (or parameter more generally), of at least a certain size.
+
+
+With simple experimental designs, we can often rely on analytic solutions. For more complex designs, this might not be possible.
+
+The alternative is to calculate the power of a specific design by simulating its data generation process as we have done above. We can do that many times, assuming a certain effect size, and check each time whether the p-value for the target parameter(s) is less than our critical threshold `alpha` (typically 0.05).
+
+We can do this more efficiently by adopting a functional programming approach and encapsulating each component of the simulation in a separate function.
+
+### Step 1
+
+We want to be able to simulate mock data mimicking the data generation process of our
+experimental design. Contrary to the previous example, here we want to implement
+a complete randomization to treatment groups.
+
+```{r}
+# Function for data generation - taking as arguments:
+# - the sample size n
+# - the hypothesized treatment effect tau
+
+gen_data <- function(n, tau) {
+  
+  dat <- data.frame(
+    
+    # Assign units to treatment condition (0, 1)
+    Z = sample(rep(c(0, 1), n / 2)),
+    
+    # Set outcome's distribution for units in the control group
+    Y = rnorm(n)
+  
+  )
+  
+  # Impose the treatment effect on units in the treatment group
+  dat$Y <- ifelse(dat$Z == 1, dat$Y + tau, dat$Y)
+
+  return(dat)
+}
+```
+
+
+### Step 2
+
+We want to be able to run the desired statistical test on the mock data and extract the
+coefficients that are relevant for our power analysis.
+
+```{r}
+# Function to run the statistical test and extract the p-values of the
+# coefficient of the treatment effect.
+# It takes as argument data set with Z identifying the treatment condition and
+# Y identifying the outcome of interest
+
+run_test <- function(df) {
+  m <- summary(lm(Y ~ Z, df))
+  return(m$coefficients["Z","Pr(>|t|)"])
+}
+```
+
+
+### Step 3
+
+We want to iterate steps 1 and 2 several times.
+
+```{r}
+# Function that calls gen_data() and run_test() for N times and return the vector
+# of p-values generated
+
+run_sim <- function(n, tau, num_sim) {
+  p_values <- c()
+  
+  for (i in 1:num_sim) {
+    df <- gen_data(n, tau)
+    p_value <- run_test(df)
+    p_values[i] <- p_value
+  }
+  
+  return(p_values)
+}
+```
+
+
+### Step 4
+
+Finally, we want to compute the power of our experiment as a function of our chosen parameters.
+The power is just the proportion of times the p-values extracted in our simulation
+fall below our significance threshold `alpha`.
+
+```{r}
+get_power <- function(n, tau, num_sim, alpha) {
+  p_values <- run_sim(n, tau, num_sim)
+  return(mean(p_values < alpha))
+}
+```
+
+We now have all the components needed to run a power simulation.
+
+```{r}
+
+# Initialize a pseudo-random number generator for reproducibility
+set.seed(8)
+
+# Define relevant parameters
+n <- 40
+tau <- 0.05
+alpha <- 0.05
+num_sim <- 1000
+
+# Calculate the power of the experiment
+get_power(n, tau, num_sim, alpha)
+```
+
+These results suggest that, if your experimental design is captured by this simulation, we would expect to detect an effect size of 0.05 in about 4.9% of the experiments. Typically, we only run one experiment, hence that's quite a low probability -- we would most likely not want to spend research funds if we had less than 1 in 20 chances of correctly rejecting the null!
+
+
+### Increasing power 
+
+How can we *increase* the power of our experiment?
+
+One obvious option is to relax our significance threshold. If we set `alpha = 0.1` (rather than 0.05), then we are willing to be more lenient when rejecting the null hypothesis, hence our power increases.
+
+```{r}
+# Initialize a pseudo-random number generator for reproducibility
+set.seed(8)
+
+# Define relevant parameters
+n <- 40
+tau <- 0.05
+alpha <- 0.1
+num_sim <- 1000
+
+# Calculate the power of the experiment
+get_power(n, tau, num_sim, alpha)
+```
+
+In this case, our estimated power is higher than in our original example.
+However, relaxing our significance threshold to 0.1 is not ideal: while we increase our power, we also double the risk of a Type I error (we will falsely reject `H_0` 1 in 10 times). In our hypothetical case this is not concerning as we know there is a true effect, but when running an experiment we do not know whether the null hypothesis is incorrect.
+
+Another option is to increase the hypothesized treatment effect. If our treatment effect is 1, for example, then the difference between treatment and control groups will be much larger and so, *ceteris paribus*, it should be easier to detect.
+
+```{r}
+# Initialize a pseudo-random number generator for reproducibility
+set.seed(8)
+
+# Define relevant parameters
+n <- 40
+tau <- 1              # Increase the hypothesized effect size
+alpha <- 0.05         # Significance threshold reset to conventional value
+num_sim <- 1000
+
+# Calculate the power of the experiment
+get_power(n, tau, num_sim, alpha)
+```
+
+By increasing our effect size, this time our power value even exceeds the typical 0.8 threshold that experimentalists use to define "well-powered" experiments.
+
+Increasing the hypothesized effect size, however, makes a large assumption about the data generation process. If the true effect size, in the real world, is closer to 0.05, then our simulation with `tau = 1` is not a good estimate of the power of the experiment when it is conducted on a sample of the population of interest.
+
+Suppose that previous research suggests that we should expect `tau = 0.05`, as before. To be able to detect this true effect more easily, our model needs to be more sensitive. Put it in another way, we need to increase the precision of our estimates. To do so, while refraining ourselves from making strong assumption about the data generation process, we can increase our sample size.
+
+To analyse how sensitive the power of our experiment is to different magnitudes of the sample, we can run our previous simulations multiple times for different sample sizes.
+
+```{r}
+# Initialize a pseudo-random number generator for reproducibility
+set.seed(8)
+
+# Define relevant parameters
+sample_sizes <- c(500, 5000, 10000, 15000, 20000, 30000)    # The parameter n can now
+                                                            # take one of these values
+tau <- 0.05         
+alpha <- 0.05
+num_sim <- 1000
+
+# Define an empty vector to store power values for each sample size
+power_values <- c()
+
+
+# Loop over sample sizes
+for (n in sample_sizes) {
+  
+  # Calculate and store power value
+  power_values <- append(power_values, get_power(n, tau, num_sim, alpha))
+  
+}
+
+power_by_n <- data.frame(N=sample_sizes, P=power_values)
+power_by_n
+```
+
+
+## Power curves
+
+When conducting a power analysis, it is often convenient to graph variations in the power of an experiment as a function of the parameters of interest (in our case, the sample size of the experiment).
+
+To keep our code in order and efficient, let's continue to use a functional approach and define a function to graph the results of the power simulation.
+
+``` {r}
+# Function for graphing power curves
+# It takes as arguments:
+# - data frame with power results (assuming variables for power values and manipulated parameter)
+# - variable name and label for x-axis
+# - variable name and label for y-axis
+# - desired power value
+
+graph_power_curves <- function(df, x_var, y_var, x_label, y_label, power_threshold) {
+  return(
+    ggplot(df, aes(x = x_var, y = y_var)) +
+      geom_point() +
+      geom_line() +
+      labs(x = x_label, y = y_label) +
+      geom_hline(yintercept = power_threshold, linetype = "dashed")  
+  )
+}
+
+# Generate the power curve
+graph_power_curves(power_by_n, power_by_n$N, power_by_n$P, 'Sample Size', 'Power', 0.8)
+```
+
+The graph suggests that in order to reach an acceptable level of power for our hypothesized treatment effect of size 0.05, we need a rather large number of participants
+in each treatment arm -- about 7000.
+
+
+## Power simulation with covariates
+
+So far we have considered a very simple experimental design:
+  * where the unit of randomization coincides with the unit of observation;
+  * without covariates; and
+  * assuming equal allocation to treatment and control.
+
+As illustration of a more complex scenario, let's see what we could gain
+in terms of power by controlling for covariates.
+We could expect this to increase the precision of our model (smaller standard error) and, consequently, improve the power of the experiment.
+Once again, we can investigate this using a simulation approach.
+
+``` {r}
+# We need to update the function that we have defined above
+# for generating mock data
+gen_data_cov <- function(n, tau, gender_e, age_e) {
+  
+  dat <- data.frame(
+    
+    # Generate "gender" and "age" covariates
+    gender = sample(rep(c("F", "M"), n / 2)),
+    age = sample(x=18:65, size=n, replace=TRUE),
+    
+    # Assign units to treatment condition (0, 1)
+    Z = sample(rep(c(0, 1), n / 2))
+    
+  )
+  
+  # Set outcome's distribution for units in the control group
+  dat$Y = rnorm(n) + gender_e * (dat$gender=="M") + age_e * dat$age
+  
+  # Impose the treatment effect on units in the treatment group
+  dat$Y <- ifelse(dat$Z == 1, dat$Y + tau, dat$Y)
+
+  return(dat)
+}
+
+# Finally, we need to update our statistical test to include the covariates
+run_test_cov <- function(df) {
+  m <- summary(lm(Y ~ Z + (gender=="M") + age, df))
+  return(m$coefficients["Z","Pr(>|t|)"])
+}
+
+run_sim_cov <- function(n, tau, gender_e, age_e, num_sim) {
+  p_values <- c()
+  
+  for (i in 1:num_sim) {
+    df <- gen_data_cov(n, tau, gender_e, age_e)
+    p_value <- run_test_cov(df)
+    p_values[i] <- p_value
+  }
+  
+  return(p_values)
+}
+
+get_power_cov <- function(n, tau, gender_e, age_e, num_sim, alpha) {
+  p_values <- run_sim_cov(n, tau, gender_e, age_e, num_sim)
+  return(mean(p_values < alpha))
+}
+```
+
+
+We can now run a comparison of power values when the covariates are/aren't included
+in the model.
+
+```{r}
+# Initialize a pseudo-random number generator for reproducibility
+set.seed(8)
+
+# Define relevant parameters
+sample_sizes <- c(500, 5000, 10000, 15000, 20000)     # The parameter n can now
+                                                      # take one of these values
+tau <- 0.05         
+alpha <- 0.05
+num_sim <- 1000
+
+# Define an empty vector to store power values for each sample size
+power_values <- c()
+power_values_cov <- c()
+
+# Now we need to make further assumptions on the covariates' "effect" on the outcome
+gender_e <- 0.06                         
+age_e <- 0.08
+
+
+# Loop over sample sizes
+for (n in sample_sizes) {
+  
+  # Calculate and store power values
+  power_values <- append(
+    power_values, get_power(n, tau, num_sim, alpha)
+  )
+  power_values_cov <- append(
+    power_values_cov, get_power_cov(n, tau, gender_e, age_e, num_sim, alpha)
+  )
+}
+
+power_by_n <- data.frame(N=sample_sizes, P=power_values, Pcov=power_values_cov)
+power_by_n
+```
+
+
+And now let's graph the results.
+``` {r}
+ggplot(power_by_n) +
+  geom_line(aes(x = N, y = P), color = "blue") + 
+  geom_line(aes(x = N, y = Pcov), color = "red") + 
+  labs(x = "Sample Size", y = "Simulated Power") +
+  geom_hline(yintercept = 0.8, linetype = "dashed")
+
+```
+
+
+## Power analysis for conjoint design
+
+The complexities involved in the design of conjoint studies can make difficult to
+estimate if our experiment is sufficiently powered.
+Furthermore, not many resources are available for this task.
+
+We are going to look at an example of how we might conduct a
+simulation‐based power analysis for a conjoint design using the DeclareDesign framewor.
+In this example, we simulate the following design features:
+
+* Each respondent completes several conjoint “tasks”, each with two profiles
+* Each profile has attributes “party”, “experience” and “age”
+* Each attribute can affect an underlying utility function
+* In each task, the respondent chooses the profile with the highest utility
+
+We then estimate via a simple regression the effect of each attribute on being chosen.
+
+``` {r}
+# Declare the population
+population <- declare_population(
+  N = 300,
+  respondent_id = 1:N
+)
+
+# Simulate data of a conjoint design where
+# each respondent sees 4 tasks and in each task 2 profiles
+simulate_conjoint <- function(data) {
+  tasks <- 10
+  profiles_per_task <- 2
+  total_profiles <- tasks * profiles_per_task
+  
+  # For each respondent, create total_profiles rows (one per profile)
+  data <- data %>%
+    slice(rep(1:n(), each = total_profiles)) %>%
+    group_by(respondent_id) %>%
+    mutate(
+      task = rep(1:tasks, each = profiles_per_task),
+      profile = rep(1:profiles_per_task, times = tasks),
+      
+      # Randomly assign attributes to each profile:
+      party = sample(c(0, 1), size = n(), replace = TRUE),
+      experience = sample(c("Low", "High"), size = n(), replace = TRUE),
+      age = sample(c("Young", "Old"), size = n(), replace = TRUE)
+    ) %>%
+  
+    # Generate a known latent utility assuming:
+    #   party: true effect = 0.5 (when party==1)
+    #   experience: "High" gives +0.3 effect
+    #   age: "Old" gives -0.2 effect
+    # In other words, we impose on the data the hypothesized effect for
+    # each of the attributes
+    mutate(
+      utility = 0.1 * party +
+                0.05 * (experience == "High") -
+                0.2 * (age == "Old") +
+                rnorm(n())
+    ) %>%
+    ungroup() %>%
+    group_by(respondent_id, task) %>%
+    # In each task, the respondent chooses the profile with the highest utility
+    mutate(chosen = if_else(utility == max(utility), 1, 0)) %>%
+    ungroup()
+  
+  data
+}
+
+# Declare an estimator.
+# We use a simple OLS regression of the binary outcome “chosen”
+# on the attribute indicators with robust SE
+estimator <- declare_estimator(
+  formula = chosen ~ party + experience + age,
+  model = lm_robust,
+  
+  # Argument term = TRUE asks to return all the terms
+  # If term = FALSE, the function only returns the first non-intercept term
+  term = TRUE
+)
+
+# Combine all the features into one design using the + operator
+conjoint_design <- population +
+  declare_step(simulate_conjoint) +
+  estimator
+
+# Run the simulation
+set.seed(123)
+sim_results <- simulate_design(conjoint_design, sims = 200)
+
+# Look at a summary of the simulation results.
+# summary(sim_results)
+
+# For each attribute, estimate power as proportion of simulations where
+# the p-value for the party effect is < 0.05.
+sim_results %>%
+  group_by(term) %>%
+  summarise(power = mean(p.value < 0.05))
+```
+
+
+## Limitations
+
+Power estimation involves making and justifying assumptions
+on key parameters of the data generation process:
+
+  * The hypothesized treatment effect size (can you use previous studies to inform this?)
+  * The noisiness of the data generation process (the standard deviation of our control arm, in the example above)
+  * Whether to include covariates that may absorb some of the unexplained variance, and how these feed into your regression model
+
+Power estimations are useful when the assumptions that we make about the data generation process (including the treatment effect size) well approximate the real experimental data. Obviously, since our goal is typically to design an experiment to learn something about the world, we are very unlikely to be certain if that is true. We might then want to first run a pilot of the study to recover plausible
+parameters for estimating the power of our study.

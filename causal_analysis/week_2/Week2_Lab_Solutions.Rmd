@@ -1,0 +1,403 @@
+---
+title: "Week 2: Randomized Experiments"
+date: HT 2025
+author: replace with your name
+output: pdf_document
+---
+
+# Introduction
+In this week's lecture, we delved into the core concepts of causal inference, focusing particularly on the role of random assignment in experimental design. We discussed how random assignment is pivotal in addressing **The Fundamental Problem of Causal Inference**. By equitably distributing both observed and unobserved confounders across treatment and control groups, random assignment strengthens the internal validity of our causal inferences.
+
+We also established that randomized experiments are often considered the 'gold standard' of causal research due to their robustness in establishing causal relationships. The analysis of such experiments is typically straightforward, employing tools like t-tests and linear regression for estimations. However, it's crucial to remember the potential trade-offs between internal and external validity in experimental research.
+
+In this lab, we will bring these concepts to life. Specifically, we will:
+
+1. Create and analyse a hypothetical randomised experiment to illustrate the efficacy of random assignment in overcoming the fundamental problem of causal inference.
+2. Use real data from a field experiment by Gerber, Green, and Larimer to explore the motivations behind voting behavior, employing regression analyses to estimate Average Treatment Effects (ATE).
+3. Assess the impact of different treatments and the role of extrinsic and intrinsic motivations in voter turnout.
+4. Explore how to check for covariate balance in treatment and control groups and discuss the implications for selection bias and randomisation efficacy.
+
+
+**Before starting this seminar**
+
+1.  Create a folder called `lab2`.
+
+2.  Download the data and the empty RMarkdown file (available on [Canvas](https://canvas.ox.ac.uk/courses/226614/modules)). Also download the two .png files if you want to try to knit this rmd to pdf. 
+
+3.  Save both in our `lab2` folder.
+
+4. Open the RMarkdown file.
+
+5.  Set your working directory using the `setwd()` function or by clicking on \"More\". For example, this may look like this: `setwd(\"\~/Desktop/Causal Inference/2024/lab2\")`. 
+
+If you have saved the rmd file, the dataset, and the image files from canvas in the same folder as instructed above, you can skip setwd()
+
+
+
+```{r setup, include=FALSE}
+# Let's get started!
+#setwd("folderpath/lab2")
+rm(list=ls()) # Clear working environment
+
+## Global options
+knitr::opts_chunk$set(cache = FALSE,  # What does cache = TRUE do? When is this useful?
+                      warning = FALSE, 
+                      message = FALSE)
+
+# The following code checks and installs all packages needed for running the
+# code. It then also loads them into our environment.
+
+#install.packages("pacman") 
+library(pacman) 
+
+## Load (and install) packages needed for the analyses
+pacman::p_load(tidyverse,  # Cleaning data, plotting pretty plots ;)
+               stargazer  # Neat regression tables 
+               ) # Style the RMD HTML output
+
+```
+
+
+# How functions function
+One of the great strengths of R is the user’s ability to write their own functions. Sometimes there is a small task (or series of tasks) you need done and you find yourself having to repeat it multiple times. In these types of situations it can be helpful to create your own custom function. The structure of a function is given below:
+
+When defining the function you will want to provide the list of arguments required (inputs and/or options to modify behaviour of the function), and wrapped between curly brackets place the tasks that are being executed on/using those arguments. The argument(s) can be any type of object (like a scalar, a matrix, a dataframe, a vector, a logical, etc), and it’s not necessary to define what it is in any way.
+
+Finally, you can “return” the value of the object from the function, meaning pass the value of it into the global environment. The important idea behind functions is that objects that are created within the function are local to the environment of the function – they don’t exist outside of the function.
+
+> **Note**: You can also have a function that doesn’t require any arguments, nor will it return anything.
+
+## Toss a coin
+
+### Write a basic function
+
+Let’s try creating a simple example function. This function will flip a coin for us and give us the result.
+
+```{r Functions-1.1}
+toss_a_coin <- function(n) {
+    sample(c("heads", "tails"), n, replace = T)
+}
+```
+
+Now, we can use the function as we would any other function. We type out the name of the function, and inside the parentheses we provide a numeric value `n`:
+
+```{r Functions-1.2}
+toss_a_coin(5)
+```
+### Replicate functions
+We can also create a dataset with multiple draws. You can do this using the `replicate()` command, with two arguments: the first is the number of simulations and the second is the function being evaluated. The `replicate()` function in R is crucial for statistical simulations, like Monte Carlo methods or bootstrapping, allowing for repeated execution of a function. For instance, replicate(10, toss_a_coin(5)) performs ten sets of five coin tosses, providing a dataset to analyse patterns and probability distributions.
+```{r Functions-1.3}
+replicate(10, toss_a_coin(5))
+```
+## Find the mean
+ This code gives us the numbers 1 to 15.
+```{r Functions-1.4}
+numbers <- 1:15 # Save numbers 1 to 15 in a vector
+numbers # Check that it worked
+```
+
+If we calculated the mean by hand, we would sum all values up and divide the sum by the number of observations.
+$$
+\bar{x} = \frac{\sum_{i=1}^{n} x_i}{n} 
+$$
+Or in R code:
+```{r Functions-1.5}
+sum(numbers)/length(numbers)
+```
+## Write a basic function
+But we might want to do this operation more than once. So, let's put this into a function:
+```{r Functions-1.6}
+find_mean <- function(vector){
+  # Store the sample size
+  n <- length(vector)
+  # Sum up all values
+  sum <- sum(vector)
+  # Divide sum by n
+  mean <- sum/n
+  # Return the mean
+  return(mean)
+}
+```
+
+And let's try our `find_mean` function out:
+```{r Functions-1.7}
+find_mean(numbers)
+```
+
+Pretty simple, right? In this case, we only had one line of code that was run, but in theory you could have many lines of code to get obtain the final results that you want to “return” to the user. 
+
+But isn't there a function for this already? Let's see what the inbuilt base R `mean()` function does.
+```{r Functions-1.8}
+?mean
+```
+
+It seems like the function does the exact same. So let's see if we get the same result by using a basic call like we did before.
+```{r Functions-1.9}
+mean(numbers)
+```
+
+So far, so good. But what is going on under the hood?
+```{r Functions-1.10}
+getS3method("mean", "default")
+```
+Much more than in our function! But now that you know how functions work, you can write your own functions for all sorts of things: automate recoding tasks, simulate data or simply play around!
+
+
+# Randomisation
+In this question we will demonstrate that randomised experiments work by creating an imaginary experiment, using simulated data. We will simulate the potential outcome under control ($Y_{0}$) and the potential outcome under treatment ($Y_{1}$) for 100 units that form the sample for our experiment. Note that this is a *purely hypothetical scenario*. In reality, we never observe potential outcomes under both treatment and control for the same units: we only observe one of them (the fundamental problem of causal inference). By creating a randomised experiment with this dataset, we’ll demonstrate that experiments overcome the fundamental problem.
+
+Let's start by simulating data of our hypothetical experiment. For that, we will need to use the command `set.seed(1)` so that your results are the same as the solutions.
+```{r simulate-data-task-1}
+# Set seed
+set.seed(1)
+
+# Simulate potential outcome under control (Y0) for 100 units
+y0 <- round(rnorm(100, 50, 20), digits = 2)
+
+# Set seed (again!)
+set.seed(1)
+
+# Simulate potential outcome under treatment (Y1) for 100 units
+y1 <- y0 + rnorm(100, 20, 5)
+
+# Tie everything into a dataset
+a <- data.frame(cbind(y0, y1))
+
+# Get rid of unnecessary vectors
+rm(y0, y1)
+
+```
+
+**Task 1.1** 
+Find the true Average Treatment Effect for all units, using $Y_{0}$ and $Y_{1}$.
+
+```{r task-1.1}
+mean(a$y1-a$y0)
+```
+
+
+**Task 1.2**  
+Now, we’ll randomly assign half of the units to treatment and half to control by creating a new variable indicating treatment status. We can do this using the following steps:
+i) First, input the command `set.seed(1)` again so that your results are the same as the solutions.
+ii) Assign each unit a random number from 1 to 100: create a new column in the dataset named `rand`, using the `sample()` command and a vector of the numbers 1 to 100. 
+iii) Re-order the dataset from lowest to highest value of rand using the code `a <- a[order(a$rand),]`.   
+iv) Create a treatment variable named `tr` that equals 1 for the first 50 units and 0 for the second 50 using the code `c(rep(1,50),rep(0,50))`.  
+```{r task-1.2a}
+set.seed(1); a$rand <- sample(c(1:100)) # Task 1.2 (i) and (ii)
+a <- a[order(a$rand),] # Task 1.2 (iii)
+a$tr <- c(rep(1,50),rep(0,50)) # Task 1.2 (iv)
+```
+
+**Task 1.3** 
+Conduct a test to assess whether the treatment and control groups have the same average potential outcomes under control ($Y_{0}$). Has randomisation succeeded in creating treatment and control groups with equivalent potential outcomes under control?
+```{r task-1.3}
+ttest_experiment <- t.test(a$y0[a$tr==1], a$y0[a$tr==0])
+ttest_experiment
+```
+
+> Remember that randomisation isn’t guaranteed to completely equalise potential outcomes in any one instance. Instead, it does so in expectation over many repeated randomisations, as we show below.
+
+**Task 1.4** 
+Find the Average Treatment Effect from the experiment. How similar is it to the true Average Treatment Effect?
+```{r task-1.4}
+mean(a$y1[a$tr==1])-mean(a$y0[a$tr==0])
+```
+The estimated ATE is 24.6, which is close to the true ATE (20.54) but not exactly the same. Again, remember that any one randomisation isn’t guaranteed to give the true ATE.
+
+**Task 1.5** 
+Now, let’s see how our experimental procedure performs over repeated randomisations, using a simulation:
+
+Create a function that takes in the dataset `a`, carries out a randomised experiment, and plots the observed outcomes in treatment and control groups. You can do this by using code from task 1.2 and the plot function that we already provide below. Do we have to set a seed here?  
+
+> **Code Hint**: Remember that a function in R has the following format: `function.name <- function(input) { function commands }`.
+
+```{r task-1.5a}
+experiment.sim <- function(a) {
+  # Assign each unit a random number from 1 to 100
+  a$rand <- sample(c(1:100))
+  # Re-order the dataset from lowest to highest value of rand using the code
+  a <- a[order(a$rand), ]
+  # Create a treatment variable named `tr`
+  a$tr <- c(rep(1, 50), rep(0, 50))
+  
+  
+  # Set up the plotting area for two panels (1 row, 2 columns)
+  par(mfrow = c(1, 2))
+
+  # Plot for control group (y0) where tr == 0
+  plot(a$y0[a$tr == 0], main = "Control Group", xlab = "Observation", ylab = "Y0", ylim = c(0, 120))
+  abline(h = mean(a$y0[a$tr == 0]), col = "#2A788EFF", lwd = 3, lty = 2)
+
+
+  # Plot for treatment group (y1) where tr == 1
+  plot(a$y1[a$tr == 1], main = "Treatment Group", xlab = "Observation", ylab = "Y1", ylim = c(0, 120))
+  abline(h = mean(a$y1[a$tr == 1]), col = "#2A788EFF", lwd = 3, lty = 2)
+
+  # Reset plotting area to default (optional)
+  par(mfrow = c(1, 1))
+}
+```
+
+**Second, show the results of 5 randomised experiments by running the function 5 times.**
+
+```{r task-1.5b}
+nsims <- 5 
+replicate(nsims,experiment.sim(a))
+```
+
+
+
+# Social norms and turnout: A field experiment
+## Introduction
+Why do people bother to vote? One hypothesis is adherence to social norms. Voting is widely regarded as a civic duty and people worry that others will think badly of them if they fail to participate. According to this theory, voters may receive two different types of utility from voting; (a) the intrinsic rewards from performing this duty and (b) the extrinsic rewards received when others observe them doing so. To gauge the effects of priming intrinsic motives and applying varying degrees of extrinsic pressure on voting behaviour, Gerber, Green, and Larimer conducted a famous field experiment in Michigan prior to the August 2006 primary election. The sample for the experiment was 344,084 voters. They were randomly assigned to either the control group or one of four treatment groups.\newline
+Gerber, A., Green, D., & Larimer, C. (2008). "[Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment](https://doi.org/10.1017/S000305540808009X)." *American Political Science Review*, 102 (1): 33-48.
+
+**Treatment: Civic duty**\newline
+We’ll practice analysing experiments by focusing on two of their treatments. The first treatment, “civic duty”, involved sending a letter to the voter carrying the message “DO YOUR CIVIC DUTY - VOTE!”. 
+
+![*Letter sent to people in the civic duty group.*](civic_duty_treatment.png)
+**Treatment: Neighbours**\newline
+The second treatment, “Neighbors” sent the same letter, but also informed the voter that who votes is public information (which is the case by law in the USA). It listed the recent voting record of each registered voter in the household and the voting records of those living nearby, and stated that a follow-up letter after the election would report back to the household and to their neighbours on who had voted and who had not.The idea was to see whether priming extrinsic motivations would encourage this treatment group to turn out more than the control group, who received no letter.
+
+![*Letter sent to people in the neighbour group.*](neighbour_treatment.png)
+
+For this question we’ll use the original data of Gerber et al, contained in the file `gerber.Rda`. 
+
+Below is a list of the variable definitions:
+
+- `sex` - gender (1 if female, 0 if male)
+- `yob` - year of birth
+- `p2004` - 1 if Respondent voted in the 2004 Primary Election, 0 otherwise
+- `voting` - 1 if Respondent voted in the 2006 Primary Election, 0 otherwise (the outcome variable)
+- `control` - 1 if Respondent is assigned to the control group, 0 otherwise
+- `civicduty` - 1 if Respondent is assigned to the “Civic Duty” group, 0 otherwise
+- `neighbors` - 1 if Respondent is assigned to the “Neighbors” group, 0 otherwise
+
+Let's first load the `gerber.Rda` data into our environment!
+```{r load-data-task-2}
+load("gerber.Rda")
+```
+
+
+**Task 2.1** 
+For both treatments, calculate the average treatment effect and test whether it is statistically significant. Interpret the results, giving a precise explanation of the magnitude of the treatment effects. What do they suggest about the motivations that people have for voting?
+```{r task-2.1}
+# TREATMENT: CIVIC DUTY
+mean(g$voting[g$civicduty==1]) - mean(g$voting[g$control==1]) 
+
+ttest_civic_duty <- t.test(g$voting[g$civicduty==1], g$voting[g$control==1])
+ttest_civic_duty
+
+# TREATMENT: NEIGHBOURS
+mean(g$voting[g$neighbors==1]) - mean(g$voting[g$control==1])
+
+ttest_neighbors <- t.test(g$voting[g$neighbors==1], g$voting[g$control==1])
+ttest_neighbors
+```
+The ATE for the civic duty treatment is 0.018 and the ATE for the neighbors treatment is 0.081. They have t-statistics of 6.9 and 30.2 respectively, meaning that they are both statistically significant at all conventional significance levels. Because the outcome variable is binary, the ATEs just tell us the differences in the probability that someone voted. Thus, the probability that someone voted in the “civic duty” group was 1.8 percentage points higher than the control group and the probability that someone voted in the “neighbors” group was 8.1 percentage points higher than the control group. The results support the idea that people have both intrinsic motivations to vote (since “civic duty” led to higher voting) and even stronger extrinsic motivations to vote (since public shaming led to even higher voting). 
+
+Note that you could also express these results in terms of proportions: recall from last term that the mean of a binary variable is the same as the probability of the “1” outcome occurring and the same as the proportion of its observations that equal 1. Thus, 1.8 percentage points more people voted in the “civic duty” group compared to the control group and 8.1 percentage points more people voted in the “neighbors” group compared to the control group. 
+
+
+**Task 2.2* 
+For both treatment groups, compare the mean values of `yob`, `sex` and `p2004` to the control group. Do the results suggest that randomisation was successful? Is selection bias likely to be a problem in this experiment?
+
+```{r task-2.2}
+#COMPARISONS CIVIC DUTY VS CONTROL GROUP
+t.test(g$yob[g$civicduty == 1], g$yob[g$control == 1])
+
+t.test(g$sex[g$civicduty == 1], g$sex[g$control == 1])
+
+t.test(g$p2004[g$civicduty == 1], g$p2004[g$control == 1])
+#COMPARISONS NEIGHBOUR VS CONTROL GROUP
+t.test(g$yob[g$neighbors == 1], g$yob[g$control == 1])
+
+t.test(g$sex[g$neighbors == 1], g$sex[g$control == 1])
+
+t.test(g$p2004[g$neighbors == 1], g$p2004[g$control == 1])
+```
+
+In all cases, the difference between the treatment group and control group is tiny. This suggests that randomisation was successful. Under true randomisation the control group should provide a valid counterfactual for the treatment group, which means that the average characteristics of the two groups should be virtually identical. This also means that selection bias is unlikely to be a problem in this experiment. If randomisation was successful, there should be zero selection bias. However, it is worth pointing out three caveats.
+
+First, although the differences are very tiny for the p2004 variable, the difference is statistically significant. As always in statistics, it is important to consider the size of an effect as well as its statistical significance. Here the dataset is huge, making it very easy for even tiny differences to be statistically significant, so this is probably not a major concern.
+
+Second, if there had been large differences between the treatment and control groups, that would not necessarily mean that there was a failure of randomisation. It is perfectly possible for such differences to emerge due to chance alone. If you did find large differences in your own experiment, it would certainly be sensible to check whether an error was made in randomisation, remembering that it is possible for such differences to emerge merely by chance.
+
+Third, just because we found no difference in terms of observed variables, there could still be selection bias from unobserved variables. Nonetheless, such a case is unlikely when randomisation was successful.
+
+**Task 2.3** 
+Calculate the ATE for the the neighbors treatment using: 
+
+a) A regression containing only neighbors. 
+
+Note that you will need to subset your data appropriately in order to obtain the correct control group.
+```{r task-2.3a}
+# Subset to only neighbors and control observations
+g_reg <- g[g$neighbors==1|g$control==1,] # the base R syntax is dfname[rowstokeep, columnstokeep]. To keep all columns, we can say df[rowstokeep,] and to keep all rows but select some columns we can say df[,columnindices] -- for example, df[,c(1,3,4)] will select only the first, third, and fourth columns.
+
+
+#library(dplyr) # You can also use dplyr/tidyr
+#g_reg <- g %>% 
+#  filter(neighbors==1 | control == 1)
+
+# Run model containing only neighbors
+model1 <- lm(voting ~ neighbors, data=g_reg) 
+
+```
+
+
+b) A regression containing neighbors and the three background characteristics. 
+
+Are there any big differences in the estimated ATE between the two specifications? Or between these two estimates and the result from task 2.1? Why or why not?
+```{r task-2.3b}
+# Run model containing neighbors and background characteristics
+model2 <- lm(voting ~ neighbors + sex + yob + p2004, data=g_reg)
+
+```
+
+
+
+```{r task-2.3-table-txt, results='hide'}
+## We specified results='hide' in our chunk settings to avoid printing "text" format
+## table generated by this chunk, since we are knitting to pdf format.
+## 1. Try removing the comma and the results setting and then knit this rmd to pdf. 
+
+# Use stargazer to create a table comparing the two models with custom labels
+# Here's an easy guide to stargazer tables: https://libguides.princeton.edu/R-stargazer
+# Stargazer package documentation: https://cran.r-project.org/web/packages/stargazer/stargazer.pdf
+
+## To get MS Word compatible table in your working directory:
+stargazer(model1, model2, type="text", title = "Comparison of Regression Models",
+          column.labels = c("Base model", "With controls"),
+          covariate.labels = c("Neighbor treatment", "Female", "Year of birth", 
+                               "Turnout 2004 Primary Election"),
+          dep.var.labels.include = FALSE,
+          dep.var.caption = "Voter Turnout",
+          out="table.text" # this option will output a text file called table.text 
+                           # in your working directory getwd(). You can use this in 
+                           # word processors
+          ) 
+
+```
+In all cases, the results are virtually identical to the answer obtained in part (a) using a simple difference-in-means, although the standard errors are very slightly smaller. This is not surprising. In part a) as we saw in week 1, a simple regression with only the treatment variable is numerically exactly identical to a difference-in-means. In part b), we would not expect adding in controls for background covariates to make much difference, since they are uncorrelated with the treatment variable (even though they are strongly correlated with the outcome). It is always the case in regression analysis that we can safely omit any variable that is uncorrelated with either the outcome or the existing independent variables.
+
+```{r task-2.3-table-latex, results='asis'}
+## Note that we specify results='asis' to use print the table directly in the 
+## pdf report generated by knitting this .rmd file.
+## 1. Try knitting this file and look at Table 1. We produce that table in this chunk
+## 2. Try knitting this file without the results setting. Without the results option,
+##    the pdf report will contain only the code that would create Table 1 in latex
+
+## To get a LaTeX table:
+stargazer(model1, model2, type="latex", 
+          title = "Comparison of Regression Models",
+          column.labels = c("Base model", "With controls"),
+          covariate.labels = c("Neighbor treatment", "Female", "Year of birth", 
+                               "Turnout 2004 Primary Election"),
+          dep.var.labels.include = FALSE,
+          dep.var.caption = "Voter Turnout"
+          #,out="table.tex" ## uncomment to get a latex file in your working directory 
+          ) 
+
+```
+
