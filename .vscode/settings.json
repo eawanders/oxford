@@ -1,6 +1,14 @@
 {
-    "github.copilot.enable": {
-        "markdown": true,
-        "plaintext": true
-    }
+  "github.copilot.enable": {
+    "markdown": true,
+    "plaintext": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[rmd]": {
+    "editor.defaultFormatter": "REditorSupport.r"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.requireConfig": false
 }
