@@ -1,0 +1,55 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Experimental Protocol"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: pdf_document
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}
+---
+
+## Research Question & Hypothesis
+
+My research question is broadly focussed on the effets of exposure to AI-generated news articles on political attitudes. If an effect is seen, I am interested in its size to inform fututre research on AI's effects on voting behaviour, and then understanding who may be most susceptible to becoming more polarised and sceptical of policy and opposition partisans.
+
+**Research Question**: Does exposure to AI-generated news increase policy and affective polarisation? $\\$
+**Conformatory Hypothesis**: Exposure to the treatment will increase policy and affective polarisation.
+
+## Treatment Conditions
+
+To understands the effects of exposure to AI-generated news articles, I will need to isolate the effect of a respondents' attitudes as a result of an AI-generated news treatment. However, the primary experimental design issue I must address is whether the effect of treating someone with AI-generated news is an effect of the news content itself, or an effect of the fact that the article is AI-generated.
+
+```{r Experiment Design, echo=FALSE, results='asis'}
+library(knitr)
+library(kableExtra)
+
+# Table data with normal content
+table_data <- data.frame(
+    ` ` = c("Control", "Treatment"),
+    `True Articles` = c("Labeled as AI", "No label"),
+    `False Articles` = c("Labeled as AI", "No label"),
+    check.names = FALSE
+)
+
+# Create the table without using footnote()
+kable(table_data, align = "l", escape = FALSE, caption = "AI-generated News Control vs Treatment conditions.") %>%
+    kable_styling(full_width = FALSE, position = "center") %>%
+    add_header_above(c(" " = 1, "AI-generated News Articles" = 2), escape = FALSE) %>% # Bold top header
+    row_spec(0, bold = TRUE) %>% # Bold the "True" and "False" headers
+    column_spec(1, width = "4cm") %>% # Widen the first column
+    column_spec(2, width = "4cm") %>% # Widen "True" column
+    column_spec(3, width = "4cm") # Widen "False" column
+
+# Manually add a LaTeX footnote below the table
+cat("\\begin{flushleft} \\footnotesize Note: Treatment variations to test for interaction effects of veracity, ideological stance, context, and source will be used. \\end{flushleft}")
+```
+
+## How units are assigned to treatment conditions.
+
+## How you will measure the primary outcomes.
+
+## How your primary hypotheses will be tested
