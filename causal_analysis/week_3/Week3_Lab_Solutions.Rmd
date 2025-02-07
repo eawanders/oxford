@@ -1,0 +1,453 @@
+---
+title: "Selection on Observables - Solutions"
+author: Tanisha Mohapatra & Fernando Sanchez Monforte
+date: "Week 3 HT 2025"
+output:
+  pdf_document:
+    number_sections: false
+---
+
+# Introduction
+
+This week, we will look at one of the available tools for inference when the treatment of interest is not randomized -- **matching**. In particular, we explore how relying on the **selection on observables** can boost (or not) our confidence in the effects of treatment that we uncover in such scenarios. 
+
+Although this approach is far from the 'gold standard' of RCTs, often, the scenarios in which we can adjust for treatment probability based on observable characteristics can have some advantages. These scenarios:
+
++ Don't require researchers to conduct their own data collection (which might be costly, impractical, unethical or a combination thereof);
++ Allow for a larger sample sizes; 
++ Can be used to study events that already happened, but remain of interest.
+
+
+In this lab session, we will implement to concepts from this week's lecture\footnote{This session builds on materials kindly shared by Tom O'Grady, Jack Blumenau, and Julia de Romémont}. Specifically:
+
+1. Discuss the pitfalls of ignoring the observational nature of treatment assignment
+2. Go over matching techniques and options
+3. Compare treatment and control groups before and after matching
+4. Analyze ATT before and after matching
+5. Explore ATT's robustness to different matching choices
+
+
+**Before starting this seminar**
+
+1.  Create a folder called `Lab3`.
+2.  Download the data and the empty RMarkdown file from Canvas
+3.  Save both in our `Lab3` folder.
+4.  Open the RMarkdown file.
+5.  Set your working directory using the `setwd()` function or by clicking on \"More\". 
+6.  Prepare your R environment running the code below.
+
+
+```{r Setup, echo=FALSE}
+# Let's get started!
+
+## Global options:
+knitr::opts_chunk$set(cache = FALSE, # Set this to TRUE if chunks are performing time taking calculations and you want to use those calculations at a later stage. The first time chunks run, R will store the results of chunk in your disk and use this copy for all subsequent runs
+                     echo = FALSE, # If TRUE, code chunk is printed to the pdf
+                     warning = FALSE, 
+                     message = FALSE)
+
+## We use pacman to install and load all packages we need: 
+# install.packages("pacman") # Uncomment if you don't have pacman installed yet!
+library(pacman)
+pacman::p_load(tidyverse,  # Cleaning data, plotting 
+               stargazer,  # Neat regression tables
+               kableExtra, # Yet another package for tables
+               tableone, # This one is for summary/balance tables
+               MatchIt, # For matching procedures
+               rgenoud, # Helps with optimization problems
+               ggplot2, # Plots!
+               sjPlot, # Other plots!
+               foreign # Read different file formats
+               )
+
+```
+
+# MPs for Sale?
+
+What is the monetary value of serving as an elected politician? It is firmly a part of received wisdom that politicians often use their positions in public office for self-serving purposes. There is much evidence that private firms profit from their connections with influential politicians, but evidence that politicians benefit financially *because of* their political positions is thin. \href{https://www.jstor.org/stable/27798523}{Eggers and Hainmueller (2009)} seek to address this question by asking: what are the financial returns to serving in parliament? They study data from the UK political system, and compare the wealth at the time of death for individuals who ran for office and won (MPs) to individuals who ran for office and lost (candidates) to draw causal inferences about the effects of political office on wealth.\footnote{Eggers, A.C., and Hainmuller J. (2009). \href{https://www.cambridge.org/core/journals/american-political-science-review/article/mps-for-sale-returns-to-office-in-postwar-british-politics/E4C2B102194AA1EA0D2F1F777EAE3C08}{``MPs for Sale? Returns to Office in Postwar British Politics}.'' \textit{American Political Science Review}, 103 (4): 513-533}
+The data from this study is in Rdata format, and provided that you have downloaded the data and placed it within the right folder, then it can be loaded using the `load()` function as follows:
+
+```{r mps-loaddta}
+load("eggers_mps.Rdata")
+# If you haven't saved your .rmd code file in the same folder:
+#load("pathtodatafolder/eggers_mps.Rdata")
+```
+
+Files in `.Rdata` format are automatically loaded with a pre-assigned name (`mps` in this case). The dataset includes observations for `r nrow(mps)` individuals. There are indicators for the main outcome of interest -- the (log) wealth at the time of the individual's death (`lnrealgross`), and for the treatment -- whether the individual was elected to parliament (`treated == 1`) or failed to win their election (`treated == 0`). The data also includes information on a rich set of covariates, as described below
+
+
+Table: Variables in 'mps.RData', from [Eggers and Hainmueller (2009)](https://www.jstor.org/stable/27798523)
+
+| **Variable**    | **Description**  |
+|----------|--------------------------------------------------------------|
+| `lnrealgross`    | Wealth at the time of the individual's death (logged) |
+| `treated`    | Was individual elected to parliament? 1 = Yes, 0 = No |                               
+| `labour`    | Labour Party member (1) or not (0)   |                                                              
+| `tory`    | Conservative Party member (1) or not (0)   |                                                          
+| `yob`    | Year of birth   |                                                                     
+| `yod`    | Year of death   |                                                                     
+| `female`    | Female (1) or not (0)   |                                                                     
+| `aristo`    | Individual holds an aristocratic title (1) or not (0)   |                                         
+| `scat_**`    | Variables about secondary education of the individual, all prefixed `scat_` (see the paper for details)  |
+| `ucat_**`    | Variables about university education of the individual, all prefixed `ucat_` (see the paper for details)|  
+| `oc_**`    | Variables about pre-treatment occupation of the individual, all prefixed `oc_` (see the paper for details) |                                                                     
+
+## A. Getting started  
+
+### Task 1  
+Estimate the average treatment effect using either a `t.test` or a bivariate linear regression. What is it? Is it significantly different from  zero? Can we interpret this as an unbiased estimate of the causal effect of elected office on wealth?
+
+
+```{r mps-ttest}
+t_test <- t.test(mps$lnrealgross[mps$treated ==  1],
+       mps$lnrealgross[mps$treated ==  0])
+```
+
+
+```{r mps-lm1}
+lm_model <- summary(lm(lnrealgross ~ treated, data = mps))
+```
+
+
+The results suggests that gross log wealth of those in the treated group -- those individuals who were elected to parliament -- was 0.52 points higher than for those in the control group. In other words, elected candidates were worth, on average, 67% (i.e. `(exp(0.517)-1)*100`) more at death than candidates who failed to win elections. The difference is significantly different from zero. **Is the difference found above causal? Why (not)?**
+
+
+### Task 2  
+There are clearly many potentially confounding differences between those who are elected and those who are not elected, preventing us from inferring anything about a causal relationship between serving as an MP and wealth at the time of death. That is, it is likely that the differences estimated in the regression above are subject to selection bias. Let's test whether that's the case.
+
+> *Hint*: You can check selected variables one by one, produce a table, plot the values, or approach it it in any other way
+
+
+```{r pre-balance}
+## Create a balance table for some socio-demographic variables
+CreateTableOne(vars = c('labour', 'tory', 'yob','yod',
+                        'female','aristo','scat_eto','ucat_ox'),
+               strata = "treated" ,
+               data = mps) %>% kableone()
+```
+
+
+We can see that the balance on the selected observables is not as bad as we could expect, but it is not perfect. *Which variables should be the main source of concern? Why?*
+
+
+## Matching
+
+The main function we will use is `matchit()`, from the `MatchIt` package. The function takes a number of arguments, the most important of which are listed in the table below.\footnote{You can also explore the help file for the function by running `?matchit`.} Note that, depending on the matching method, not all of the argument will be needed and then they will take on their default values.
+
+Table: Arguments to the `matchit()` function
+
+|**Argument**|**Description**|
+|----------|--------------------------------------------------------------|
+|`formula`| A two-sided formula in the form of `treatment_variable ~ covariates` |
+|`data`| A data frame containing the variables in `formula`.|
+|`method` | The matching method to be used. Available options are, among others, `"exact"`, `"nearest"` and `"genetic"`.|
+|`distance` | If applicable, the distance measure to be used, like `"euclidean"` or `"mahalanobis"`\footnote{To learn more about this distance measure, see the discussion linked \href{https://jamesmccaffrey.wordpress.com/2017/11/09/example-of-calculating-the-mahalanobis-distance/}{here}.}|
+|`estimand`| Either `"ATT"` to calculate the average treatment effect for the treated (the default), `"ATE"` for the average treatment effect, or `"ATC"` for the average treatment effect for the controls. |
+|`replace`| For methods that allow it, should matched observations be re-used? `TRUE` or `FALSE`|
+|`ratio` | For methods that allow it, how many control units should be matched to each treated unit in k:1 matching? |
+|`m.order` | For methods that allow it, the order that the matching takes place. Set to `"random"` when ties should be broken randomly.|
+
+
+Let's go back to our MPs dataset.
+
+### Task 3  
+Can we use **matching** to remove or at least reduce the bias? The idea here is to make treatment independent of the potential outcomes **conditional** on observable covariates. Implement matching as discussed in the lecture using the `matchit()` function from the `MatchIt` package.
+
+To start, let's use exact 1:1 matching. Remember, this means that for every treated unit we have to find a non-treated (control) unit that is exactly the same on all observables we specify. We first will match the observables that were found to be most imbalanced: Conservative Party MP (`tory`), aristocratic title (`aristo`), and whether the individual received their secondary education from Eton (`scat_eto`). 
+
+#### Task 3.1 
+How many matched observations are there? 
+
+```{r base-match}
+
+## Perform matching:
+match.out <- matchit(treated ~ tory + aristo + scat_eto, 
+                     data = mps,
+                     method = "exact",
+                     estimand = "ATT")  
+
+## Number of observations after matching:
+nobs <- summary(match.out)$nn 
+
+## Extract data:
+matched.data <- match.data(match.out) 
+
+
+### ESS = effective sample size = size of unweighted sample with the same level of precision
+# w = matched.data$weights[matched.data$treated == 0]
+# sum(w)^2/sum(w^2)
+
+# See more: https://stats.stackexchange.com/questions/611902/reduced-effective-sample-size-in-balanced-population-after-inverse-probability-t
+
+
+## See whether exact matching worked - each overlapping combination
+## of the matched variables should create a separate subclass:
+#tapply(paste0(mps$tory, mps$aristo, mps$scat_eto), mps$treated, table)
+#table(matched.data$subclass)
+
+```
+
+There are 162 matched observations. This number comes from the fact that we are matching for the treated units, where there are 165 in the original data, and from the fact that three treated units were dropped because they could not be matched on these covariates.
+
+#### Task 3.2  
+What is the average treatment effect on the treated (ATT)? 
+
+```{r base-result}
+## estimate model with matched data, without covariates and 
+## with weights (calculated based on the proportion of treated
+## units in each sttratum, see the helpfile)
+
+est <- lm(lnrealgross ~ treated, data = matched.data, weights = weights)
+
+coef(est)[2]
+
+```
+
+The ATT (the coefficient associated with the variable `treated` is equal to `r coef(est)[2] %>% round(3)` 
+
+### Task 4
+Re-evaluate the balance between treated and control observations on gender, aristocratic title, and whether the individual received their secondary education from Eton. Do this for the raw data, and then for the matched data with by regressing each covariate on the treatment variable. 
+
+> \textit{Hint:} For the matched data, you need to specify the `weights`.
+
+
+```{r post-balance}
+
+## Pre-match balance
+m.tory <- lm(tory ~ treated, data = mps)
+m.aristo <- lm(aristo ~ treated, data = mps)
+m.scat_eto <- lm(scat_eto ~ treated, data = mps)
+
+## Post-match balance
+m.tory.match <- lm(tory ~ treated, data = matched.data, weights = weights)
+m.aristo.match <- lm(aristo ~ treated, data = matched.data, weights = weights)
+m.scat_eto.match <- lm(scat_eto ~ treated, data = matched.data, weights = weights)
+
+# You can look at each model individually with summary(model.name).
+# Alternatively, below is some code to put this all in a neat table. 
+# PS: the code is horrible to look at, I know. 
+
+tory <- get_model_data(m.tory,"est",terms = c("treated"))
+tory.match <- get_model_data(m.tory.match,"est",terms = c("treated"))
+
+aristo <- get_model_data(m.aristo,"est",terms = c("treated"))
+aristo.match <- get_model_data(m.aristo.match,"est",terms = c("treated"))
+
+scat_eto <- get_model_data(m.scat_eto,"est",terms = c("treated"))
+scat_eto.match <- get_model_data(m.scat_eto.match,"est",terms = c("treated"))
+
+out <- data.frame(
+  "var" = c("Conservative Party member","Aristocratic title","Eton-educated"),
+  "raw" = c(paste0(tory$p.label," (",round(tory$std.error,2),")"),
+            paste0(aristo$p.label," (",round(aristo$std.error,2),")"),
+            paste0(scat_eto$p.label," (",round(scat_eto$std.error,2),")")),
+  "match" = c(paste0(tory.match$p.label," (",round(tory.match$std.error,2),")"),
+              paste0(aristo.match$p.label," (",round(aristo.match$std.error,2),")"),
+              paste0(scat_eto.match$p.label," (",round(scat_eto$std.error,2),")"))
+)
+
+colnames(out) <- c("Variable", "Effect: Raw data","Effect: Matched data")
+kable(out, booktabs =T) %>% kable_paper() 
+
+```
+
+
+In the raw data, there is significant imbalance between treatment and control groups with respect to all the variables variables. After matching, there is no imbalance between matched treatment and control groups with respect to any of these variables. This makes sense, as the exact matching process implies that the distribution of these covariates should be identical in the treatment and control groups.
+
+### Task 5
+Apply the `summary()` function on the output from `matchit()` and create a plot of the standardised mean differences. 
+
+> \textit{Hint:} Have a look at the function's help file with `?plot.summary.matchit`.
+
+```{r post-fig, fig.align='center'}
+
+# Combine relevant statistics
+dta_plot = rbind(
+  data.frame(var = rownames(summary(match.out)$sum.all),
+             type = 'raw',
+           std = summary(match.out)$sum.all[, 'Std. Mean Diff.']),
+  data.frame(var = rownames(summary(match.out)$sum.matched),
+             type = 'matched',
+           std = summary(match.out)$sum.matched[, 'Std. Mean Diff.'])
+  )
+
+# Plot
+ggplot(dta_plot,
+       aes(y = var, x = std, group = type, fill = type))+
+  geom_vline(aes(xintercept = 0), color = 'black', linewidth = 1.3) +  # add vertical line at 0
+  geom_point(shape = 21, size = 4) + # add values as points
+  scale_fill_manual(name = '', values = c('grey', 'black')) + # adjust legend
+  labs(title = 'Standadrized Mean Differences',
+       subtitle = 'Raw vs. matched samples',
+       x = 'Standadrized Mean Differences', y ='' ) +
+  theme_minimal() # define theme
+
+```
+
+
+The output here is more detailed, and easier to read, that the output we got from the t-tests. Of particular interest is the standardized mean difference (`Std. Mean Diff.`) columns of the output, which calculate the quantity that we saw in lecture for assessing balance before and after matching. As a reminder, this quantity is equal to:
+  
+  $$ \text{bias}_{X_i} = \frac{\bar{X}_t - \bar{X}_c}{\sigma_{t}} $$
+  
+  where $\bar{X}_t$ is the mean of the covariate in the treatment group, $\bar{X}_c$ is the covariate mean in the control group, and $\sigma_{t}$ is the standard deviation of $X$ in the treated group. Ideally, as is the case here, we should see the standardized difference in means between treated and control groups decrease significantly after matching for all covariates. This implies that the groups are comparable on average, at least with respect to these observable factors, as a result of the matching process.
+
+As we can also see in the plot, the standardized difference in means is zero for all covariates in the matched sample, which makes sense given that we are using exact matching!
+
+
+
+### Task 6
+Rematch the data, this time expanding the list of covariates to include all of the schooling, university and occupation categories. Use exact matching again. What is the ATT? How many observations remain in the matched data?
+  
+```{r extend}
+## matching
+match.out2 <- matchit(treated ~ tory + aristo + scat_pub + scat_eto +
+                        scat_nm + scat_sec + oc_teacherall + oc_barrister +
+                        oc_solicitor + oc_dr + oc_civil_serv +
+                        oc_local_politics + oc_business + oc_white_collar +
+                        oc_union_org + oc_journalist + oc_miner + ucat_ox +
+                        ucat_deg + ucat_nm, 
+                      data = mps,
+                      method = "exact",
+                      estimand = "ATT",
+                      ratio = 1) 
+summary(match.out2)$nn 
+
+## extract data
+matched.data2 <- match.data(match.out2) 
+
+
+## estimate model with matched data 
+est2 <- lm(lnrealgross ~ treated, data = matched.data2, weights = weights)
+coef(est2)[2]
+```
+
+The ATT has increased to `r coef(est2)[2] %>% round(3)`, and there are now far fewer matched observations (105). 
+
+
+## Alternative specifications
+
+### Task 7  
+Eggers and Hainmueller run the matching analysis separately for Labour and Conservative candidates. Do this now and try to replicate the 3$^{rd}$ and 6$^{th}$ columns from Table 3 of their paper (see below). As you will see in the paper, they use M=1 genetic matching but you can get quite close to this result using a nearest neighbour 1:1 matching with replacement and mahalanobis distance. Adapt the code given below to do this. In their analysis, they do not only match on the categorical variables we have used so far, they also use the continuous variables for year of birth and year of death (`yob`,`yod`). Include these in the new matching procedure. 
+
+
+![Table 3 from: Eggers and Hainmuellert (2009)](Eggers and Hainmuller (2009) Table 3.png)
+
+
+```{r con-lab}
+
+
+labour_mps <- mps[mps$labour==1,]
+tory_mps <- mps[mps$tory==1,]
+
+## matching labour
+match.lab <- matchit(treated ~ tory + aristo + scat_pub + scat_eto +
+                       scat_nm + scat_sec + oc_teacherall + oc_barrister +
+                       oc_solicitor + oc_dr + oc_civil_serv +
+                       oc_local_politics + oc_business + oc_white_collar +
+                       oc_union_org + oc_journalist + oc_miner + ucat_ox +
+                       ucat_deg + ucat_nm +
+                       yob + yod, 
+                     data = labour_mps,
+                     method = "nearest",
+                     estimand = "ATT",
+                     distance = "mahalanobis",
+                     ratio = 1,
+                     replace = T) 
+# extract data
+matched.lab <- match.data(match.lab) 
+
+# estimate model with matched data
+est.lab <- lm(lnrealgross ~ treated, data = matched.lab, weights = weights)
+
+## matching tories
+match.tory <- matchit(treated ~ tory + aristo + scat_pub + scat_eto +
+                        scat_nm + scat_sec + oc_teacherall + oc_barrister +
+                        oc_solicitor + oc_dr + oc_civil_serv +
+                        oc_local_politics + oc_business + oc_white_collar +
+                        oc_union_org + oc_journalist + oc_miner + ucat_ox +
+                        ucat_deg + ucat_nm + yob + yod, 
+                      data = tory_mps,
+                      method = "nearest",
+                      estimand = "ATT",
+                      distance = "mahalanobis",
+                      ratio = 1,
+                      replace = T) 
+# extract data
+matched.tory <- match.data(match.tory) 
+
+# estimate model with matched data
+est.tory <- lm(lnrealgross ~ treated, data = matched.tory, weights = weights)
+
+## output results
+lab <- get_model_data(est.lab,"est",terms = c("treated"))
+con <- get_model_data(est.tory,"est",terms = c("treated"))
+
+out <- data.frame(
+  "n" = c("ATT","Std. Error"),
+  "cp"= c(paste0(round(con$estimate,2),con$p.stars),round(con$std.error,2)),
+  "lp"= c(paste0(round(lab$estimate,2),lab$p.stars),round(lab$std.error,2))
+)
+colnames(out) <- c(" ", "Conservatives","Labour")
+
+kable(out, booktabs = T) %>% kable_paper()
+```
+
+
+The ATT for Labour candidates is 0.15, and is not statistically significant. The ATT for Conservative candidates is 0.97, and is significantly different from zero. Both of these cases are quite close to the numbers reported in table 3 of the paper.
+
+
+### Task 8
+
+\textit{Optional:} For those of you who are interested, you can replicate the genetic matching approach that they use in the paper by using `method = "genetic"`. You should also provide a high number to `pop.size`, for instance 1000. However, this means it will take a while to run. You can decrease the number if you want, but note that this means that the estimates may be quite imprecise.
+
+```{r optional, eval = F, echo=F}
+
+## labour
+match.gen.lab <- matchit(treated ~ tory + aristo + scat_pub + scat_eto +
+                           scat_nm + scat_sec + oc_teacherall + oc_barrister +
+                           oc_solicitor + oc_dr + oc_civil_serv +
+                           oc_local_politics + oc_business + oc_white_collar +
+                           oc_union_org + oc_journalist + oc_miner + ucat_ox +
+                           ucat_deg + ucat_nm + yob + yod,
+                         data = labour_mps,
+                         method = "genetic",
+                         estimand = "ATT",
+                         ratio = 1,
+                         replace = T,
+                         pop.size = 10)
+matched.gen.lab <- match.data(match.gen.lab)
+est.gen.lab <- lm(lnrealgross ~ treated, data = matched.gen.lab, weights = weights)
+
+## tories
+match.gen.tory <- matchit(treated ~ tory + aristo + scat_pub + scat_eto +
+                            scat_nm + scat_sec + oc_teacherall + oc_barrister +
+                            oc_solicitor + oc_dr + oc_civil_serv +
+                            oc_local_politics + oc_business + oc_white_collar +
+                            oc_union_org + oc_journalist + oc_miner + ucat_ox +
+                            ucat_deg + ucat_nm + yob + yod,
+                          data = tory_mps,
+                          method = "genetic",
+                          estimand = "ATT",
+                          ratio = 1,
+                          replace = T,
+                          pop.size = 10)
+matched.gen.tory <- match.data(match.gen.tory)
+est.gen.tory <- lm(lnrealgross ~ treated, data = matched.gen.tory, weights = weights)
+
+# If you ran this, the results would be as in the table below
+```
+
+```{r, eval = F, echo=F}
+lab <- get_model_data(est.gen.lab,"est",terms = c("treated"))
+con <- get_model_data(est.gen.tory,"est",terms = c("treated"))
+
+out <- data.frame(
+  "n" = c("ATT","Std. Error"),
+  "cp"= c(con$p.label,round(con$std.error,2)),
+  "lp"= c(lab$p.label,round(lab$std.error,2))
+)
+colnames(out) <- c(" ", "Conservatives","Labour")
+
+kable(out, booktabs =T) %>% kable_paper()
+```
+
