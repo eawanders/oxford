@@ -1,0 +1,218 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+author: '1090063'
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    includes:
+header-includes:
+  - \setlength{\footnotesep}{1em}
+  - \setlength{\skip\footins}{2em}
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+citation_package: biblatex
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+link-citations: true
+---
+
+# Problem 1
+
+We will examine how randomized experiments work by creating an imaginary experiment. Use the dataset `a` from the file called `experiment.Rda`. For each individual unit ($i$) in our sample, the dataset contains the potential outcome under control ($Y_i^0$ or $Y_0i$) and the potential outcome under treatment ($Y_i^1$ or $Y_1i$) in the columns `a$y0` and `a$y1`, respectively. This is a purely hypothetical scenario. In reality, we never observe potential outcomes under both treatment and control for the same units: we can only observe one of them (the fundamental problem of causal inference). By creating a randomized experiment with this dataset, we’ll demonstrate how experiments overcome this fundamental problem.
+
+```{r File Setup, include=FALSE}
+# Set working directory
+setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/assignments/problem_set_1")
+
+# Set global options
+knitr::opts_chunk$set(
+  cache = FALSE, # Prevents caching of code chunks
+  warning = FALSE, # Prevents printing of warnings
+  message = FALSE, # Prevents printing of messages
+  echo = TRUE # Echo set to TRUE will print your code in the output file.
+)
+
+# Load pacman package
+if (!require("pacman")) install.packages("pacman")
+library(pacman)
+
+# Load (and install) packages needed for the analyses
+pacman::p_load(
+  tidyverse, # Cleaning data, plotting plots
+  ddplyr # Data manipulation
+)
+
+knitr::knit_hooks$set(inline = function(x) {
+  if (is.numeric(x)) {
+    return(format(round(x, 3), nsmall = 3))
+  }
+  return(as.character(x))
+})
+```
+
+```{r Data Setup, echo=FALSE, results='hide'}
+# Load the dataset ()
+load("experiment-1.Rda")
+
+# Assign the dataset to a new variable (for converting to .csv)
+experiment_data <- a
+
+# Save the dataset as a .csv and .rds file (for working in VSCode)
+saveRDS(experiment_data, file = "experiment-1.rds")
+write.csv(a, "experiment-1.csv", row.names = TRUE)
+
+# Read the dataset (using the .csv file) and display summary statistics
+data <- read.csv("experiment-1.csv")
+head(data)
+summary(data)
+```
+
+## Question 1
+Find the “true” Average Treatment Effect across all units. **[5 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+```{r True ATE, echo=FALSE}
+# Calculate the average treatment effect (ATE) across all units, i
+true_ate <- mean(data$y1 - data$y0)
+```
+
+The true Average Treatment Effect (ATE) is the value obtained if we were able to observe both the potential outcomes (treatment and control) for each individual. The true ATE is **``r true_ate``** and is calculated by taking the mean difference between the potential outcomes under treatment ($Y_1i$) and control ($Y_0i$) for each unit. However, this is a purely hypothetical scenario as we can never observe both potential outcomes for the same unit in reality.
+
+## Question 2
+
+Next, we’ll implement a randomized experiment on this sample of 100 units. We randomly assign half of the units to treatment and half to control by creating a new variable indicating treatment status ($D_i$).
+
+Conduct a test to assess whether the treatment and control groups have the same average potential outcomes under control. Has randomization succeeded in creating treatment and control groups with equivalent potential outcomes under control? Why? **[5 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+```{r Randomisation, echo=FALSE, results='hide'}
+# Set seed for reproducibility
+set.seed(1)
+
+# Assign each unit a random number between 0 and 100 in a new column
+data$rand <- sample(c(1:100))
+
+# Re-order the dataset from lowest to highest value of rand
+data <- data[order(data$rand), ]
+
+# Create a treatment variable named tr that equals 1 for the first 50 units and 0 for the second 50
+data$tr <- c(rep(1, 50), rep(0, 50))
+
+# View the variables in the dataset
+glimpse(data)
+```
+
+```{r Test for Randomisation, echo=FALSE, results='hide'}
+# Testing whether randomisation has given us equivalent potential outcomes under control
+
+## Mean potential outcomes under control for treatment group
+mean_y0_tr <- mean(data$y0[data$tr == 1])
+
+## Mean potential outcomes under control for control group
+mean_y0_ctrl <- mean(data$y0[data$tr == 0])
+
+## Calculate a t-test to compare average potential outcomes under control
+control_t_test <- t.test(data$y0[data$tr == 1], data$y0[data$tr == 0])
+```
+
+To assess whether the randomisation succeeded in creating treatment and control groups with equivalent potential outcomes under control, we compare whether the average potential outcomes under control for the treatment and control groups are statistically different. The mean potential outcomes under control for the treatment group is **``r mean_y0_tr``** and for the control group is **``r mean_y0_ctrl``**. A t-test comparing the average potential outcomes under control for the treatment and control groups gives a p-value of **``r control_t_test$p.value``**.
+
+Therefore, randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control. The null hypothesis is that the average potential outcomes under control are equal between the treatment and control groups. Given that **``p(`r control_t_test$p.value`) > 0.05``**, we cannot reject the null hypothesis as the treatment and control groups are not statistically different from one another.
+
+## Question 3
+
+Estimate the Average Treatment Effect based on your experiment. How similar is it to the “true” Average Treatment Effect? Explain. **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+```{r Estimated ATE, echo=FALSE, results='hide'}
+estimated_ate <- mean(data$y1[data$tr == 1] - data$y0[data$tr == 0])
+
+# Calculate the difference between the true and estimated ATE
+diff_ate <- true_ate - estimated_ate
+
+# Calculate the percentage difference between the true and estimated ATE
+percent_diff_ate <- (diff_ate / true_ate) * 100
+```
+
+Since we have now randomised the distribution of the treatment and control groups, we can calculate the estimated Average Treatment Effect (ATE) to give the expected difference in outcomes between the treated and the 'comparable control'.
+
+The estimated ATE is **``r estimated_ate``**. This is calculated by taking the mean difference between the potential outcomes under treatment ($Y_1i$) of the treatment group and the potential outcomes under control ($Y_0i$) of the control group. The esimated ATE is lower than the true ATE **``r estimated_ate` < `r true_ate``**
+by **``r percent_diff_ate``%** because the treatment and control groups are not perfectly balanced. However, the estimated ATE is still close to the true ATE because the randomisation has created treatment and control groups with equivalent potential outcomes under control, as shown in `1.2`.
+
+## Question 4
+
+Now, let’s see how the experimental procedure performs over repeated randomizations.
+
+What is the average estimated ATE across your 10,000 experiments? Does this suggest that your estimator is unbiased? Why? **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+```{r Repeated Randomisation, echo=FALSE, results='hide'}
+# Create a function that takes in the dataset `data`, carries out a randomized experiment, and reports the estimated ATE.
+
+randomised_experiment <- function(data) {
+  # Assign each unit a random number between 0 and 100 in a new column
+  data$rand <- sample(c(1:100))
+
+  # Re-order the dataset from lowest to highest value of rand
+  data <- data[order(data$rand), ]
+
+  # Create a treatment variable named tr that equals 1 for the first 50 units and 0 for the second 50
+  data$tr <- c(rep(1, 50), rep(0, 50))
+
+  # Calculate the estimated ATE
+  estimated_ate <- mean(data$y1[data$tr == 1] - data$y0[data$tr == 0])
+
+  return(estimated_ate)
+}
+
+# Run the function 10,000 times, and store these results in a variable.
+
+replicated_results <- replicate(10000, randomised_experiment(data))
+
+# Calculate the average estimated ATE across the 10,000 experiments
+mean_replicated_results <- mean(replicated_results)
+```
+
+The mean estimated ATE across the 10,000 experiments is **``r mean_replicated_results``**. This suggests that the estimator is unbiased because the average estimated ATE across the repeated randomisations is very close to the true ATE, **``r true_ate``**, a difference of ``r abs(mean_replicated_results - true_ate)``. The repeated randomisations improve our mean estimate of the ATE significatly from the single ransomisation sample done in `1.3`.
+
+## Question 5
+
+Repeat Task (4), calculating the mean difference in potential outcomes under control (a$y0) between the treatment and control groups instead of the ATE. What is the mean difference from your 10,000 experiments? What does this signify? **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+```{r Mean Difference in Potential Outcomes, echo=FALSE, results='hide'}
+# Function to calculate the mean difference in potential outcomes under control between the treatment and control groups.
+
+randomised_mean_diff_experiment <- function(data) {
+  # Assign each unit a random number between 0 and 100 in a new column
+  data$rand <- sample(c(1:100))
+
+  # Re-order the dataset from lowest to highest value of rand
+  data <- data[order(data$rand), ]
+
+  # Create a treatment variable named tr that equals 1 for the first 50 units and 0 for the second 50
+  data$tr <- c(rep(1, 50), rep(0, 50))
+
+  # Calculate the mean difference in potential outcomes under control
+  mean_diff_y0 <- mean(data$y0[data$tr == 1]) - mean(data$y0[data$tr == 0])
+
+  return(mean_diff_y0)
+}
+
+# Run the function 10,000 times, and store these results in a variable.
+
+replicated_mean_diff_results <- replicate(10000, randomised_mean_diff_experiment(data))
+
+# Calculate the average mean difference in potential outcomes under control across the 10,000 experiments
+mean_replicated_mean_diff_results <- mean(replicated_mean_diff_results)
+```
+
+The mean difference in potential outcomes under control between the treatment and control groups across the 10,000 experiments is **``r round(mean_replicated_mean_diff_results, digits = 5)``**. This signifies that the randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control. The mean difference in potential outcomes under control is close to zero, indicating that the treatment and control groups are not statistically different from one another. This is consistent with the results from `1.2`.
