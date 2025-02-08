@@ -19,10 +19,6 @@ bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_librar
 link-citations: true
 ---
 
-# Problem 1
-
-We will examine how randomized experiments work by creating an imaginary experiment. Use the dataset `a` from the file called `experiment.Rda`. For each individual unit ($i$) in our sample, the dataset contains the potential outcome under control ($Y_i^0$ or $Y_0i$) and the potential outcome under treatment ($Y_i^1$ or $Y_1i$) in the columns `a$y0` and `a$y1`, respectively. This is a purely hypothetical scenario. In reality, we never observe potential outcomes under both treatment and control for the same units: we can only observe one of them (the fundamental problem of causal inference). By creating a randomized experiment with this dataset, we’ll demonstrate how experiments overcome this fundamental problem.
-
 ```{r File Setup, include=FALSE}
 # Set working directory
 setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/assignments/problem_set_1")
@@ -42,7 +38,11 @@ library(pacman)
 # Load (and install) packages needed for the analyses
 pacman::p_load(
   tidyverse, # Cleaning data, plotting plots
-  ddplyr # Data manipulation
+  dplyr, # Data manipulation
+  knitr, # Knitting documents
+  kableExtra, # Table formatting
+  modelsummary, # Table formatting
+  tribble # Create tibbles
 )
 
 knitr::knit_hooks$set(inline = function(x) {
@@ -53,8 +53,13 @@ knitr::knit_hooks$set(inline = function(x) {
 })
 ```
 
-```{r Data Setup, echo=FALSE, results='hide'}
-# Load the dataset ()
+# Problem 1
+
+We will examine how randomized experiments work by creating an imaginary experiment. Use the dataset `a` from the file called `experiment.Rda`. For each individual unit ($i$) in our sample, the dataset contains the potential outcome under control ($Y_i^0$ or $Y_0i$) and the potential outcome under treatment ($Y_i^1$ or $Y_1i$) in the columns `a$y0` and `a$y1`, respectively. This is a purely hypothetical scenario. In reality, we never observe potential outcomes under both treatment and control for the same units: we can only observe one of them (the fundamental problem of causal inference). By creating a randomized experiment with this dataset, we’ll demonstrate how experiments overcome this fundamental problem.
+
+
+```{r Problem 1 Data Setup, echo=FALSE, results='hide'}
+# Load the dataset
 load("experiment-1.Rda")
 
 # Assign the dataset to a new variable (for converting to .csv)
@@ -216,3 +221,166 @@ mean_replicated_mean_diff_results <- mean(replicated_mean_diff_results)
 ```
 
 The mean difference in potential outcomes under control between the treatment and control groups across the 10,000 experiments is **``r round(mean_replicated_mean_diff_results, digits = 5)``**. This signifies that the randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control. The mean difference in potential outcomes under control is close to zero, indicating that the treatment and control groups are not statistically different from one another. This is consistent with the results from `1.2`.
+
+# Problem 2
+
+Past research suggests that ballot secrecy influences turnout. A recent field experiment sent emails to a random group of nonvoters around the 2014 election in Mississippi, reminding them that their vote was secret.
+
+For this exercise, we wish to establish if the results of this experiment hold when we focus on the female subsample (instead of the full sample).
+
+```{r Problem 2 Data Setup, echo=FALSE, results='hide'}
+# Read the dataset and assign it to a new variable
+ballot_data <- read.csv("ballot-1.csv")
+
+# Ballot data summary statistics
+head(ballot_data)
+summary(ballot_data)
+glimpse(ballot_data)
+
+# Create a filtered dataset for a women-only subsample
+female_data <- ballot_data %>%
+  filter(d_gend_female == 1)
+```
+
+## Question 1
+
+Confirm that the randomization process was successful by making sure that women in treatment and control groups are similar in all relevant aspects, e.g., age, ethnicity, non-voting habits. Show your results either using a figure or by producing a publishable table. **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+```{r Randomisation Check, echo=FALSE, results='hide'}
+randomisation_check <- function(female_data, variables) {
+  # Create an empty data frame to store results
+  results_df <- data.frame(
+    Variable = character(),
+    T_Test = numeric(), # Use underscores instead of hyphens
+    P_Value = numeric(),
+    stringsAsFactors = FALSE
+  )
+
+  # Loop through each variable
+  for (variable in variables) {
+    # Perform t-test
+    t_test <- t.test(
+      female_data[[variable]][female_data$mail == 1],
+      female_data[[variable]][female_data$mail == 0]
+    )
+
+    # Store results in the data frame
+    results_df <- rbind(
+      results_df,
+      data.frame(
+        Variable = variable,
+        T_Test = t_test$statistic,
+        P_Value = t_test$p.value
+      )
+    )
+  }
+  return(results_df)
+}
+
+# Run the function on selected variables
+randomisation_results <- randomisation_check(
+  female_data,
+  variables = c("d_age", "d_race_blk", "d_race_hsp", "d_race_oth", "never_voted", "vote_year")
+)
+```
+
+To test whether the women in treatment and control groups are similar in all relevant aspects, t-tests were conducted to see whether the groups were statostically significantly different from one another on each variable of interest. Table 1 shows the results of t-tests comparing the characteristics of women in the treatment and control groups. The null hypothesis is that the average values of the variables are equal between the treatment and control groups. The p-values are all greater than 0.05 indicating we cannot reject the null hypothesis. This suggests that the randomisation process was successful in creating treatment and control groups with similar characteristics as there are no statistically significant differences between groups. Although differences between observed variables across groups is found, there could still be selection bias from unobserved variables; however, this is unlikely if randomisation was successful.
+
+```{r Randomisation Table, echo=FALSE}
+# Add the results to a table
+randomisation_results %>%
+  mutate(across(c(T_Test, P_Value), ~ round(.x, 3))) %>%
+  rename("t-test" = T_Test, "p-value" = P_Value) %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    caption = "t-test and p-value Results for Variables",
+    row.names = FALSE,
+    align = c("l", "r", "r") # Align first column left, others right
+  ) %>%
+  kable_styling(latex_options = "hold_position") %>%
+  footnote(
+    general = "Note: significance values * p < 0.05, ** p < 0.01, *** p < 0.001.",
+    general_title = ""
+  )
+```
+
+## Question 2
+
+Estimate the Average Treatment Effect and test whether the effects you calculated are robust to the inclusion of covariates. Report all results in a single table. Is it necessary to include covariates when calculating the ATE? **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+Although randomisation appears to have been successful, we still want to test for the effects of covariates on the estimated Average Treatment Effect (ATE). Firstly, a simple model is estimated for the ATE without covariates. Secondly, to estimate the ATE and test whether effects are robust to the inclusion of covariates, a regression model is compared to ATE without the inclusion of `d_age`, `d_race_blk`, `d_race_hsp`, `d_race_oth`, `never_voted`, and `vote_year`. Results of these two models are shown in Table 2.
+
+```{r ATE without covariates, echo=FALSE, results='hide'}
+# Difference in mean estimate to compare to regression model
+## Estimated Average Treatment Effect (ATE) without covariates
+ate_no_covariates <- mean(
+  female_data$vote2014[female_data$mail == 1]
+) - mean(
+  female_data$vote2014[female_data$mail == 0]
+)
+ate_no_covariates
+
+# t-test for ATE without covariates
+t_test_no_covariates <- t.test(
+  female_data$vote2014[female_data$mail == 1],
+  female_data$vote2014[female_data$mail == 0]
+)
+
+# Regression model for Estimated Average Treatment Effect (ATE) without covariates
+model_1 <- lm(
+  vote2014 ~ mail,
+  data = female_data
+)
+```
+
+```{r ATE with covariates, echo=FALSE, results='hide'}
+# Regression model for Estimated Average Treatment Effect (ATE) with covariates
+model_2 <- lm(
+  vote2014 ~ mail +
+    d_age + d_race_blk + d_race_hsp + d_race_oth + never_voted + vote_year,
+  data = female_data
+)
+```
+
+```{r ATE Table, echo=FALSE}
+# Goodness-of-fit statistics to add to table table
+custom_gof <- tibble::tribble(
+  ~raw, ~clean, ~fmt,
+  "nobs", "Num. Obvs", 0,
+  "r.squared", "R-squared", 3,
+  "adj.r.squared", "Adj. R-squared", 3,
+  "fstatistic", "F-statistic", 3
+)
+
+# Create a table comparing the Estimated ATE for Mail Treatment with and without covariates
+modelsummary(
+  list(
+    "ATE without Covariates" = model_1,
+    "ATE with Covariates" = model_2
+  ),
+  title = "Estimated ATE for Mail Treatment (With and Without Covariates)",
+  coef_map = c(
+    "mail" = "Mail Treatment",
+    "d_age" = "Age",
+    "d_race_blk" = "Black",
+    "d_race_hsp" = "Hispanic",
+    "d_race_oth" = "Other Race",
+    "never_voted" = "Never Voted",
+    "vote_year" = "Years Since Last Vote"
+  ),
+  stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01), # Custom significance levels
+  statistic = NULL, # Removes default significance legend
+  gof_map = custom_gof, # Custom goodness-of-fit statistics
+  notes = "Note: Standard errors are in parentheses. Both models are estimated using OLS regressions.",
+  output = "latex"
+)
+```
+
+The ATE without covariates is **``r (ate_no_covariates)``**. This tells us the difference in probability that someone voted between the treatment and control groups. Therefore, as the `vote_2014` is binary, those who received mail reminding them their vote was a secret saw a decreased probability of voting of **``r (ate_no_covariates)*100``** percentage points compared to the control group,a very small amount. The t-test for the ATE without covariates gives a p-value of **``r t_test_no_covariates$p.value``** meaning the results are also not statistically significant. Whilsy ballot secrecy may theoretically influence voting turnout, the effects seen are neither large nor statistically significant.
+
+The second model accounts for the covariates which were shown to be similar across treatment and control groups in `2.1`. The inclusion of covariates does not change the estimated ATE significantly, with the ATE with covariates being **``r (summary(model_2)$coefficients[2, 1])``**. The p-value for the ATE with covariates is **``r summary(model_2)$coefficients[2, 4]``**, showing signs of weak significance, unlike when estimated without covariates. The inclusion of covariates controlling for black voters and those who have never voted before are the most significant. The model with covariates also has a higher R-squared value of **(``r summary(model_2)$r.squared` > `r summary(model_1)$r.squared``)** compared to the model without covariates. This suggests that the inclusion of covariates improves the model's explanatory power, but whilst the estimated ATE's are similar and neither is significantly robust, the inclusion of covariates is not necessary when calculating the ATE in this case, but should be included to ensure a more robust model.
