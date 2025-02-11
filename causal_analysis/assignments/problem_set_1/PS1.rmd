@@ -388,3 +388,17 @@ The second model accounts for the covariates which were shown to be similar acro
 # Problem 3
 
 A key problem incumbents encounter in civil wars is a lack of information to combat insurgency. Insurgents exploit information asymmetries at the local level to hide and become a difficult target for incumbents. In the absence of such information, incumbents often resort to indiscriminate violence, via large-scale reprisals against entire villages suspected to host insurgents. One example of indiscriminate violence is Aerial bombardment. Due to the nature of insurgency, bombing frequently occurs in and around settled areas, and leading to many civilian casualties.
+
+Using data from the Vietnam War, Kocher, Pepinsky and Kalyvas (2011) examined the effect of bombings on Viet Cong support. In particular, they looked at the impact of the September 1969 bombings on hamlet control in December 1969.
+
+The data comes from various sources. The United States compiled a gazetteer of South Vietnamese hamlets, identified their geographic coordinates, and conducted a census. District Senior Advisors (DSAs, army officers ranking major or above) were assigned to complete detailed questionnaires for every village and hamlet in their zones of operation. Some of these questionnaires were compiled monthly, others quarterly. DSAs were detached from U.S. units to live and work in the districts they rated. The RVN (Republic of Viet Nam) had 261 districts with a median area of 377 kilometers squared, or about one-fourth the size of the median U.S. county. There was a median of 36 hamlets per district in 1969. In this exercise, we will explore how matching models work, using the dataset in `Vietnam_matching.dta`. We will apply the matching procedure to estimate the effect of experiencing a bombing in September 1969 on insurgency control in December 1969.
+
+## Question 1
+
+Which covariates should you use in the matching procedure and why? **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+When using matching methods to estimate causal effects, we want to compare a treatment group to a control group that is as similar as possible to the treatment group. This is done by matching units on covariates that are likely to be associated with both the treatment and the outcome.
+
+In this case, we should use covariates that are likely to be associated with both the bombing in September 1969 and the control of hamlets by the Viet Cong in December 1969. These covariates should be measured before the treatment is applied to avoid bias in the estimation of the treatment effect.
