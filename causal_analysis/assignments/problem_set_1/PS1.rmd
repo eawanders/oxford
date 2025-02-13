@@ -399,6 +399,58 @@ Which covariates should you use in the matching procedure and why? **[10 points]
 
 \hspace{0pt}\rule{100pt}{0.4pt}
 
-When using matching methods to estimate causal effects, we want to compare a treatment group to a control group that is as similar as possible to the treatment group. This is done by matching units on covariates that are likely to be associated with both the treatment and the outcome.
+When looking at the effects of bombings on hamlet control, we want to estimate the average causal (treatment) effect of the bombing in September 1969 on the control of hamlets by the Viet Cong in December 1969. To estimate this average causal effect, we should compare the hamlets that were bombed in September 1969 to those that were not; however, as the bombings were not randomised, we need to identify suitable control hamlets where covariates are similar to those that were bombed. We can do this through a matching procedure to find hamlets which are as similar to one another as possible, other than whether they were bombed or not. Before selecting a matching technique to identify hamlets, a suitable set of covariates should be selected for use in the marching procedure.
 
-In this case, we should use covariates that are likely to be associated with both the bombing in September 1969 and the control of hamlets by the Viet Cong in December 1969. These covariates should be measured before the treatment is applied to avoid bias in the estimation of the treatment effect.
+There are three primary types of covariates that should be considered for the matching procedure:
+
+- covariates likely associated with the treatment (bombing) and the outcome (hamlet control),
+- covariates that occur pre-treatment, and
+- covariates which are unaffected by the treatment (bombing).
+
+Firstly, we should control for all covariates which determine both bombings and hamlet control as these are likely confounders. We want to control for confounders as these variables are ones which may infuence the likelihood of bombing or hamlet control, and therefore may bias the estimated effect of the bombingm giving spurious results. Secondly, covariates which are pre-treatment measures should be included to avoid post-treatment measures being affected by the treatment. And thirdly, only covariates which are not affected by the treatment should be included.
+
+The following covariated should therefore be included in the matching procedure:
+
+```{r Matching Covariates Table, echo=FALSE}
+# Table of covariates to be used in the matching procedure and why
+covariates_table <- data.frame(
+  Covariate = c(
+    "Rough terrain (`std`)",
+    "Distance to boundary (`ln_dist`)",
+    "Development index (`score`)",
+    "Hamlet population (`lnhpop`)",
+    "Pre-bombing control (`mod2a_1admn`)"
+  ),
+  Explanation = c(
+    "More difficult terrain may influence both bombing likelihood and hamlet control.",
+    "Hamlets closer to international borders may have strategic importance affecting both bombing decisions and control.",
+    "More developed hamlets may have been targeted differently and had different control conditions.",
+    "Larger hamlets may have been more strategically important, affecting both bombing decisions and control dynamics.",
+    "If a hamlet was already contested or insurgent-controlled before bombing, this could affect both the likelihood of being bombed and later control."
+  )
+)
+
+# Display the table
+kable(covariates_table, format = "latex", booktabs = TRUE, align = "l") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(2, width = "10cm") # Adjust column width
+```
+
+
+## Question 2
+
+Choose a matching estimator – briefly describe your choice. Assess balance in pre-treatment covariates between treated and control units, before and after matching. What is the measure you used for assessing balance? **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+## Question 3
+
+Estimate the causal effect of interest with matching. Are the results from your matching analysis different from using a simple OLS regression without covariates? If there is a difference: how do you explain it? **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
+
+## Question 4
+
+How does the comparison between matching and OLS regression change when you include covariates (control variables)? Report the models in a single table and discuss. **[10 points]**
+
+\hspace{0pt}\rule{100pt}{0.4pt}
