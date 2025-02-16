@@ -42,7 +42,10 @@ pacman::p_load(
   knitr, # Knitting documents
   kableExtra, # Table formatting
   modelsummary, # Table formatting
-  tribble # Create tibbles
+  tribble, # Create tibbles
+  haven, # Read .dta files
+  MatchIt, # Matching estimators
+  cobalt # Balance assessment
 )
 
 knitr::knit_hooks$set(inline = function(x) {
@@ -393,6 +396,19 @@ Using data from the Vietnam War, Kocher, Pepinsky and Kalyvas (2011) examined th
 
 The data comes from various sources. The United States compiled a gazetteer of South Vietnamese hamlets, identified their geographic coordinates, and conducted a census. District Senior Advisors (DSAs, army officers ranking major or above) were assigned to complete detailed questionnaires for every village and hamlet in their zones of operation. Some of these questionnaires were compiled monthly, others quarterly. DSAs were detached from U.S. units to live and work in the districts they rated. The RVN (Republic of Viet Nam) had 261 districts with a median area of 377 kilometers squared, or about one-fourth the size of the median U.S. county. There was a median of 36 hamlets per district in 1969. In this exercise, we will explore how matching models work, using the dataset in `Vietnam_matching.dta`. We will apply the matching procedure to estimate the effect of experiencing a bombing in September 1969 on insurgency control in December 1969.
 
+```{r Problem 3 Dataset, echo=FALSE, results='hide'}
+# Set working directory
+setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/assignments/problem_set_1")
+
+# Load the dataset (using the read_dta function from the haven package)
+vietnam_data <- read_dta("Vietnam_matching-1.dta")
+
+# Summary of the data
+glimpse(vietnam_data)
+head(vietnam_data)
+summary(vietnam_data)
+```
+
 ## Question 1
 
 Which covariates should you use in the matching procedure and why? **[10 points]**
@@ -415,26 +431,28 @@ The following covariated should therefore be included in the matching procedure:
 # Table of covariates to be used in the matching procedure and why
 covariates_table <- data.frame(
   Covariate = c(
-    "Rough terrain (`std`)",
-    "Distance to boundary (`ln_dist`)",
-    "Development index (`score`)",
-    "Hamlet population (`lnhpop`)",
-    "Pre-bombing control (`mod2a_1admn`)"
+    "Rough terrain (``std``)",
+    "Distance to boundary (``ln_dist``)",
+    "Development index (``score``)",
+    "Hamlet population (``lnhpop``)",
+    "Pre-bombing control (``mod2a_1admn``)"
   ),
   Explanation = c(
     "More difficult terrain may influence both bombing likelihood and hamlet control.",
     "Hamlets closer to international borders may have strategic importance affecting both bombing decisions and control.",
     "More developed hamlets may have been targeted differently and had different control conditions.",
-    "Larger hamlets may have been more strategically important, affecting both bombing decisions and control dynamics.",
+    "Larger hamlets may be more strategically important, affecting both bombing decisions and control dynamics.",
     "If a hamlet was already contested or insurgent-controlled before bombing, this could affect both the likelihood of being bombed and later control."
   )
 )
 
-# Display the table
+# Displaying the table
 kable(covariates_table, format = "latex", booktabs = TRUE, align = "l") %>%
   kable_styling(latex_options = c("hold_position")) %>%
-  kableExtra::column_spec(2, width = "10cm") # Adjust column width
+  kableExtra::column_spec(2, width = "10cm")
 ```
+
+
 
 
 ## Question 2
@@ -442,6 +460,39 @@ kable(covariates_table, format = "latex", booktabs = TRUE, align = "l") %>%
 Choose a matching estimator – briefly describe your choice. Assess balance in pre-treatment covariates between treated and control units, before and after matching. What is the measure you used for assessing balance? **[10 points]**
 
 \hspace{0pt}\rule{100pt}{0.4pt}
+
+Before estimating the causal effect of bombings on hamlet control, we need to choose a matching estimator to identify suitable control hamlets. The matching estimator chosen should be the one which ensures that the control hamlets are as similar as possible to the treated hamlets, other than whether they were bombed or not. The matching estimator should also ensure that the control hamlets are balanced across all covariates used in the matching procedure so that we have a balanced control between treated and control groups. There are many matching estimators to choose from, for example: exact matching, nearest neighbour matching, propensity score matching, genetic matching, normalised Euclidean distance matching, and Mahalanobis distance matching. With these possible methods, we also want to ensure that we keep as many observations as possible and assess the bias-variance trade-off to ensure accurate and consistent results.
+
+The most strict matching estimator of exact matches returns ``No exact matches found``, an expected outcome due to the nature of continuous covariates in the dataset. Instead, a number of alternative estimators are considered to determine the best matching estimator for the dataset.
+
+# The mahalanobis distance matching is likely best here, play around with a few alternatives.
+
+```{r Matching Estimators, echo=FALSE, results='hide'}
+# Nearest neighbour matching
+nearest_neighbour_matching <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT"
+)
+
+# Check balance before and after matching
+summary(nearest_neighbour_matching, standardize = TRUE)
+love.plot(nearest_neighbour_matching, threshold = 0.1)
+
+# Mahalanobis distance matching
+nearest_neighbour_matching2 <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "mahalanobis",
+  ratio = 1,
+  replace = T
+)
+summary(nearest_neighbour_matching2, standardize = TRUE)
+love.plot(nearest_neighbour_matching2, threshold = 0.1)
+```
 
 ## Question 3
 
