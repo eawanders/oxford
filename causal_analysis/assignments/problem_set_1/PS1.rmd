@@ -13,6 +13,8 @@ header-includes:
   - \setlength{\skip\footins}{2em}
   - \usepackage{setspace}
   - \setstretch{1.25}
+  - \usepackage{caption}
+  - \captionsetup[figure]{position=above}
 citation_package: biblatex
 csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
 bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
@@ -45,7 +47,9 @@ pacman::p_load(
   tribble, # Create tibbles
   haven, # Read .dta files
   MatchIt, # Matching estimators
-  cobalt # Balance assessment
+  cobalt, # Balance assessment
+  Matching, # Used in Genetic matching estimators
+  tibble # Create tibbles
 )
 
 knitr::knit_hooks$set(inline = function(x) {
@@ -81,7 +85,7 @@ summary(data)
 ## Question 1
 Find the “true” Average Treatment Effect across all units. **[5 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r True ATE, echo=FALSE}
 # Calculate the average treatment effect (ATE) across all units, i
@@ -96,7 +100,7 @@ Next, we’ll implement a randomized experiment on this sample of 100 units. We 
 
 Conduct a test to assess whether the treatment and control groups have the same average potential outcomes under control. Has randomization succeeded in creating treatment and control groups with equivalent potential outcomes under control? Why? **[5 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Randomisation, echo=FALSE, results='hide'}
 # Set seed for reproducibility
@@ -136,7 +140,7 @@ Therefore, randomisation has succeeded in creating treatment and control groups 
 
 Estimate the Average Treatment Effect based on your experiment. How similar is it to the “true” Average Treatment Effect? Explain. **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Estimated ATE, echo=FALSE, results='hide'}
 estimated_ate <- mean(data$y1[data$tr == 1] - data$y0[data$tr == 0])
@@ -159,7 +163,7 @@ Now, let’s see how the experimental procedure performs over repeated randomiza
 
 What is the average estimated ATE across your 10,000 experiments? Does this suggest that your estimator is unbiased? Why? **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Repeated Randomisation, echo=FALSE, results='hide'}
 # Create a function that takes in the dataset `data`, carries out a randomized experiment, and reports the estimated ATE.
@@ -194,7 +198,7 @@ The mean estimated ATE across the 10,000 experiments is **``r mean_replicated_re
 
 Repeat Task (4), calculating the mean difference in potential outcomes under control (a$y0) between the treatment and control groups instead of the ATE. What is the mean difference from your 10,000 experiments? What does this signify? **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Mean Difference in Potential Outcomes, echo=FALSE, results='hide'}
 # Function to calculate the mean difference in potential outcomes under control between the treatment and control groups.
@@ -249,7 +253,7 @@ female_data <- ballot_data %>%
 
 Confirm that the randomization process was successful by making sure that women in treatment and control groups are similar in all relevant aspects, e.g., age, ethnicity, non-voting habits. Show your results either using a figure or by producing a publishable table. **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Randomisation Check, echo=FALSE, results='hide'}
 randomisation_check <- function(female_data, variables) {
@@ -314,7 +318,7 @@ randomisation_results %>%
 
 Estimate the Average Treatment Effect and test whether the effects you calculated are robust to the inclusion of covariates. Report all results in a single table. Is it necessary to include covariates when calculating the ATE? **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 Although randomisation appears to have been successful, we still want to test for the effects of covariates on the estimated Average Treatment Effect (ATE). Firstly, a simple model is estimated for the ATE without covariates. Secondly, to estimate the ATE and test whether effects are robust to the inclusion of covariates, a regression model is compared to ATE without the inclusion of `d_age`, `d_race_blk`, `d_race_hsp`, `d_race_oth`, `never_voted`, and `vote_year`. Results of these two models are shown in Table 2.
 
@@ -413,7 +417,7 @@ summary(vietnam_data)
 
 Which covariates should you use in the matching procedure and why? **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 When looking at the effects of bombings on hamlet control, we want to estimate the average causal (treatment) effect of the bombing in September 1969 on the control of hamlets by the Viet Cong in December 1969. To estimate this average causal effect, we should compare the hamlets that were bombed in September 1969 to those that were not; however, as the bombings were not randomised, we need to identify suitable control hamlets where covariates are similar to those that were bombed. We can do this through a matching procedure to find hamlets which are as similar to one another as possible, other than whether they were bombed or not. Before selecting a matching technique to identify hamlets, a suitable set of covariates should be selected for use in the marching procedure.
 
@@ -452,56 +456,272 @@ kable(covariates_table, format = "latex", booktabs = TRUE, align = "l") %>%
   kableExtra::column_spec(2, width = "10cm")
 ```
 
-
-
-
 ## Question 2
 
 Choose a matching estimator – briefly describe your choice. Assess balance in pre-treatment covariates between treated and control units, before and after matching. What is the measure you used for assessing balance? **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
-Before estimating the causal effect of bombings on hamlet control, we need to choose a matching estimator to identify suitable control hamlets. The matching estimator chosen should be the one which ensures that the control hamlets are as similar as possible to the treated hamlets, other than whether they were bombed or not. The matching estimator should also ensure that the control hamlets are balanced across all covariates used in the matching procedure so that we have a balanced control between treated and control groups. There are many matching estimators to choose from, for example: exact matching, nearest neighbour matching, propensity score matching, genetic matching, normalised Euclidean distance matching, and Mahalanobis distance matching. With these possible methods, we also want to ensure that we keep as many observations as possible and assess the bias-variance trade-off to ensure accurate and consistent results.
+Before estimating the causal effect of bombings on hamlet control, we need to choose a matching estimator to identify suitable control hamlets. The matching estimator chosen should be the one which ensures that the control hamlets are as similar as possible to the treated hamlets, other than whether they were bombed or not. The matching estimator should also ensure that the control hamlets are balanced across all covariates used in the matching procedure so that we have a balanced control between treated and control groups. There are many matching estimators to choose from, for example: exact matching, nearest neighbour matching, propensity score matching, genetic matching, normalised Euclidean distance matching, and Mahalanobis distance matching. With these possible methods, we want to ensure that we keep as many observations as possible, and assess the bias-variance trade-off to ensure accurate and consistent results. The measure for assessing balance is the standardised mean difference, which is a measure of balance between the treated and control groups, with a value of 0 indicating perfect balance.
 
-The most strict matching estimator of exact matches returns ``No exact matches found``, an expected outcome due to the nature of continuous covariates in the dataset. Instead, a number of alternative estimators are considered to determine the best matching estimator for the dataset.
-
-# The mahalanobis distance matching is likely best here, play around with a few alternatives.
-
+The most strict matching estimator of exact matches returns ``No exact matches found``, an expected outcome due to the nature of continuous covariates in the dataset. Instead, a number of alternative estimators are considered to determine the best matching estimator for the dataset. Table 3 highlights different matching models which are considered. Models have been considered with and without replacement of observations. The intuition behind comparing these models is the expectation that replacement will help to find better matches, especially given the continuous nature of the covariates; however, this may come with the trade-off of higher variance. The table shows the number of matched observations, the Mean Absolute Standardised Difference (MASD), the Median Standardised Mean Difference (MSMD), and the Maximum Standardised Mean Difference (MaxSMD) for each matching estimator. Lower values of MASD, MSMD, and MaxSMD indicate better balance between the treated and control groups.
 ```{r Matching Estimators, echo=FALSE, results='hide'}
-# Nearest neighbour matching
+# Nearest neighbour matching (without replacement)
 nearest_neighbour_matching <- matchit(
   bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
-  estimand = "ATT"
+  estimand = "ATT",
+  replace = FALSE
 )
 
-# Check balance before and after matching
-summary(nearest_neighbour_matching, standardize = TRUE)
-love.plot(nearest_neighbour_matching, threshold = 0.1)
+# Nearest neighbour matching (with replacement)
+nearest_neighbour_matching_replace <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  replace = TRUE
+)
 
-# Mahalanobis distance matching
-nearest_neighbour_matching2 <- matchit(
+
+# Mahalanobis distance matching (without replacement)
+mahalanobis_matching <- matchit(
   bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
   distance = "mahalanobis",
   ratio = 1,
-  replace = T
+  replace = FALSE
 )
-summary(nearest_neighbour_matching2, standardize = TRUE)
-love.plot(nearest_neighbour_matching2, threshold = 0.1)
+
+# Mahalanobis distance matching (with replacement)
+mahalanobis_matching_replace <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "mahalanobis",
+  ratio = 1,
+  replace = TRUE
+)
+
+# Mahalanobis distance matching (with replacement, ratio = 2)
+mahalanobis_matching_ratio2 <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "mahalanobis",
+  ratio = 2, # Match each treated unit to 2 control units
+  replace = TRUE
+)
+
+# Propensity score matching (without replacement)
+propensity_score_matching <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "logit",
+  replace = FALSE
+)
+
+# Propensity score matching (with replacement)
+propensity_score_matching_replace <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "logit",
+  replace = TRUE
+)
+
+# Normalised Euclidean distance matching (without replacement)
+euclidean_matching <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "euclidean",
+  replace = FALSE
+)
+
+# Normalised Euclidean distance matching (with replacement)
+euclidean_matching_replace <- matchit(
+  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data,
+  method = "nearest",
+  estimand = "ATT",
+  distance = "euclidean",
+  replace = TRUE
+)
+
+# Function to extract matching results
+extract_matching_results <- function(match_model, model_name) {
+  bal_stats <- bal.tab(
+    match_model,
+    un = TRUE, thresholds = c(m = 0.1)
+  )$Balance # Extract balance stats
+
+  # Count matched observations
+  n_matched <- sum(match_model$weights > 0)
+
+  # Calculate balance statistics
+  masd <- mean(
+    abs(bal_stats$Diff.Adj),
+    na.rm = TRUE
+  )
+  msmd <- median(
+    abs(bal_stats$Diff.Adj),
+    na.rm = TRUE
+  )
+  maxsmd <- max(
+    abs(bal_stats$Diff.Adj),
+    na.rm = TRUE
+  )
+
+  return(tibble(
+    Model = model_name,
+    Matched = n_matched,
+    MASD = masd,
+    MSMD = msmd,
+    MaxSMD = maxsmd
+  ))
+}
+
+# Combine results into a table
+results_table <- bind_rows(
+  extract_matching_results(
+    nearest_neighbour_matching, "Nearest Neighbour (No Replacement)"
+  ),
+  extract_matching_results(
+    nearest_neighbour_matching_replace, "Nearest Neighbour (Replacement)"
+  ),
+  extract_matching_results(
+    mahalanobis_matching, "Mahalanobis (No Replacement)"
+  ),
+  extract_matching_results(
+    mahalanobis_matching_replace, "Mahalanobis (Replacement)"
+  ),
+  extract_matching_results(
+    mahalanobis_matching_ratio2, "Mahalanobis (Replacement, Ratio = 2)"
+  ),
+  extract_matching_results(
+    propensity_score_matching, "Propensity Score Matching (No Replacement)"
+  ),
+  extract_matching_results(
+    propensity_score_matching_replace, "Propensity Score Matching (Replacement)"
+  ),
+  extract_matching_results(
+    euclidean_matching, "Euclidean (No Replacement)"
+  ),
+  extract_matching_results(
+    euclidean_matching_replace, "Euclidean (Replacement)"
+  )
+)
+```
+
+Based on these results, the Mahalanobis distance matching estimator with replacement has the lowest MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement)"]``. Given this result, an additional model where the ratio of control to treated units is 2 is also considered to try and increase the number of matched observations. This model has a slightly higher MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]``, but has a much higher number of matched observations of ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]`` compared to the next best model matching ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement)"]``. The Mahalanobis distance matching estimator with replacement and a many-to-one matching approach is therefore chosen as the best matching estimator for the dataset as it best optimises the balance between treated and control groups and maximises the number of matched observations, helping to reduce bias and increase the precision of the estimated causal effect.
+
+This model's balance is then asssessed across covariates using the Mean Standardised Difference before and after matching, shown in Figure 1. We see from this figure that all post-matching covariates fall within the accepted range of balance of ``<0.1`` making this a suitable matching estimator for the dataset.
+
+```{r Matching Results Table, echo=FALSE}
+# Displaying the table
+results_table %>%
+  mutate(
+    across(where(is.numeric), round, digits = 4)
+  ) %>% # Round numbers for clarity
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    caption = "Comparison of Matching Estimators"
+  ) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  ) %>%
+  column_spec(
+    1,
+    width = "6cm"
+  ) %>%
+  column_spec(
+    2:5,
+    width = "2cm"
+  ) %>%
+  footnote(
+    general = "MASD = Mean Absolute Standardized Difference, MSMD = Median Standardized Mean Difference, MaxSMD = Maximum Standardized Mean Difference. Lower values indicate better balance.",
+    threeparttable = TRUE
+  )
+```
+
+```{r Matching Plot, echo=FALSE}
+# Extract balance statistics for Mahalanobis Matching (With Replacement, Ratio = 2)
+match.out <- mahalanobis_matching_ratio2 # Assign model to variable
+
+# Combine relevant statistics
+dta_plot <- rbind(
+  data.frame(
+    var = rownames(summary(match.out, standardize = TRUE)$sum.all),
+    type = "Raw",
+    std = summary(match.out, standardize = TRUE)$sum.all[, "Std. Mean Diff."]
+  ),
+  data.frame(
+    var = rownames(summary(match.out, standardize = TRUE)$sum.matched),
+    type = "Matched",
+    std = summary(match.out, standardize = TRUE)$sum.matched[, "Std. Mean Diff."]
+  )
+)
+
+# Define cutoff values (typically 0.1 or 0.25 for SMD thresholds)
+cutoff1 <- 0.05
+cutoff2 <- 0.1
+
+# Generate SMD Plot with Requested Modifications
+ggplot(dta_plot, aes(y = var, x = std, shape = type, color = type)) +
+  geom_vline(aes(xintercept = 0), color = "black", linewidth = 0.25) + # Vertical line at 0
+  geom_vline(aes(xintercept = cutoff1), linetype = "dashed", color = "black", linewidth = 0.25) + # Cutoff at 0.05
+  geom_vline(aes(xintercept = -cutoff1), linetype = "dashed", color = "black", linewidth = 0.25) +
+  geom_vline(aes(xintercept = cutoff2), linetype = "solid", color = "black", linewidth = 0.25) + # Cutoff at 0.1
+  geom_vline(aes(xintercept = -cutoff2), linetype = "solid", color = "black", linewidth = 0.25) +
+  geom_vline(aes(xintercept = -1), linetype = "solid", color = "black", linewidth = 0.25) + # X-axis boundary
+  geom_hline(aes(yintercept = 0), linetype = "solid", color = "black", linewidth = 0.25) +
+  geom_point(size = 2, stroke = 0.5, shape = 1, color = "black") + # Unmatched (outline only)
+  geom_point(data = dta_plot[dta_plot$type == "Matched", ], aes(x = std, y = var), size = 1.75, fill = "black") + # Matched (solid black)
+  scale_shape_manual(values = c("Unmatched" = 1, "Matched" = 16)) + # Open circles (Unmatched) and filled circles (Matched)
+  scale_color_manual(values = c("Unmatched" = "black", "Matched" = "black")) + # Ensure both appear in legend
+  scale_x_continuous(limits = c(-1, 1), breaks = seq(-1, 1, by = 0.25)) + # X-axis scale from -1 to +1
+  scale_y_discrete(expand = c(0.2, 0.2)) + # Remove extra space on y-axis
+  scale_color_manual(values = c("black", "black")) + # Ensure both have black color
+  theme_minimal(base_family = "Times") +
+  labs(
+    x = "Standardized Mean Differences",
+    y = "",
+    caption = "Note: Figure represents the Mahalanobis Matching (With Replacement, Ratio = 2) model. Lower values indicate better balance. \n Black dots represents post-matching standardized mean differences and open circles represent pre-matching standardized mean differences."
+  ) +
+  theme(
+    legend.title = element_blank(), # Remove legend title
+    legend.position = "none", # Keep legend on the right
+    plot.caption = element_text(hjust = 0), # Left-align caption
+    text = element_text(family = "Times", size = 10), # Set consistent font
+    axis.text = element_text(family = "Times", size = 10), # Reduce x-axis text size
+    axis.title.x = element_text(size = 10, margin = margin(t = 5)), # Reduce x-axis title size and increase spacing
+    axis.ticks = element_line(color = "black", linewidth = 0.25), # Match table lines
+    panel.grid.major.x = element_blank(), # Remove vertical grid lines
+    panel.grid.major.y = element_line(linetype = "dashed", color = "grey70", linewidth = 0.25), # Soft dashed horizontal lines
+    panel.grid.minor = element_blank(), # Remove minor grid lines
+    plot.margin = margin(10, 10, 30, 10) # Increase bottom margin for x-axis spacing
+  )
 ```
 
 ## Question 3
 
 Estimate the causal effect of interest with matching. Are the results from your matching analysis different from using a simple OLS regression without covariates? If there is a difference: how do you explain it? **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
 
 ## Question 4
 
 How does the comparison between matching and OLS regression change when you include covariates (control variables)? Report the models in a single table and discuss. **[10 points]**
 
-\hspace{0pt}\rule{100pt}{0.4pt}
+\hspace{0pt}\rule{100pt}{0.25pt}
