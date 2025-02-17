@@ -560,7 +560,7 @@ euclidean_matching_replace <- matchit(
 
 # Function to extract matching results
 extract_matching_results <- function(match_model, model_name) {
-  bal_stats <- bal.tab(
+  bal_stats <- cobalt::bal.tab(
     match_model,
     un = TRUE, thresholds = c(m = 0.1)
   )$Balance # Extract balance stats
@@ -582,7 +582,7 @@ extract_matching_results <- function(match_model, model_name) {
     na.rm = TRUE
   )
 
-  return(tibble(
+  return(tibble::tibble(
     Model = model_name,
     Matched = n_matched,
     MASD = masd,
