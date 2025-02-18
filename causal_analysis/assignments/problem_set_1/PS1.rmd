@@ -34,22 +34,19 @@ knitr::opts_chunk$set(
 )
 
 # Load pacman package
-if (!require("pacman")) install.packages("pacman")
+if (!require("pacman")) install.packages("pacman", dependencies = TRUE)
 library(pacman)
 
 # Load (and install) packages needed for the analyses
 pacman::p_load(
   tidyverse, # Cleaning data, plotting plots
-  dplyr, # Data manipulation
   knitr, # Knitting documents
   kableExtra, # Table formatting
   modelsummary, # Table formatting
   haven, # Read .dta files
   MatchIt, # Matching estimators
   cobalt, # Balance assessment
-  Matching, # Used in Genetic matching estimators
-  tibble, # Create tibbles
-  broom # Tidy regression output
+  Matching # Used in Genetic matching estimators
 )
 
 knitr::knit_hooks$set(inline = function(x) {
@@ -401,9 +398,6 @@ Using data from the Vietnam War, Kocher, Pepinsky and Kalyvas (2011) examined th
 The data comes from various sources. The United States compiled a gazetteer of South Vietnamese hamlets, identified their geographic coordinates, and conducted a census. District Senior Advisors (DSAs, army officers ranking major or above) were assigned to complete detailed questionnaires for every village and hamlet in their zones of operation. Some of these questionnaires were compiled monthly, others quarterly. DSAs were detached from U.S. units to live and work in the districts they rated. The RVN (Republic of Viet Nam) had 261 districts with a median area of 377 kilometers squared, or about one-fourth the size of the median U.S. county. There was a median of 36 hamlets per district in 1969. In this exercise, we will explore how matching models work, using the dataset in `Vietnam_matching.dta`. We will apply the matching procedure to estimate the effect of experiencing a bombing in September 1969 on insurgency control in December 1969.
 
 ```{r Problem 3 Dataset, echo=FALSE, results='hide'}
-# Set working directory
-setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/assignments/problem_set_1")
-
 # Load the dataset (using the read_dta function from the haven package)
 vietnam_data <- read_dta("Vietnam_matching-1.dta")
 file.exists("Vietnam_matching-1.dta")
@@ -714,11 +708,9 @@ logistic_att_model <- polr(
 )
 
 # Simple OLS regression without covariates
-ols_model <- summary(
-  lm(
-    mod2a_1adec ~ bombed_969,
-    data = vietnam_data
-  )
+ols_model <- lm(
+  mod2a_1adec ~ bombed_969,
+  data = vietnam_data
 )
 
 # Create a named list of models
@@ -737,18 +729,24 @@ modelsummary(models,
   output = "latex", # Output in LaTeX format
   title = "Comparison of Causal Effect Estimates
   from Matching and OLS Regression",
-  notes = "Note: Standard errors are in parentheses.
-  Both ATT models use matched data to estimate the causal effect of ``bombed_969`` on ``mod2a_1adec``.",
+  notes = "Note: Standard errors are in parentheses. Both ATT models use
+  matched data to estimate the causal effect of ``bombed_969`` on
+  ``mod2a_1adec``.",
 )
 
 # Extract coefficients for bombed_969
-ols_coef <- coef(ols_model)["bombed_969"] # OLS model coefficient
-att_coef <- coef(att_model)["bombed_969"] # ATT model coefficient
-logit_or <- exp(coef(logistic_att_model)["bombed_969"]) # Convert log-odds to odds ratio
+ols_coef <- coef(
+  ols_model
+)["bombed_969"] # OLS model coefficient
+att_coef <- coef(
+  att_model
+)["bombed_969"] # ATT model coefficient
+logit_or <- exp(
+  coef(logistic_att_model)["bombed_969"]
+) # Convert log-odds to odds ratio
 ```
 
 The OLS coefficient shows us that for a one-unit increase in bombings per hamlet in September 1969, the average control of hamlets by the Viet Cong in December 1969 increases on the 1-5 scale by **`r ols_coef`**. This compares to the even smaller effect of **`r att_coef`** in the ATT model using OLS. The ordered logistic model shows that the odds of a hamlet being controlled by the Viet Cong in December 1969 is **`r logit_or`** times higher if it was bombed in September 1969.
-
 
 Whilst all models suggest a statistically significant effect of bombing increasing insurgent control of hamlets, the OLS (No Covariates) model is likely to be biased due to the non-randomised nature of the treatment and the lack of control for confounders. The ATT models are more robust as they use matching to balance the dataset across covariates, reducing bias and increasing the precision of the estimated causal effect. The ordered logistic model is likely to be the most accurate as it accounts for the ordinal nature of the outcome variable. Therefore, the difference seen between OLS (No Covariates) and the ATT (Ordered Logistic) model is due to the lack of control for confounders in the OLS model, leading to a downwardly biased estimate of the causal effect of bombings on hamlet control in December 1969, as well as the assumption of linearity in the OLS model which is not appropriate for the ordinal outcome variable.
 
@@ -757,3 +755,73 @@ Whilst all models suggest a statistically significant effect of bombing increasi
 How does the comparison between matching and OLS regression change when you include covariates (control variables)? Report the models in a single table and discuss. **[10 points]**
 
 \hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Causal Effect Estimates with Covariates, echo=FALSE}
+# Estimate ATT Model (OLS)
+att_model <- lm(
+  mod2a_1adec ~ bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = matched_data,
+  weights = weights
+)
+
+# Ordered Logistic Model
+logistic_att_model <- polr(
+  factor(mod2a_1adec) ~
+    bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = matched_data,
+  weights = weights,
+  method = "logistic"
+)
+
+# Simple OLS regression without covariates
+ols_model <- lm(
+  mod2a_1adec ~ bombed_969,
+  data = vietnam_data
+)
+
+# Simple OLS regression with covariates
+ols_model_covariates <- lm(
+  mod2a_1adec ~ bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = vietnam_data
+)
+
+# Create a named list of models
+models <- list(
+  "ATT (OLS)" = att_model,
+  "ATT (Ordered Logistic)" = logistic_att_model,
+  "OLS (No Covariates)" = ols_model,
+  "OLS (With Covariates)" = ols_model_covariates
+)
+
+# Display table using modelsummary
+modelsummary(models,
+  estimate = "estimate",
+  statistic = "std.error",
+  stars = c("*" = 0.05, "**" = 0.01, "***" = 0.001),
+  gof_omit = "IC|Log|Adj", # Hides unnecessary model fit stats
+  output = "latex", # Output in LaTeX format
+  title = "Comparison of Causal Effect Estimates
+  from Matching and OLS Regression",
+  notes = "Note: Standard errors are in parentheses. Both ATT models use
+  matched data to estimate the causal effect of ``bombed_969`` on
+  ``mod2a_1adec``.",
+)
+
+# Extract coefficients for bombed_969
+ols_coef <- coef(
+  ols_model
+)["bombed_969"] # OLS model coefficient
+att_coef <- coef(
+  att_model
+)["bombed_969"] # ATT model coefficient
+logit_or <- exp(
+  coef(logistic_att_model)["bombed_969"]
+) # Convert log-odds to odds ratio
+ols_coef_covariates <- coef(
+  ols_model_covariates
+)["bombed_969"] # OLS model coefficient with covariates
+```
+
+When including covariates in the OLS regression model, the estimated causal effect of bombings on hamlet control in December 1969 is reduced from **`r ols_coef`** to **`r ols_coef_covariates`**. This brings the coefficient estimate a lot closer to the **`r att_coef`** estimate from the ATT (OLS) model. This is due to now accounting for the confounding variables in the OLS model. The ATT models are still more robust as they use matching to balance the dataset across covariates, reducing bias and increasing the precision of the estimated causal effect. Although there are far fewer observations in the ATT models, both the ATT and OLS models are strongly statistically significant.
+
+However, the OLS regression model may still not give meaningful causal estimates. Whilst the inclusion of covariates to try to satisfy the Conditional Indpendence Assumption (CIA), whereby otential outcomes for control units are the same as for treated units, when those units have the same covariate values ($X_i$), we cannot guarantee $\beta_{OLS}=\tau_{ATE}$ as we do not know which covariates satsify the CIA. We include all the observed covariates in the OLS model, but there may still be unobserved covariates and heterogeneity which is not accoutned for in the model, leading to omitted variable bias. The ATT models therefore remain more robust as they use matching to balance the dataset across covariates, reducing bias and increasing the precision of the estimated causal effect.

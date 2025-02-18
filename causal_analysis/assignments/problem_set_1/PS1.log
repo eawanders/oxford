@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.7)  18 FEB 2025 01:10
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.7)  18 FEB 2025 15:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -767,33 +767,54 @@ Package pdftex.def Info: PS1_files/figure-latex/Matching Plot-1.pdf  used on inp
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 7.74557pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (7.74557pt too wide) in paragraph at lines 706--707
+ [][] 
+ []
+
+
+
+[9]
+
+[10]
+
+[11]
 
 Package caption Warning: Unused \captionsetup[figure] on input line 63.
 See the caption package documentation for explanation.
 
 
 
-[9]
-
-[10] (./PS1.aux)
+[12] (./PS1.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 19830 strings out of 475172
- 389452 string characters out of 5764614
- 803744 words of memory out of 5000000
- 42512 multiletter control sequences out of 15000+600000
- 620269 words of font info for 88 fonts, out of 8000000 for 9000
+ 19877 strings out of 475172
+ 390798 string characters out of 5764614
+ 858442 words of memory out of 5000000
+ 42553 multiletter control sequences out of 15000+600000
+ 623441 words of font info for 91 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,13n,107p,359b,1290s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 89i,13n,107p,359b,1300s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on PS1.pdf (10 pages, 266485 bytes).
+Output written on PS1.pdf (12 pages, 272818 bytes).
 PDF statistics:
- 224 PDF objects out of 1000 (max. 8388607)
- 181 compressed objects within 2 object streams
- 38 named destinations out of 1000 (max. 500000)
+ 237 PDF objects out of 1000 (max. 8388607)
+ 192 compressed objects within 2 object streams
+ 44 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 
