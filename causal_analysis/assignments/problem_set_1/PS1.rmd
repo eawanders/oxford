@@ -44,12 +44,12 @@ pacman::p_load(
   knitr, # Knitting documents
   kableExtra, # Table formatting
   modelsummary, # Table formatting
-  tribble, # Create tibbles
   haven, # Read .dta files
   MatchIt, # Matching estimators
   cobalt, # Balance assessment
   Matching, # Used in Genetic matching estimators
-  tibble # Create tibbles
+  tibble, # Create tibbles
+  broom # Tidy regression output
 )
 
 knitr::knit_hooks$set(inline = function(x) {
@@ -406,8 +406,10 @@ setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/assignments/p
 
 # Load the dataset (using the read_dta function from the haven package)
 vietnam_data <- read_dta("Vietnam_matching-1.dta")
+file.exists("Vietnam_matching-1.dta")
 
 # Summary of the data
+str(vietnam_data)
 glimpse(vietnam_data)
 head(vietnam_data)
 summary(vietnam_data)
@@ -443,10 +445,12 @@ covariates_table <- data.frame(
   ),
   Explanation = c(
     "More difficult terrain may influence both bombing likelihood and hamlet control.",
-    "Hamlets closer to international borders may have strategic importance affecting both bombing decisions and control.",
-    "More developed hamlets may have been targeted differently and had different control conditions.",
-    "Larger hamlets may be more strategically important, affecting both bombing decisions and control dynamics.",
-    "If a hamlet was already contested or insurgent-controlled before bombing, this could affect both the likelihood of being bombed and later control."
+    "Hamlets closer to international borders may have strategic importance affecting
+    both bombing decisions and control.", "More developed hamlets may have been targeted
+    differently and had different control conditions.", "Larger hamlets may be more
+    strategically important, affecting both bombing decisions and control dynamics.",
+    "If a hamlet was already contested or insurgent-controlled before bombing,
+    this could affect both the likelihood of being bombed and later control."
   )
 )
 
@@ -465,6 +469,7 @@ Choose a matching estimator – briefly describe your choice. Assess balance in 
 Before estimating the causal effect of bombings on hamlet control, we need to choose a matching estimator to identify suitable control hamlets. The matching estimator chosen should be the one which ensures that the control hamlets are as similar as possible to the treated hamlets, other than whether they were bombed or not. The matching estimator should also ensure that the control hamlets are balanced across all covariates used in the matching procedure so that we have a balanced control between treated and control groups. There are many matching estimators to choose from, for example: exact matching, nearest neighbour matching, propensity score matching, genetic matching, normalised Euclidean distance matching, and Mahalanobis distance matching. With these possible methods, we want to ensure that we keep as many observations as possible, and assess the bias-variance trade-off to ensure accurate and consistent results. The measure for assessing balance is the standardised mean difference, which is a measure of balance between the treated and control groups, with a value of 0 indicating perfect balance.
 
 The most strict matching estimator of exact matches returns ``No exact matches found``, an expected outcome due to the nature of continuous covariates in the dataset. Instead, a number of alternative estimators are considered to determine the best matching estimator for the dataset. Table 3 highlights different matching models which are considered. Models have been considered with and without replacement of observations. The intuition behind comparing these models is the expectation that replacement will help to find better matches, especially given the continuous nature of the covariates; however, this may come with the trade-off of higher variance. The table shows the number of matched observations, the Mean Absolute Standardised Difference (MASD), the Median Standardised Mean Difference (MSMD), and the Maximum Standardised Mean Difference (MaxSMD) for each matching estimator. Lower values of MASD, MSMD, and MaxSMD indicate better balance between the treated and control groups.
+
 ```{r Matching Estimators, echo=FALSE, results='hide'}
 # Nearest neighbour matching (without replacement)
 nearest_neighbour_matching <- matchit(
@@ -483,7 +488,6 @@ nearest_neighbour_matching_replace <- matchit(
   estimand = "ATT",
   replace = TRUE
 )
-
 
 # Mahalanobis distance matching (without replacement)
 mahalanobis_matching <- matchit(
@@ -517,6 +521,8 @@ mahalanobis_matching_ratio2 <- matchit(
   ratio = 2, # Match each treated unit to 2 control units
   replace = TRUE
 )
+
+exists("mahalanobis_matching_ratio2")
 
 # Propensity score matching (without replacement)
 propensity_score_matching <- matchit(
@@ -625,7 +631,7 @@ results_table <- bind_rows(
 
 Based on these results, the Mahalanobis distance matching estimator with replacement has the lowest MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement)"]``. Given this result, an additional model where the ratio of control to treated units is 2 is also considered to try and increase the number of matched observations. This model has a slightly higher MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]``, but has a much higher number of matched observations of ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]`` compared to the next best model matching ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement)"]``. The Mahalanobis distance matching estimator with replacement and a many-to-one matching approach is therefore chosen as the best matching estimator for the dataset as it best optimises the balance between treated and control groups and maximises the number of matched observations, helping to reduce bias and increase the precision of the estimated causal effect.
 
-This model's balance is then asssessed across covariates using the Mean Standardised Difference before and after matching, shown in Figure 1. We see from this figure that all post-matching covariates fall within the accepted range of balance of ``<0.1`` making this a suitable matching estimator for the dataset.
+This model's balance is then asssessed across covariates using the Mean Standardised Difference before and after matching, shown in Figure 1. We see from this figure that all post-matching covariates fall within the accepted range of balance of ``<0.1`` which implies that as a result of this matching process, the groups are comparable on average, with respect to these observable factors.
 
 ```{r Matching Results Table, echo=FALSE}
 # Displaying the table
@@ -650,75 +656,101 @@ results_table %>%
     width = "2cm"
   ) %>%
   footnote(
-    general = "MASD = Mean Absolute Standardized Difference, MSMD = Median Standardized Mean Difference, MaxSMD = Maximum Standardized Mean Difference. Lower values indicate better balance.",
+    general = "MASD = Mean Absolute Standardized Difference, MSMD = Median Standardized Mean Difference, MaxSMD = Maximum Standardized Mean Difference. Genetic matching has been discarded due to higher imbalance and heavier computational load. The binary variable ``bombed_969_bin`` is the treatment variable used to balance the dataset.",
     threeparttable = TRUE
   )
 ```
 
-```{r Matching Plot, echo=FALSE}
-# Extract balance statistics for Mahalanobis Matching (With Replacement, Ratio = 2)
+```{r Matching Plot, echo=FALSE,}
+# Extract balance statistics for Mahalanobis
+# Matching (With Replacement, Ratio = 2)
 match.out <- mahalanobis_matching_ratio2 # Assign model to variable
 
-# Combine relevant statistics
-dta_plot <- rbind(
-  data.frame(
-    var = rownames(summary(match.out, standardize = TRUE)$sum.all),
-    type = "Raw",
-    std = summary(match.out, standardize = TRUE)$sum.all[, "Std. Mean Diff."]
-  ),
-  data.frame(
-    var = rownames(summary(match.out, standardize = TRUE)$sum.matched),
-    type = "Matched",
-    std = summary(match.out, standardize = TRUE)$sum.matched[, "Std. Mean Diff."]
-  )
+par(family = "Times", cex = 0.8)
+
+plot(summary(match.out),
+  abs = FALSE,
+  position = "topleft",
+  var.order = "matched",
+  xlim = c(-1, 1),
 )
 
-# Define cutoff values (typically 0.1 or 0.25 for SMD thresholds)
-cutoff1 <- 0.05
-cutoff2 <- 0.1
-
-# Generate SMD Plot with Requested Modifications
-ggplot(dta_plot, aes(y = var, x = std, shape = type, color = type)) +
-  geom_vline(aes(xintercept = 0), color = "black", linewidth = 0.25) + # Vertical line at 0
-  geom_vline(aes(xintercept = cutoff1), linetype = "dashed", color = "black", linewidth = 0.25) + # Cutoff at 0.05
-  geom_vline(aes(xintercept = -cutoff1), linetype = "dashed", color = "black", linewidth = 0.25) +
-  geom_vline(aes(xintercept = cutoff2), linetype = "solid", color = "black", linewidth = 0.25) + # Cutoff at 0.1
-  geom_vline(aes(xintercept = -cutoff2), linetype = "solid", color = "black", linewidth = 0.25) +
-  geom_vline(aes(xintercept = -1), linetype = "solid", color = "black", linewidth = 0.25) + # X-axis boundary
-  geom_hline(aes(yintercept = 0), linetype = "solid", color = "black", linewidth = 0.25) +
-  geom_point(size = 2, stroke = 0.5, shape = 1, color = "black") + # Unmatched (outline only)
-  geom_point(data = dta_plot[dta_plot$type == "Matched", ], aes(x = std, y = var), size = 1.75, fill = "black") + # Matched (solid black)
-  scale_shape_manual(values = c("Unmatched" = 1, "Matched" = 16)) + # Open circles (Unmatched) and filled circles (Matched)
-  scale_color_manual(values = c("Unmatched" = "black", "Matched" = "black")) + # Ensure both appear in legend
-  scale_x_continuous(limits = c(-1, 1), breaks = seq(-1, 1, by = 0.25)) + # X-axis scale from -1 to +1
-  scale_y_discrete(expand = c(0.2, 0.2)) + # Remove extra space on y-axis
-  scale_color_manual(values = c("black", "black")) + # Ensure both have black color
-  theme_minimal(base_family = "Times") +
-  labs(
-    x = "Standardized Mean Differences",
-    y = "",
-    caption = "Note: Figure represents the Mahalanobis Matching (With Replacement, Ratio = 2) model. Lower values indicate better balance. \n Black dots represents post-matching standardized mean differences and open circles represent pre-matching standardized mean differences."
-  ) +
-  theme(
-    legend.title = element_blank(), # Remove legend title
-    legend.position = "none", # Keep legend on the right
-    plot.caption = element_text(hjust = 0), # Left-align caption
-    text = element_text(family = "Times", size = 10), # Set consistent font
-    axis.text = element_text(family = "Times", size = 10), # Reduce x-axis text size
-    axis.title.x = element_text(size = 10, margin = margin(t = 5)), # Reduce x-axis title size and increase spacing
-    axis.ticks = element_line(color = "black", linewidth = 0.25), # Match table lines
-    panel.grid.major.x = element_blank(), # Remove vertical grid lines
-    panel.grid.major.y = element_line(linetype = "dashed", color = "grey70", linewidth = 0.25), # Soft dashed horizontal lines
-    panel.grid.minor = element_blank(), # Remove minor grid lines
-    plot.margin = margin(10, 10, 30, 10) # Increase bottom margin for x-axis spacing
-  )
+title(
+  main = "Figure 1: Standardised Mean Differences Before and After Matching",
+  font.main = 1, # Bold (1 = plain, 2 = bold, 3 = italic, 4 = bold italic)
+  cex.main = 0.8 # Increase title size
+)
 ```
+
 
 ## Question 3
 
 Estimate the causal effect of interest with matching. Are the results from your matching analysis different from using a simple OLS regression without covariates? If there is a difference: how do you explain it? **[10 points]**
 
 \hspace{0pt}\rule{100pt}{0.25pt}
+
+When using matching techniques to combat issues of non-randomisation in the receipt of a treatment, we estimate the Average Treatment Effect on the Treated (ATT) to determine the causal effect of the treatment on the outcome. After using the binary treatment variable `bombed_969_bin` to balance the dataset, we can estimate the causal effect of bombings on hamlet control in December 1969 (`mod2a_1adec`), using the continuous variable `bombed_969`, using the covariates `std`, `ln_dist`, `score`, `lnhpop`, and `mod2a_1admn`.
+
+Two ATT models are estimated. The first model (`ATT (OLS)`) uses Ordinary Least Squares; however, this requires a strong assumption that the scaling of the outcome variable is linear and continuous. Instead, the 5-point scale of `mod2a_1adec` is ordinal in nature such that we cannot assume the differences between categories is equal. Therefore, the second model (`ATT (Ordered Logistic)`) uses an ordered logistic model to estimate the causal effect of bombings on hamlet control in December 1969. Finally, a third model (`OLS (No Covariates)`) is a simple OLS regression without covariates. The results are presented in Table 4.
+
+```{r Causal Effect Estimates, echo=FALSE}
+# Extract matched dataset
+matched_data <- match.data(mahalanobis_matching_ratio2)
+
+# Estimate ATT Model (OLS)
+att_model <- lm(
+  mod2a_1adec ~ bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = matched_data,
+  weights = weights
+)
+
+# Ordered Logistic Model
+logistic_att_model <- polr(
+  factor(mod2a_1adec) ~
+    bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  data = matched_data,
+  weights = weights,
+  method = "logistic"
+)
+
+# Simple OLS regression without covariates
+ols_model <- summary(
+  lm(
+    mod2a_1adec ~ bombed_969,
+    data = vietnam_data
+  )
+)
+
+# Create a named list of models
+models <- list(
+  "ATT (OLS)" = att_model,
+  "ATT (Ordered Logistic)" = logistic_att_model,
+  "OLS (No Covariates)" = ols_model
+)
+
+# Display table using modelsummary
+modelsummary(models,
+  estimate = "estimate",
+  statistic = "std.error",
+  stars = c("*" = 0.05, "**" = 0.01, "***" = 0.001),
+  gof_omit = "IC|Log|Adj", # Hides unnecessary model fit stats
+  output = "latex", # Output in LaTeX format
+  title = "Comparison of Causal Effect Estimates
+  from Matching and OLS Regression",
+  notes = "Note: Standard errors are in parentheses.
+  Both ATT models use matched data to estimate the causal effect of ``bombed_969`` on ``mod2a_1adec``.",
+)
+
+# Extract coefficients for bombed_969
+ols_coef <- coef(ols_model)["bombed_969"] # OLS model coefficient
+att_coef <- coef(att_model)["bombed_969"] # ATT model coefficient
+logit_or <- exp(coef(logistic_att_model)["bombed_969"]) # Convert log-odds to odds ratio
+```
+
+The OLS coefficient shows us that for a one-unit increase in bombings per hamlet in September 1969, the average control of hamlets by the Viet Cong in December 1969 increases on the 1-5 scale by **`r ols_coef`**. This compares to the even smaller effect of **`r att_coef`** in the ATT model using OLS. The ordered logistic model shows that the odds of a hamlet being controlled by the Viet Cong in December 1969 is **`r logit_or`** times higher if it was bombed in September 1969.
+
+
+Whilst all models suggest a statistically significant effect of bombing increasing insurgent control of hamlets, the OLS (No Covariates) model is likely to be biased due to the non-randomised nature of the treatment and the lack of control for confounders. The ATT models are more robust as they use matching to balance the dataset across covariates, reducing bias and increasing the precision of the estimated causal effect. The ordered logistic model is likely to be the most accurate as it accounts for the ordinal nature of the outcome variable. Therefore, the difference seen between OLS (No Covariates) and the ATT (Ordered Logistic) model is due to the lack of control for confounders in the OLS model, leading to a downwardly biased estimate of the causal effect of bombings on hamlet control in December 1969, as well as the assumption of linearity in the OLS model which is not appropriate for the ordinal outcome variable.
 
 ## Question 4
 
