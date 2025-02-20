@@ -1,0 +1,111 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}
+---
+
+\newpage
+
+# Experimental Pre-Analysis Plan
+## Reseseach Question
+
+\begin{quote} \textit{Does exposure to AI-generated news increase affective polarisation?} \end{quote}
+
+## Theoretical and Empirical Motivations
+
+Advancements in machine learning techniques, particularly transformer models trained to efficiently handle sequential data inputs and outputs, have popularised the field of Artificial Intelligence (AI) [@vaswani2017]. Amongst AI’s applications, generating hyper-realistic textual and visual content has become easily accessible, helping AI become an enabling informational tool. Yet, as unregulated AI technologies remain prone to hallucinations and misuse from bad actors, they are raising concern in social and political contexts [@rawte2023; @duberry2022]. AI can be used to generate manipulative political information and deceitful deepfakes which can be used to incite hate or spread misinformation. Questions are therefore being raised on whether AI-generated content influences voting behaviour and election outcomes such that it poses a threat to the trust and integrity of democratic political institutions [@stockwell2024a].
+
+My research question builds upon the rise of fake news, and fills a distinct gap in the new AI literature. Structural effects of globalisation and economic liberalism, coupled with individual political failings and electoral shocks have created an increasingly unequal and divided world. Consequent disillusionment and disconnected identities have encouraged voter volatility and rising populist narratives, notably in the United Kingdom (UK) [@norris2019; @fieldhouse2019: 28-32]. This environment — coupled with social media — has encouraged the dangerous spread of fake news which has been shown to favour populists, affect voting behaviour, and strengthen identities and affective polarisation within echo chambers [@cantarella2023; @pfister2023; @hobolt2023]. Despite minimal literature on AI in political science, early research suggests AI-generated messages can also be persuasive, and propaganda produced by AI can be compelling [@bai2023; @goldstein2024]. But, when aware of political content being AI-generated, readers become sceptical of its validity even if the content is true [@altay2024]. Given possible scepticism towards veracity, @cashell2024 argues deepfakes are used to perpetuate existing stereotypes rather than attempting to persuade new views. As AI-generated content can be compelling and may be used to polarise in similar ways to fake news, the volatile political landscape also provides fertile ground for widespread dissemination of deceitful AI-generated information.
+
+Given there are fears that AI-generated news can contribute to the spread of misinformation, as well as manipulate and spread hate through deepfakes which are often indistinguishable from real content, AI-generated news is being associated with untrustworthy conent [@altay2024]. As trust in news sources is key to whether we how voters perceive and act on informaiton for decision-making, the implication of AI-generated news diminising trust in news sources is that it may also diminish trust in the political system and institutions, thus increasiing polarised views on articles opposed to their core beleifs [@hobolt2023].
+
+The research focuses on the UK to expand the literature beyond the United States. The dependent variables are conceptually grounded in voting behaviour and valence theory, with consideration given to their operationalisation and measurement validity so results can be reliably used for further research [@adcock2001; @goertz2006; @green2012; @fisher2017]. However, further literature review is required to better identify whetehr attitudes and affective polarisation may be susceptible to persuasion from a simple experimental exposure. Running a pilot study may be an effective way to provide credence to my initial hypotheses before refining the research design.
+
+If AI is shown to influence affective polarisation, it could validate populists using the technology to shape political discourse and threaten institutions, risking democratic backsliding [@haggard2021]. The implications of this research topic would inform how we regulate, highlight, or restrict AI-generated news — whether inaccurate or not.[^1]
+
+[^1]:
+    However, aggregate-level effects of AI on the 2024 UK election were minimal [@simon2024b].
+
+## Hypotheses to be Tested
+
+### Confirmatory Hypothesis
+$H_1$: Exposure to AI-generated news articles will increase affective polatisation.
+
+### Exploratory Hypotheses
+$H_2$: Exposure to AI-generated news articles will have a null effect towards policy attitudes on, for example, immigration and the economy.
+
+$H_3$: The veracity of AI-generated news articles will not affect outcomes.
+
+## Experimental Protocol
+
+### Treatment Conditions
+
+\newpage
+```{r Experiment Design, echo=FALSE, results='asis'}
+library(knitr)
+library(kableExtra)
+
+# Table data with normal content
+table_data <- data.frame(
+  ` ` = c("Control", "Treatment"),
+  `No Labels` = c("Human-generated Article", "AI-generated Article"),
+  `Labelled as AI` = c("N/A", "AI-generated Article"),
+  check.names = FALSE
+)
+
+# Create the table without using footnote()
+kable(table_data, align = "l", escape = FALSE, caption = "Treatments and Control for AI-generated News Exposure.") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  add_header_above(c(" " = 1, "News Article Labelling" = 2), escape = FALSE) %>% # Bold top header
+  row_spec(0, bold = TRUE) %>% # Bold the "True" and "False" headers
+  column_spec(1, width = "4cm") %>% # Widen the first column
+  column_spec(2, width = "4cm") %>% # Widen "True" column
+  column_spec(3, width = "4cm") # Widen "False" column
+
+# Manually add a LaTeX footnote below the table
+cat("\\begin{flushleft} \\footnotesize Note: Treatment variations to test for interaction effects of veracity, ideological stance, context, and source will be used. \\end{flushleft}")
+```
+
+
+
+1. Definition of the treatment conditions
+2. How units are assigned to treatment conditions.
+3. How you will measure the primary outcomes.
+4. How your primary hypotheses will be tested
+
+### Assignment
+
+### Measuring outcomes
+
+### Testing Hypotheses
+
+## Power Analysis
+
+1. Defining and trying to justify the assumptions that guide your analysis and the range of parameters that you will consider.
+2. Conduct a simulation-based power calculation using R.
+3. Plot power curves to show how changing the values of key parameters impact the power of your study.
+
+### Assumptions
+
+### Calculations
+
+## Design Threats
+
+1. Discuss whether there are potential issues of non-compliance, attrition, or spillovers in your design.
+
+2. Discuss which measures will be taken to verify and minimise potential threats presented by non-compliance, attrition, or spillovers.
+
+\newpage
+
+# Bibliography
