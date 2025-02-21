@@ -1,0 +1,636 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Week 5: Differences in Differences},
+  pdfauthor={Your name},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Week 5: Differences in Differences}
+\author{Your name}
+\date{HT 2025}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}\label{introduction}
+
+The intuition of the DiD strategy is to combine two simpler approaches.
+The first difference (before and after) \emph{eliminates unit-specific
+fixed effects}. Then, the second difference \emph{eliminates time fixed
+effects}. With this approach, we can, under some assumptions, obtain an
+unbiased estimate of a (policy) intervention.
+
+We learned that we can break down the difference between treated and
+untreated units in post-treatment as the Average Treatment Effect
+Amongst the Treated (ATT), different time trends and selection bias.
+However, we can impose additional estimation assumptions to retrieve a
+credible estimate of this treatment effect. The key assumption in
+diff-in-diff studies is the so-called \textbf{Parallel Trends} or
+\textbf{Common Trends} assumption. This assumption states that in the
+absence of the treatment/policy, we should expect to see the treated and
+untreated units following similar trends over time. Unfortunately, we
+cannot comprehensively test whether this assumption holds, but we can at
+least conduct some analyses that provide indicative, although not
+sufficient, evidence for the parallel trends assumption to hold.
+
+We also learned that we can calculate the ATT in different ways.
+Specifically, we learned that we can manually calculate the
+difference-in-difference estimator.
+
+\begin{itemize}
+\tightlist
+\item
+  Group-period interactions
+\item
+  Unit and time dummies and a treatment indicator
+\end{itemize}
+
+We rely on the parallel trends assumption by assuming that time-trends
+are the same for both treated and untreated units.
+
+Finally, we discussed inference and, in particular, standard errors.
+Specifically, we use panel data, meaning repeated observations over
+time, to estimate diff-in-differences models. Panel data likely exhibits
+serially correlated regressors and residuals. As a result, it's
+important to adjusted our coefficients' standard errors, e.g.~by using
+\emph{clustered standard errors}.
+
+\section{Lab Session Overview}\label{lab-session-overview}
+
+In this seminar, we will cover the following topics:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  ``Manually'' calculate the difference-in-differences estimator
+\item
+  Obtain the difference-in-differences estimator using the \texttt{lm()}
+  function
+\item
+  Check for parallel trends before the treatment occurred
+\item
+  Use fixed effects in difference-in-differences estimations using both
+  the \texttt{lm\_robust()} and \texttt{plm()} function.
+\item
+  Conduct a placebo test
+\end{enumerate}
+
+\textbf{Before proeceeding further:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Create a folder called \texttt{Lab5}.
+\item
+  Download the data and the empty RMarkdown file from Canvas
+\item
+  Save both in our \texttt{Lab5} folder.
+\item
+  Open the RMarkdown file.
+\item
+  Set your working directory using the \texttt{setwd()} function or by
+  clicking on "More".
+\end{enumerate}
+
+\section{Refugee exposure and support for the extreme
+right}\label{refugee-exposure-and-support-for-the-extreme-right}
+
+Dinas et
+al.~\href{https://www.cambridge.org/core/journals/political-analysis/article/waking-up-the-golden-dawn-does-exposure-to-the-refugee-crisis-increase-support-for-extremeright-parties/C50A127CC517968F2D0FA42A2A23FF85}{(2019)})
+studied the following question: \emph{Did the influx of refugees in
+Greece increase support for the right-wing Golden Dawn party in 2015?}
+
+The authors exploit that the Aegean islands close to the Turkish border
+experienced sudden and drastic increases in the number of Syrian
+refugees while other islands slightly farther away---but with otherwise
+similar institutional and socio-economic characteristics---did not.
+
+The below figure shows exposure to refugees across the Aegean islands:
+
+\pandocbounded{\includegraphics[keepaspectratio]{dinas_et_al_map.png}}
+
+\subsection{Estimating DiD}\label{estimating-did}
+
+\textbf{Group-period interactions}: Here the treatment variable is equal
+to 1 for all the years since the unit received the treatment. Then, our
+coefficient of interest is captured by the interaction between the
+treatment and the time variable. For the example of the Golden Dawn, we
+can write the respective diff-in-diffs regression equation (including
+the interaction term's coefficient that captures the causal effect) as
+follows:
+
+\[gdper_{mt} = \beta_0 + \beta_1eventr_m + \beta_2post_t + \beta_3evertr_m \times post_t + u_{mt}\]
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1613}}
+  >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2903}}
+  >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5484}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\textbf{Post = 0}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\textbf{Post = 1}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Treat = 0} & \(\beta_0 + u_{mt}\) &
+\(\beta_0 + \beta_2 + u_{mt}\) \\
+\textbf{Treat = 1} & \(\beta_0 +\beta_1 + u_mt\) &
+\(\beta_0 + \beta_1  + \beta_2 + \beta_3 + u_{mt}\) \\
+\end{longtable}
+
+Specifically, we can obtain our estimate by calculating the difference
+of the outcome variable for both treated and untreated units and then
+subtract them from each other:
+\[((\beta_0 + \beta_1  + \beta_2 + \beta_3 + u_{mt}) - (\beta_0 + \beta_1 + u_{mt})) -((\beta_0 + \beta_2 + u_{mt})-(\beta_0 + u_{mt}))\]
+\[= (\beta_2 + \beta_3) -(\beta_2)\] \[=\beta_3\]
+
+\textbf{Unit and time dummies and a treatment indicator}: Alternatively,
+we can represent this estimation strategy for the Golden Dawn example by
+the following regression model:
+
+\[gdper_{mt} =  \beta_1treatment_{mt} + \alpha_m \text{unit dummy} + \gamma_t \text{time dummy} +  u_{mt}\]
+For treated before treated \(Treatment = 0\):
+\[gdper_{mt} =  \beta_1\times 0 + \alpha_m \times 1 + \gamma_t \times +  u_{mt}\]
+\[gdper_{mt} = \alpha_m + \gamma_t + u_{mt}\] For treated after treated
+\(Treatment = 1\):
+\[gdper_{mt} = \beta_1 +  \alpha_m + \gamma_t + u_{mt}\] Then, we can
+take the difference before and after:
+\[(\beta_1 +  \alpha_m + \gamma_t + u_{mt}) - (\alpha_m + \gamma_t + u_{mt})\]
+\[ = \beta_1\]
+
+\section{Dinas et al.~(2019)}\label{dinas-et-al.-2019}
+
+\subsection{Context}\label{context}
+
+\begin{itemize}
+\tightlist
+\item
+  The refugee crisis started in the spring of 2015.
+\item
+  Greece held an \emph{election in September 2015}, right after the
+  \emph{first wave of refugee} arrivals. The variable \texttt{post} is
+  coded as 1 for observations from this election and the variable
+  \texttt{year}, somewhat unintuitively, as \texttt{2016}.
+\item
+  The \emph{previous election} had taken place only eight months prior
+  in \emph{January 2015}, which was before a significant number of
+  refugees arrived. The \texttt{year} variable is coded as \texttt{2015}
+  for observations from this election.
+\item
+  Two \emph{additional elections} were held in 2012 and 2013. The
+  \texttt{year} variable captures observations for the election in May
+  2012 with the value \texttt{2012} and the election in June 2013 with
+  \texttt{2013}.
+\item
+  The units of analysis are \emph{municipalities}.
+\end{itemize}
+
+Let's first familiarise ourselves with the data. A description of some
+of the variables that we will use today is below:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2609}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.7391}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{Year} & Election year (2012 to 2016) \\
+\texttt{municipality} & Municipality id \\
+\texttt{post} & A dummy variable that is 1 for the 2016 election and 0
+otherwise \\
+\texttt{treatment} & A dummy variable that is 1 if the municipality
+received a strong increase in refugees before the 2016 election and 0
+otherwise \\
+\texttt{evertr} & Treatment variable indicating if the municipality
+received refugees ( = 1) or not (= 0) \\
+\texttt{gdper} & The Golden Dawn's vote share at the municipality
+level \\
+\end{longtable}
+
+Now let's load the data from our computer by using the
+\texttt{read\_dta()} function. We will call this data frame
+\textbf{greekislands}.
+
+Let's start by checking our data as always.
+
+\paragraph{Task 1}\label{task-1}
+
+Use the \texttt{head()} function to familiarise yourself with the data
+set.**
+
+\begin{verbatim}
+## # A tibble: 6 x 9
+##    year  muni treatment distance gdper  post  gddif evertr post2
+##   <dbl> <dbl>     <dbl>    <dbl> <dbl> <dbl>  <dbl>  <dbl> <dbl>
+## 1  2012     1         0     240.  7.98     0 NA          0     0
+## 2  2013     1         0     240.  7.28     0 -0.705      0     0
+## 3  2015     1         0     240.  6.36     0 NA          0     1
+## 4  2016     1         0     240.  7.62     1  1.25       0     1
+## 5  2012     2         0     318.  2.58     0 NA          0     0
+## 6  2013     2         0     318.  4.28     0  1.70       0     0
+\end{verbatim}
+
+This is what we would expect. Recall that the treat variable indicates
+municipalities that are treated at some point - independent of the
+timing - while the treatment variable marks municipalities after they
+were treated.
+
+\begin{verbatim}
+## 
+## 2012 2013 2015 2016 
+##   96   96   96   96
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 2012 2013 2015 2016
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+Recall that the \texttt{treat} variable indicates municipalities that
+are treated at some point - independent of the timing - while the
+\texttt{treatment} variable marks municipalities after they were
+treated.
+
+As we can see, the data set covers multiple election years. Before
+working with the data, let's make sure we know how many and which
+elections are included in the data.
+
+\paragraph{Task 2}\label{task-2}
+
+How many elections, i.e.~\texttt{years} are covered by the data?
+
+\begin{verbatim}
+## [1] 2012 2013 2015 2016
+\end{verbatim}
+
+Let's have a look at general voting patterns of the \emph{Golden Dawn}
+over time, irrespective of treatment status of municipalities.
+
+\paragraph{Task 3}\label{task-3}
+
+Plot the vote share of the Golden Dawn Party (\texttt{gdper}) over time.
+
+There are several ways to do this. For instance, you could plot the
+dispersion across municipalities by using the \texttt{boxplot} command
+or, alternatively, calculate average values per year. Feel free to pick
+the option you deem most appropriate.
+
+\subsection{Differences-in-Differences}\label{differences-in-differences}
+
+Being aware of the general trends of the Golden Dawn's vote share is an
+important information about context and the party's history. However, it
+cannot tell us anything about the treatment effect we seek to analyse:
+The arrival of refugees in some Greek municipalities in the summer of
+2015.
+
+A naive observer might propose identifying this effect by looking at the
+differences between treated and untreated units in the post-treatment
+periods. Would this, however, be an appropriate representation of a
+possible treatment effect? It clearly would not! Comparing
+post-treatment differences only doesn't allows us to account for
+unit/municipality-specific effects and voting patterns. Treatment, after
+all, was not assigned randomly. We would not be able to say what the
+effect of the treatment is unless we can make a statement about how the
+treatment changed the outcome or resulted in the diversion from a
+previous trajectory. Using a \emph{differences-in-differences} design
+allows us to do so.
+
+\paragraph{Task 4}\label{task-4}
+
+Estimate the treatment effect by calculating differences-in-differences
+between 2015 and 2016 using the \texttt{mean()} function.
+
+\begin{quote}
+Hint: Calculate the differences between treated and untreated units for
+the years 2015 and 2016 first.
+\end{quote}
+
+\paragraph{Task 5}\label{task-5}
+
+Estimate the difference-in-difference between 2015 and 2016 using an OLS
+regression.
+
+You can run a simple OLS with the interaction term of \emph{treat} and a
+dummy variable for the post-treatment period as independent variables.
+However, you should restrict the data to the years 2015 and 2016,
+specifying
+\texttt{data\ =\ greekislands{[}greekislands\$year\textgreater{}=2015,{]}}
+as argument for your OLS.
+
+\paragraph{Task 6}\label{task-6}
+
+Estimate the difference-in-differences between 2015 and 2016 using a
+regression with unit fixed effects.
+
+\begin{quote}
+Hint: You can use \texttt{lm\_robust()}, \texttt{feols()},
+\texttt{plm()} or \texttt{lm()} with dummy variables.
+\end{quote}
+
+\subsection{Generalised Diff-in-Diff}\label{generalised-diff-in-diff}
+
+Let's now extend our analysis by including all pre-treatment periods in
+our analysis. The easiest way to do so is running a two-way fixed
+effects regression.
+
+\paragraph{Task 7}\label{task-7}
+
+Estimate the difference-in-differences using a two-way fixed effects
+regression with all time periods and \texttt{treatment} as independent
+variable.
+
+\paragraph{Task 8}\label{task-8}
+
+Calculate robust standard errors for (i) the plm FE model, (ii) the
+two-way FE model and present the regression output in a single table.
+Also include the simple OLS model in the table.
+
+\begin{quote}
+Note: There is no need to adjust standard errors after using
+\texttt{lm\_robust()} as the command automatically does that.
+\end{quote}
+
+\subsection{Pararell trends}\label{pararell-trends}
+
+As previously mentioned, we cannot, generally, test whether the parallel
+trends assumption holds because we cannot, in principle, observe the
+vote share of the Golden Dawn among treated and untreated units for the
+\textbf{hypothetical scenario} of the 2015 refugee crisis \textbf{not
+occurring}. However, we can examine, either visually or through
+statistical analyses, whether the Golden Dawn's vote share trends more
+or less uniformly for both treated and untreated units \textbf{before
+the treatment}, namely the 2015 refugee crisis, occurred. Indeed, if it
+was really the treatment (in our case, refugees arriving on the coasts
+of some Greek islands in 2015) that causally affected the Golden Dawn's
+vote share and not anything else, then we should observe the Golden
+Dawn's vote share moving \textbf{in parallel} for units (in our case,
+Greek municipalities) that were either treated or not with refugees in
+2015. However, note that detecting such parallel trends \textbf{before
+the treatment occurred} is only a \textbf{necessary} but not a
+\textbf{sufficient condition} for testing the parallel trends assumption
+which (hopefully) illustrates why this assumption is, principally, not
+testable. Nevertheless, the necessary condition is better than nothing.
+Indeed, at the very least, by examining parallel trends before the
+treatment occurred, we allow for the parallel trends assumption to be
+potentially \textbf{falsified}.
+
+One way to examine these parallel trends before the treatment occurred
+is to plot the outcome variable for both treated and untreated units
+overtime, especially before the treatment/intervention occurred. To do
+so, we, first, need to calculate the Golden Dawn's mean vote share for
+both treated and untreated units. Let's do this with tidyverse code this
+time, specifically by using the \texttt{group\_by()} and
+\texttt{summarise()} functions.
+
+\paragraph{Task 9}\label{task-9}
+
+Calculate the mean vote share for the Golden Dawn for the treated and
+the untreated units for all the elections. Store this into a new data
+frame called \texttt{plot.parallel}. Use tidy to create this new data
+frame.
+
+The syntax and the description of the functions is provided below:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3814}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6186}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Function
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{new.data\ \textless{}-\ dataframe} & Assignment operator where
+the new data frame will be stored \\
+\texttt{group\_by()} & Group observations by a variable or set of
+variables \\
+\texttt{summarise()} & Creates a new data frame with one ore more rows
+of each combination of grouping variables \\
+\texttt{mutate()} & Allows to create new variable or modify existing
+ones \\
+\end{longtable}
+
+Let's now plot these results.
+
+\paragraph{Task 10}\label{task-10}
+
+Plot the parallel trends. Set vote share for the Golden Dawn in the y
+axis, year in the x-axis. Connect the data points of the two groups
+using a line. Place the legend of your plot at the bottom. Change the
+default colour. Below you will find all the functions necessary to
+generate this plot. Remember to use the plus sign between functions.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5795}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4205}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Function
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{ggplot(x\ =\ ,\ y\ =,\ colour\ =\ )} & Map data components into
+the graph \\
+\texttt{geom\_point()} & To generate a scatterplot \\
+\texttt{scale\_color\_manual(values=c("colorname1",\ "colorIwant2"))} &
+Replace the default palette \\
+\texttt{theme(legend.position\ =\ "bottom")} & To place the legend at
+the bottom \\
+\texttt{geom\_line(aes(x=year,y=vote,\ color\ =\ condition,\ group\ =\ condition))}
+& To connect the dots with lines by group \\
+\end{longtable}
+
+\paragraph{Optional:}\label{optional}
+
+Now let's look at the leads to identify any anticipatory effects. Let's
+imagine that the Golden Dawn back in 2012 believed that there was going
+to be a major humanitarian in the future. Then, they thought that they
+could exploit this situation to increase their electoral gains. In that
+case, we wouldn't be able to disentangle whether changes in vote share
+are due to the previous campaigning efforts on the part of the Golden
+Dawn or due to the influx of alyssum seekers to Greece. We can use leads
+to identify if there are any anticipatory effects. If we find systematic
+differences between treated and untreated units, this would suggest that
+units in one or both groups are responding to the treatment before
+receiving it.
+
+\paragraph{EXTRA Exercise 1:}\label{extra-exercise-1}
+
+Create dummy year variables equal to 1 for every year and only for the
+treated municipality. Call this variable leads, plus the year. For
+example, the lead2012, will take value 1 only for treated municipalities
+and only for observations of these municipalities in the year 2012. You
+can see an example below. use the \texttt{mutate()} function to create
+these new variables. You can also use the \texttt{ifelse()} function to
+create these dummy variables. The syntax of the \texttt{ifelse()}
+function is the following:
+\texttt{new\ variable\ =\ ifelse(condition,\ "value\ if\ condition\ is\ met",\ "value\ if\ the\ condition\ is\ not\ met")}.
+Create these dummy variables for the elections in 2012, 2013, and 2015.
+
+\subparagraph{EXTRA Exercise 2:}\label{extra-exercise-2}
+
+Conduct the same two-way fixed-effect model that we used before, but
+rather than using the \texttt{treatment} variable, replace this variable
+with the new leads variables that you created. Ran separate estimations
+for each lead. Store the outputs of these regressions into different
+objects. Does the evidence suggest that there are any anticipatory
+effects? Are the results of these three models statistically
+significant? You can use the summary() or screenreg() functions to take
+a look at your results.
+
+Now, let's plot all the two-way fixed effects models where we used the
+\texttt{plm()} function into a single figure.
+
+\subparagraph{EXTRA Exercise 3:}\label{extra-exercise-3}
+
+Plot the coefficients from the leads models, plus the two-way fixed
+model for the 2016 election that you used in Question 7
+(``twoway\_FE''). Use the \texttt{plot\_coef()} function to generate
+this plot. Add the argument \texttt{scale} and set it equal to
+\texttt{TRUE}. Also, include the argument \texttt{robust} and set it
+equal to \texttt{TRUE}. In addition to the \texttt{plot\_coefs()}
+include the \texttt{coord\_flip()} function. This function will flip the
+Cartesian coordinates of the plot, so we have the models (years) in the
+x-axis and the coefficients in the y axis. Remember to add plus sign
+operator between two functions. You can also add the
+\texttt{xlab("Year")} function to a label in the x-axis.
+
+\subsection{Placebo test}\label{placebo-test}
+
+We can conduct a placebo test to evaluate whether the parallel trend
+holds. We are trying to show that there will be no statistically
+significant difference in the trend between treated and untreated
+municipalities.
+
+The steps to conduct are the following:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Use data for periods that came before the treatment was
+  implemented/happened.
+\item
+  Create a dummy variable for each before treatment that is equal to 1
+  only for that specific year and only for treated units (as we did
+  before).
+\item
+  Estimate the difference-in-difference using \texttt{plm()} or
+  \texttt{lm\_robust()} function.
+\item
+  If you find statistically significant results, this may suggest a
+  violation of parallel trends.
+\end{enumerate}
+
+\subparagraph{Task 14}\label{task-14}
+
+Drop all the observations of the year of the intervention (2016). Do
+this using the \texttt{filter()} function. Then, create a fake treatment
+variable and call it \texttt{post2} and set it equal to 1 for all
+observations in year 2015. This variable would indicate as the
+hypothetical case that the municipality would received refugees in 2015.
+
+\subparagraph{Task 15}\label{task-15}
+
+Conduct the same two-way fixed effect model using the \texttt{lm()} and
+use the \texttt{post2} variable. Store all the models in a list and plug
+this list inside of the \texttt{modelsummary(list)} function to report
+your results. Did you find statistically significant differences between
+treated and untreated units pre-treatment?. You can see an example of
+how to store multiple models in a list \texttt{list()}. Also, subset the
+data so one model will only conduct the placebo test using the 2012 and
+2015 elections, and another model only using the observations from the
+2013 and 2015 elections.
+
+\end{document}
