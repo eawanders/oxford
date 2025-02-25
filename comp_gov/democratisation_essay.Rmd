@@ -1,7 +1,7 @@
 ---
 title: "MPhil Politics, Comparative Government"
 author: "Edward Anders"
-date: "18-11-1997"
+date: "18-11-2024"
 output: pdf_document
 zotero: true
 link-citations: true
