@@ -1,0 +1,365 @@
+---
+title: "University of Oxford"
+subtitle: "MPhil in Politics: Research Design in Comparative Political Science"
+author: "Edward Anders"
+date: "`r Sys.Date()`"
+output:
+  beamer_presentation:
+    theme: "metropolis"
+    colortheme: "dolphin"
+    fonttheme: "serif"
+    latex_engine: xelatex # Explicitly specify engine here
+pdf_engine: xelatex
+fontsize: 8pt
+header-includes: |
+  \RequireXeTeX
+  \usepackage{fontspec}
+  \setsansfont{Fira Sans}
+
+
+  % Define dark blue color
+  \definecolor{darkblue}{RGB}{0, 51, 102}
+
+  % Title formatting
+  \setbeamercolor{frametitle}{fg=darkblue, bg=white}
+  \setbeamerfont{frametitle}{series=\bfseries}
+
+  % Background color
+  \setbeamercolor{background canvas}{bg=white}
+
+  % Footer styling
+  \setbeamercolor{title}{fg=darkblue, bg=white}
+  \setbeamercolor{title in head/foot}{fg=white, bg=darkblue}
+  \setbeamercolor{author in head/foot}{fg=white, bg=darkblue}
+  \setbeamercolor{date in head/foot}{fg=white, bg=darkblue}
+
+  % Define footer proportions
+  \newlength{\footerauthorwidth} \setlength{\footerauthorwidth}{0.3\paperwidth}
+  \newlength{\footertitlewidth} \setlength{\footertitlewidth}{0.4\paperwidth}
+  \newlength{\footerdatewidth} \setlength{\footerdatewidth}{\dimexpr\paperwidth - \footerauthorwidth - \footertitlewidth\relax}
+
+  % Custom footer layout
+  \setbeamertemplate{footline}{
+    \leavevmode%
+    \hbox{%
+      \begin{beamercolorbox}[wd=\footerauthorwidth,ht=2.5ex,dp=1.25ex,left]{author in head/foot}%
+        \hspace{1em} Edward Anders
+      \end{beamercolorbox}%
+      \begin{beamercolorbox}[wd=\footertitlewidth,ht=2.5ex,dp=1.25ex,center]{title in head/foot}%
+        Research Design
+      \end{beamercolorbox}%
+      \begin{beamercolorbox}[wd=\footerdatewidth,ht=2.5ex,dp=1.25ex,right]{date in head/foot}%
+        HT2025 \hspace{1em} % Adds right padding
+      \end{beamercolorbox}%
+    }%
+  }
+  \setbeamertemplate{navigation symbols}{} % Remove Beamer navigation icons
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+---
+
+```{r setup, include=FALSE}
+# Load necessary packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  rmarkdown,
+  knitr,
+  tinytex,
+  kableExtra,
+  tidyverse,
+  knitr
+)
+```
+
+# Research Question
+
+Does exposure to AI-generated news increase affective polarisation?
+
+# Theoretical and Empirical Motivations
+
+## Streucture of Theoretical Argument
+
+- **The Rise of AI**: a powerful, but potentially dangerous tool
+- **Voter Volatility**: a fertile ground for manipulation and polarisation
+- **Gaps in Literature**: limited focus on attitudes and affective polarisation
+- **Theoretical Argument**: how AI may influence affective polarisation
+  - Associations between AI-generated news and fake news
+  - Trust in news sources and political institutions
+  - Veracity and partisanship linkages
+
+# Theoretical and Empirical Motivations I
+
+## The Rise of AI
+- **The Transformer Model**: Advancements in machine learning have made AI more efficient at processing sequential data, enabling hyper-realistic content generation.
+  - *[@vaswani2017]*
+- **Accuracy Fears**: AI’s accessibility as an informational tool raises concerns due to its susceptibility to hallucinations and misuse, including the spread of manipulative political content and deepfakes.
+  - *[@rawte2023; @duberry2022]*
+- **AI in Politics**: There is growing debate on whether AI-generated misinformation impacts voting behaviour and election integrity, potentially threatening democratic institutions.
+  - *[@stockwell2024a]*
+
+# Theoretical and Empirical Motivations II
+
+## Voter Volatility
+
+- **Globalisation and economic liberalism**, alongside political failures and electoral shocks, have exacerbated inequality and division, fostering voter disillusionment and rising populism, particularly in the UK.
+  - *[@norris2019; @fieldhouse2019: 28-32]*
+- **Social media** has facilitated the spread of fake news, which disproportionately benefits populists, influences voting behaviour, and reinforces identity-based polarisation.
+  - *[@cantarella2023; @pfister2023]*
+- **Echo chambers intensify affective polarisation**, strengthening group identities and deepening political divides.
+  - *[@hobolt2023]*
+
+# Theoretical and Empirical Motivations III
+
+## Existing Literature: Effects of AI
+
+- **Persusion and propaganda**: AI-generated messaging can be persuasive and compelling across many policy areas, although effect sizes are small.
+  - *[@bai2023; @goldstein2024]*
+- **Labelling Effects**: When aware of political headlines being AI-generated, readers can become sceptical of news veracity more generally, even if the content is true.
+  - *[@altay2024]*
+- **Expected Use of AI**: political use of AI is expected to focus on deepfakes to perpetuate existing views and stereotypes rather than attempting to persuade new views.
+  - *[@cashell2024]*
+- **AI's use in elections**: aggregate-level effects of AI on the 2024 UK election were minimal.
+  - *[@simon2024b]*
+
+# Theoretical and Empirical Motivations IV
+
+## Research Gap and Contribution
+
+- **Limited in scope**: most research on the effects of AI are focussed on the US.
+- **Policy Implications**: my research aims to provide additional insight on how we should regulate, highlight, or restrict AI-generated news. Labelling AI-generated news as AI-generated may have unintended consequences.
+- **Understanding Effects**: providing a better understanding of whether fears of AI having negative effects on politics are justified.
+
+# Theoretical and Empirical Motivations V
+
+## Theoretical Argument
+- **AI as fake news**: AI-generated content may polarise opinion in a similar way to fake news. Readers feel a greater sense of loyalty to their in-group and more distrusting of the out-groups as the fake news reinforces their existing beliefs.
+  - *[@spohr2017, @azzimonti2023]*
+- **Fake news and trust**: when readers are aware that news is fake, they are less likely to trust news, politicians, and democracy.
+- **Veracity and Partisanship**: readers associate veracity with the partisan narratives they want to believe, therefore helping polarise views.
+- **Awareness of AI**: if readers are aware that the news is AI-generated, they may be less likely to trust the veracity of the news, the news source, the political institutions, and, importantly opposing partisans.
+  - *[@altay2024]*
+
+# Hypotheses
+
+## Confirmatory Hypothesis
+$H_1$: Exposure to AI-generated news articles will increase affective polarisation, but effect sizes will be small.
+
+
+## Exploratory Hypotheses
+
+$H_2$: Exposure to political content labelled as AI-generated will decrease trust in the veracity of AI-generated news articles.
+
+$H_3$: The veracity of AI-generated news articles will not affect polarisation.
+
+$H_4$: AI-generated news is associated with narratives of opposing partisans.
+
+
+# Research Design I
+
+To test these hypotheses, I will use a simple between-subjects experimental design. This randomised survey experiment will be conducted through the YouGov UniOM scheme with a representative sample of ~2,000 UK residents.
+
+```{r Experiment Design, echo=FALSE, results='asis'}
+library(knitr)
+library(kableExtra)
+
+# Table data with normal content
+table_data <- data.frame(
+  ` ` = c("Control", "Treatment"),
+  `No Labels` = c("Human-generated Article", "AI-generated Article"),
+  `Labelled as AI` = c("N/A", "AI-generated Article"),
+  check.names = FALSE
+)
+
+# Create the table without using footnote()
+kable(
+  table_data,
+  align = "l",
+  escape = FALSE,
+  caption = "Treatments and Control for AI-generated News Exposure."
+) %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  add_header_above(
+    c(" " = 1, "News Article Labelling" = 2),
+    escape = FALSE
+  ) %>% # Bold top header
+  row_spec(0, bold = TRUE) %>%
+  column_spec(1, width = "3cm") %>%
+  column_spec(2, width = "3.5cm") %>%
+  column_spec(3, width = "3cm")
+
+cat("\\begin{flushleft}
+\\footnotesize Note: Treatment variations to test for interaction effects
+ of veracity, ideological stance, context, and source will be used in
+ subsequent studies. Labelling dis-entangles the effects of exposure to the
+ news content and the role of an article being AI-generated.
+\\end{flushleft}")
+```
+
+# Research Design II
+
+## Treatment Example
+
+**BORDER CRISIS: NON-EU MIGRATION SKYROCKETS WHILE EU NUMBERS PLUNGE!**
+
+```{r, echo=FALSE, fig.align="center", out.width="50%"}
+knitr::include_graphics("/Users/edwardanders/Documents/GitHub/oxford/research_des/fake_treatment.png")
+```
+
+UK Overrun as Non-EU Migration Surges to Unprecedented Levels!
+Britain is facing an immigration crisis like never before, with non-EU migration spiralling out of control, dwarfing traditional European migration numbers, shocking new figures reveal.
+Official statistics show that while EU migration has steadily declined—even enjoying a brief peak around 2016—non-EU arrivals have exploded, soaring to eye-watering levels...
+
+
+# Research Design III
+
+## Treatment Assignment
+
+- Two treatment conditions and one control condition.
+  - Treatment: AI-generated news article (labelled or unlabelled as AI)
+  - Control: Human-generated news article
+- Participants will be randomly assigned to one of the three conditions in order for **Average Treatment Effects (ATE)** to be estimated due to randomisation.
+
+## Measuring Outcomes
+
+- Primary dependent outcome variable to measure is affective polarisation.
+- Post-treatment survey questions of both the control and treatment groups.
+  - This is due to the temporal proximity of pre- and post-exposure survey questions so to avoid pre-test sensitisation effects.
+
+# Research Design IV
+
+## Measuring Outcomes
+
+```{r Survey Table, echo=FALSE, results='asis'}
+# Creating the survey table
+survey_table <- data.frame(
+  No. = c(
+    "1", "", "1.1", "1.2", "1.3"
+  ),
+  Question = c(
+    "Affective Polarisation", "",
+    "How would you rate each of the following groups or people below? Keir Starmer, Nigel Farage; The Labour Party, Reform UK",
+    "How comfortable are you having a political discussion with a $OTHERPARTY?",
+    "How much of the time do you think you can trust the $OTHERPARTY to do what is right for the country?"
+  ),
+  Options = c(
+    "", "",
+    "Numeric thermometer scale: 0-100 (100 degrees = favourable and warm. Between 0 and 50 degrees = unfavourable and cold)",
+    "Extremely comfortable, Somewhat comfortable, Not too comfortable, Not at all comfortable",
+    "Almost never, Once in a while, About half the time, Most of the time, Almost Always"
+  )
+)
+
+# Displaying the table with category headers
+kable(
+  survey_table,
+  format = "latex",
+  booktabs = TRUE,
+  align = "l"
+) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(2, width = "4.8cm") %>%
+  kableExtra::column_spec(3, width = "4.5cm") %>%
+  row_spec(which(survey_table$Options == ""), bold = TRUE)
+
+# Manually add a LaTeX footnote below the table
+cat("\\begin{flushleft}
+\\footnotesize Note: Affective polarisation measures should use feeling thermometer ratings of the other party, trait ratings of the other party, whether or not respondents trust the other party, and a set of social distance items on the willingness to interact with opposing partisans [@levendusky2021; @druckman2019].
+\\end{flushleft}")
+```
+
+
+# Research Design V
+
+## Hypothesis Testing
+
+- To test the causal mechanisms of how exposure to AI-generated news affects affective polarisation, additional mediator variables are measured.
+
+```{r Trust Hypothesis Testing, echo=FALSE, results='asis'}
+survey_table <- data.frame(
+  No. = c(
+    "2", "", "2.1", "2.2"
+  ),
+  Question = c(
+    "Trust in Media and Democracy", "",
+    "How much do you trust the news media to provide accurate information?",
+    "How much trust do you have in how democracy functions in the UK?"
+  ),
+  Options = c(
+    "", "",
+    "Likert scale: 1 (No trust at all) – 7 (Complete trust)",
+    "Likert scale: 1 (No trust at all) – 7 (Complete trust)"
+  )
+)
+
+# Displaying the table with category headers
+kable(
+  survey_table,
+  format = "latex",
+  booktabs = TRUE,
+  align = "l"
+) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(2, width = "4.8cm") %>%
+  kableExtra::column_spec(3, width = "4.5cm") %>%
+  row_spec(which(survey_table$Options == ""), bold = TRUE)
+```
+
+
+# Research Design VI
+
+## Hypothesis Testing
+
+- To test the causal mechanisms of how exposure to AI-generated news affects affective polarisation, additional mediator variables are measured.
+
+```{r Influence Hypothesis Testing, echo=FALSE, results='asis'}
+survey_table <- data.frame(
+  No. = c(
+    "3", "", "3.1", "3.2", "3.3"
+  ),
+  Question = c(
+    "Article Credibility and Influence", "",
+    "Do you think the claim in the headline you saw was true or false?",
+    "How trustworthy did you find the news article you read?",
+    "Has the article changed your opinion on the topic?"
+  ),
+  Options = c(
+    "", "",
+    "True / False",
+    "Likert Scale: 1 (Not trustworthy at all) – 7 (Extremely trustworthy)",
+    "Yes, positively; Yes, negatively; No change; Don’t know"
+  )
+)
+
+# Displaying the table with category headers
+kable(
+  survey_table,
+  format = "latex",
+  booktabs = TRUE,
+  align = "l"
+) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(2, width = "4.8cm") %>%
+  kableExtra::column_spec(3, width = "4.5cm") %>%
+  row_spec(which(survey_table$Options == ""), bold = TRUE)
+```
+
+# Threats and Limitations
+
+## Complex Treatment Interactions
+- Dis-entangling the effects of the exposure to an AI-generated article.
+- Are the outcome measures the result of AI, content, labelling, context, veracity, or source?
+- Use of multiple treatment variations to test for interaction effects.
+
+## Attrition
+- Possible dropouts from the study may lead to biased results.
+- The survey questions may be too difficult or cumbersome to answer.
+- Make the questions short and clear to answer.
+
+## Null Effects
+- The effects of AI-generated news may be minimal or non-existent.
+- I need to situate the experiment in as extreme scenario as possible.
+- How long do effects actually last? Are there compounding effects resulting from repeated exposure?
+
+# Bibliography {.allowframebreaks}
