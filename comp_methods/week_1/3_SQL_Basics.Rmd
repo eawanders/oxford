@@ -1,0 +1,373 @@
+---
+title: "Databases and SQL in R"
+subtitle: "Intermediate Computational Methods, DPIR, University of Oxford"  
+author: "Rachel Bernhard & Marie-Lou Sohnius"
+date: "Hilary 2025"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    default_style: "dark"
+    downcute_theme: "chaos"
+    code_folding: show
+    fig_crop: false
+---
+
+
+# Overview:
+
+In this lab, we dive into using databases and SQL within R, using 2020 US election tweets. You'll learn to use version control with Github, how to set up R projects, and manage large datasets efficiently with `SQL`.
+
+**Objectives:**
+- Work with Github Repositories using the Github Desktop App.
+- Set up an R project.
+- Load tweet data into R.
+- Transfer data into an SQLite database, practicing SQL queries for analysis.
+- Gain skills in data management within SQL databases through R.
+
+By the lab's end, you'll be able to handle and analyze large datasets within an R and SQL environment, ready to tackle big data for your own projects!
+
+
+# Starting Steps
+## Create a GitHub Account
+
+Begin by setting up a GitHub account for version control and collaboration.
+
+
+![Welcome to Github!](github_signup.png)
+
+To create an account, follow the steps outlined on this page: [GitHub Account Setup](https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account). 
+
+Optionally, you can additionally sign up for the student developer pack once you have an account [here](https://education.github.com/students) to access free tools like Github CoPilot (an AI helper that writes code for you) and resources.
+
+
+## Initialize an R Project from GitHub
+
+We have set up a Github repository for this lab, which contains the data and code you need for today. 
+
+To access this material, go to today's lab page: [Week 1: Big Data Tools](https://github.com/marielousohnius/compmeth_TT24).
+on GitHub and click on the green "Code" button. Select open with GitHub Desktop and clone the repository to your computer.
+
+![Repository Overview](repo_overview.png)
+
+![Clone the Repository](clone_repo.png)
+Finally, select the local directory into which you want to clone the repository, next to the "Local Path" field, click Choose... and navigate to your directory for this class.
+
+# Working with R Projects
+Next, we will set up an R project in RStudio. This will help you manage your files and data more efficiently.
+
+## Why Use R Projects?
+
+Using R projects offers several benefits:
+
+- **Organization**: Keeps all your files related to a specific analysis together in one place.
+- **Reproducibility**: Ensures that your scripts run the same way regardless of where you are or who is running them.
+- **Convenience**: Simplifies the process of finding files and setting working directories.
+
+## Step 1: Creating a New R Project
+
+1. Open RStudio.
+2. Go to File > New Project.
+3. Choose "New Directory" for a completely new project.
+
+![Creating a new project](Rproject.png)
+
+4. Select "New Project" and then enter a suitable name for your project directory.
+5. Choose a location to save the project on your computer.
+6. Click on "Create Project".
+
+   ![Project creation settings](Rproject_options.png)
+
+## Step 2: Structure of an R Project
+
+After creating your project, RStudio will open a new session. You will notice a few things:
+
+- A new RStudio project file (`projectname.Rproj`) is created.
+- The working directory is set to the project directory automatically.
+
+It's good practice to organize your project with subfolders like `R/` for scripts, `data/` for datasets, and `doc/` for documentation.
+
+## Step 3: Working with R Projects
+
+- **Opening a project**: Open RStudio, then click on `File > Open Project` and select the `.Rproj` file.
+- **Saving files**: Save scripts and data within the project directory to keep everything organized.
+
+[![Project setup](Rproject_best_practice.png)](https://www.r-bloggers.com/2020/01/rstudio-projects-and-working-directories-a-beginners-guide/)
+
+
+
+## Step 4: Closing a Project
+
+To close your project, you can go to `File > Close Project` in RStudio. This will return you to a default session, or you can directly open another project.
+
+# Introduction to SQL
+
+To learn more about SQL and databases in R, we are going to use a subset of the [Kaggle 2020 US election tweets dataset](https://www.kaggle.com/datasets/manchunhui/us-election-2020-tweets). The dataset contains tweets related to the 2020 US election, with hashtags for both Donald Trump and Joe Biden. Each dataframe, for Biden and Trump, consists of 150,000 tweets related to the US Election 2020, collected between October 15 and November 8, 2020. Tweets were gathered using the Twitter API `statuses_lookup` and `snsscrape` tools, targeting keywords associated with the election. The dataset aims to capture the evolving public discourse surrounding the election, with updates extending post-election to include critical developments and reactions. It is frequently being used for sentiment analysis and other NLP tasks.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r package setup}
+
+# install.packages("pacman")
+pacman::p_load(tidyverse,
+               rmdformats)
+```
+
+
+Let's start by loading the datasets using the `read.csv` function and checking the first few rows of each dataset.
+
+## Load data
+```{r load data}
+
+# load small datasets
+hashtag_donaldtrump_small <- read.csv("1_Data/hashtag_donaldtrump_small.csv")
+
+hashtag_joebiden_small <- read.csv("1_Data/hashtag_joebiden_small.csv")
+
+```
+
+```{r check data}
+
+# Check the first few rows of the datasets
+head(hashtag_donaldtrump_small)
+
+head(hashtag_joebiden_small)
+
+```
+
+While we're only looking at the first few rows of the dataset, it's important to note that these datasets contain a large number of rows (150,000 each!). This is where SQL databases come in handy. We can store and manage large datasets more efficiently using SQL.
+
+## SQL packages in R
+
+To work with SQL in R, we need to load the `DBI` and `RSQLite` packages. The `DBI` package provides a common interface for database interaction, while `RSQLite` is an embedded database engine that allows us to work with SQLite databases in R.
+
+```{r load packages}
+pacman::p_load(DBI, RSQLite)
+```
+
+Now that we have the necessary packages loaded, we can create a database and store our dataframes in it. We will create a new SQLite database and save the `hashtag_donaldtrump_small` and `hashtag_joebiden_small` dataframes as tables in the database.
+
+## Create a database
+
+To create a database, we use the `dbConnect` function from the `RSQLite` package. We specify the database type as `SQLite` and provide the path where we want to save the database. This sets up a connection to the database, which is currently still empty.
+
+Let's set up an empty database called tweets.sqlite. 
+
+Hint: `db <- dbConnect(RSQLite::SQLite(), dbname = "your_database_name.sqlite")`
+
+```{r create database}
+# Save dataframe as database
+
+# create new database
+```
+
+Before we move on, we should ensure that we stored the database in the right place. We can check the current working directory using the `getwd()` function.
+
+```{r check working directory}
+# check where database is stored
+getwd()
+```
+
+Great! As promised, the R Project has set our working directory to the project folder. 
+
+Let's get some data into the database. We will save the `hashtag_donaldtrump_small` and `hashtag_joebiden_small` dataframes as tables in the database.
+
+To do this, use the `dbWriteTable` function to save the dataframes as tables in the database. Here's an example of how to save a generic dataframe as a table in the database: 
+
+`dbWriteTable(conn = db, name = "a_table_name_you_choose", value = name_of_dataframe, overwrite = TRUE)`
+
+Set overwrite to `TRUE` if you want to overwrite the table if it already exists. This is handy in case you want to run the code multiple times without encountering errors.
+
+```{r fill database, eval=FALSE}
+# save trump dataframe as a first table called "trump" in database
+
+
+# save biden dataframe as table called "biden" in database
+
+
+# check that it worked by listing the tables in the database using dbListTables
+dbListTables(db)
+```
+
+Great job! Now we have successfully saved the dataframes as tables in the database. Let's check what variables are in the Trump table. 
+
+Hint: `dbListFields(db, "table_name")`
+
+```{r check tables}
+# check columns
+
+```
+## SQL queries 101
+
+You can also check the first few rows of the tables using the `dbGetQuery` function.This way, you send a query to the database to retrieve the data.
+
+SQL queries are written as strings and passed to the `dbGetQuery` function. Here's an example of how to retrieve the first five rows from the `trump` table:
+
+```{r check first few rows, eval=FALSE}
+# Check first few rows
+dbGetQuery(db, "SELECT *
+                FROM trump 
+                LIMIT 5")
+```
+
+We specify here that we `SELECT` all columns (`*`) `FROM` the table `trump` and `LIMIT` it at `5` rows. Note that in SQL, we work in a very specific order. The order of operations is as follows:
+
+![](sql_overview.png)
+The table below provides a neat overview of the SQL components and their functions.
+
+
+| Component  | Description                                        | Notes                                                       |
+|------------|----------------------------------------------------|-------------------------------------------------------------|
+| SELECT     | Choose columns                                     | Always required. Can include operators like SUM, COUNT, AVG |
+| FROM       | Specify the table                                  | Always required                                             |
+| WHERE      | Filter rows based on a condition                   | Optional                                                    |
+| GROUP BY   | Group rows based on column values                  | Optional                                                    |
+| ORDER BY   | Sort rows based on column values                   | Optional                                                    |
+| LIMIT      | Restrict the number of rows in the result          | Optional                                                    |
+| JOIN       | Merge multiple tables                              | Optional                                                    |
+
+
+## Your first queries
+
+Say that instead of the first few rows of the Trump table, you want to see the first 10 rows of just the `user_description` variable in the Trump table. How would you change the query from above?
+
+```{r check user description}
+# Check first few rows of user_description
+
+```
+
+Great! You're getting the hang of SQL queries. How about the number of rows? For that, you use a similar format than before, but instead of `SELECT *`, you use `SELECT COUNT(*)`. Don't forget to remove the `LIMIT` so that you get the total number of rows.
+
+```{r check number of rows}
+# Check number of rows
+
+```
+
+Let's check out some users and their Tweets. Do users with a larger following generally have more likes and retweets? We can find out by looking at the `user_followers_count` and `likes` and `retweet_count` columns. 
+
+Write a similar query as before to get the first 15 rows, but this time, select the `user_followers_count`, `likes`, and `retweet_count` columns. 
+
+Hint: select multiple columns by separating them with a comma (,).
+
+```{r check user followers and likes}
+# Check user followers and likes
+
+```
+
+Finally, let's check from which countries the tweets are coming. We can do this by looking at the `country` column. Limit your output to the first 10 rows.
+
+Hint: You can use the `DISTINCT` keyword before the column to get only it's unique values.
+
+```{r check country distribution 1}
+# Check country distribution
+
+```
+
+What do Australians write about the US election? Let's find out by filtering the data to only show tweet content (`tweet`) from Australia. Show the first 10 rows.
+
+Hint: Use the `WHERE` clause to filter the data based on a condition, e.g.:
+`WHERE variable = 'condition'`
+
+```{r check tweets from Australia}
+# Check tweets from Australia
+
+```
+
+What countries are most represented in the dataset? We can check by using the `GROUP BY` clause to group the data by country and count the number of tweets from each country.
+
+Hint: `dbGetQuery(db, "SELECT column_name, COUNT(*) FROM table_name GROUP BY column_name ORDER BY COUNT(*) DESC LIMIT 10")`
+
+```{r check country distribution 2}
+# Check country distribution
+
+
+```
+
+Neat! We've learned how to use SQL queries to explore the data in the database.
+
+## Basic merging
+
+But what if we wanted to have both tables in one, for easier analysis? We can also create a new table that combines the data from both the existing `trump` and `biden` tables using SQL queries.
+
+To start, we have to create a column in each table to indicate the source of the data (#Trump or #Biden). We can then create a new table that appends both tables together.
+
+Let's first create an empty column in each table called `content` to indicate the source of the data and the type of data we will insert.
+Hint: `dbExecute(db, "ALTER TABLE table_name ADD COLUMN column_name TEXT")`
+
+```{r add a column to the database}
+# create column indicating the source of the data
+
+```
+
+Now that we have added the `content` column to both tables, we can update the values in the column to indicate the source of the data. We will set the value to "trump" for the `trump` table and "biden" for the `biden` table.
+
+Hint: `dbExecute(db, "UPDATE table_name SET column_name = 'value'")`
+
+```{r add text to the column}
+
+```
+
+Well done! Let's check which tables are in the database. You can do that by using the `dbListTables` function.
+
+```{r check tables again}
+# show all tables
+```
+
+In my example, we already have an all_tweets table in the database. If you made a mistake and want to remove the table, you can use the `dbRemoveTable` function.
+
+Hint: `dbRemoveTable(db, "table_name")`
+
+```{r remove a table from database}
+# what if we make a mistake and want to remove the table?
+```
+
+We're ready to create a new table that appends both the `trump` and `biden` tables together. We can do this using the `UNION ALL` operator in SQL.
+
+Hint: `dbExecute(db, "CREATE TABLE new_table_name AS SELECT * FROM table1 UNION ALL SELECT * FROM table2")`
+
+```{r merge tables}
+# create a third table that appends both
+```
+
+Well done! Let's double check that the new table `all_tweets` was created successfully and contains 150,000 tweets from each the Trump and Biden datasets.
+
+```{r check new table, eval=FALSE}
+# check distribution of content
+dbGetQuery(db, "SELECT content, COUNT(*) 
+                FROM all_tweets 
+                GROUP BY content")
+
+```
+
+Now that we have created the databases successfully, we can remove the original dataframes from the environment.
+
+```{r remove data}
+# remove dataframes from memory
+rm(hashtag_donaldtrump_small, hashtag_joebiden_small)
+
+```
+
+## Sample data
+
+Sometimes you are working with very big databases. When testing code, it is useful to work with a sample of the data. We can extract a sample from the database to work with by using the LIMIT function in SQL.
+
+Let's extract a sample of 100 tweets from each of the Trump, Biden, and combined tables.
+
+Hint: `dbGetQuery(db, "SELECT * FROM table_name ORDER BY RANDOM() LIMIT 100")`
+
+```{r extract samples from database}
+# load sample from database
+
+
+```
+
+
+## Disconnect from the database
+Finally, let's disconnect from the database to free up resources.
+
+```{r disconnect from database, eval=FALSE}
+# disconnect from database
+dbDisconnect(db)
+```
+
