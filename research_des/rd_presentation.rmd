@@ -168,7 +168,7 @@ library(kableExtra)
 table_data <- data.frame(
   ` ` = c("Control", "Treatment"),
   `No Labels` = c("Human-generated Article", "AI-generated Article"),
-  `Labelled as AI` = c("N/A", "AI-generated Article"),
+  `Labelled as AI` = c("Human-Generated Article", "AI-generated Article"),
   check.names = FALSE
 )
 
@@ -185,9 +185,9 @@ kable(
     escape = FALSE
   ) %>% # Bold top header
   row_spec(0, bold = TRUE) %>%
-  column_spec(1, width = "3cm") %>%
+  column_spec(1, width = "2.5cm") %>%
   column_spec(2, width = "3.5cm") %>%
-  column_spec(3, width = "3cm")
+  column_spec(3, width = "3.5cm")
 
 cat("\\begin{flushleft}
 \\footnotesize Note: Treatment variations to test for interaction effects
