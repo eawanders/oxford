@@ -1,0 +1,481 @@
+---
+title: "Social Network Analysis"
+subtitle: "Intermediate Computational Methods, DPIR, University of Oxford"
+author: "Rachel Bernhard & Marie-Lou Sohnius"
+date: "Hilary 2025"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    default_style: "dark"
+    downcute_theme: "chaos"
+    code_folding: show
+    fig_crop: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+```
+
+# Section 1: Load Required Libraries
+
+This section clears the workspace and loads the necessary packages for our network analysis. We use `pacman` to load multiple packages at once. The key libraries include:
+
+- **igraph**: For network analysis and computing metrics.
+- **ggraph**: For advanced network visualizations.
+- **tidygraph**: Provides a tidy interface for working with graph objects.
+- **tidyverse**: For data manipulation and plotting.
+
+```{r}
+# Clear the workspace
+rm(list = ls())
+
+# Load pacman (installs it if not available)
+if (!require(pacman)) install.packages("pacman")
+
+# Load required packages
+pacman::p_load(igraph,
+               ggraph,
+               tidygraph,
+               tidyverse,
+               igraphdata,
+               RColorBrewer)
+```
+
+# Section 2: Load the Pajek File and Preprocess the Graph
+
+Here we load the trade network provided in a Pajek file. We then simplify the graph to remove any duplicate edges or self-loops, which helps ensure that our subsequent analyses aren’t affected by redundant data.
+
+
+
+```{r}
+# Load the network from a Pajek file.
+# Replace the filename with the correct relative or absolute path.
+# Set working directory to the location of the Pajek file
+setwd("/Users/edwardanders/Documents/GitHub/oxford/comp_methods/week_2")
+
+g <- read_graph(
+  "/Users/edwardanders/Documents/GitHub/oxford/comp_methods/week_2/imports_manufactures.net",
+  format = "pajek"
+)
+
+# Simplify the graph by removing multiple edges and self-loops.
+g <- igraph::simplify(
+  g,
+  remove.multiple = TRUE, # Remove multiple edges to be interested in who is trading with who
+  remove.loops = TRUE # Ensure no self-loops
+)
+
+# Optional: Check the structure of the graph.
+summary(g)
+print(g)
+```
+Here's a quick look at the network: it's a directed graph with 80 countries and 998 trade connections. Each country (or node) has details like its name, ID, and coordinates for the plot, while the connections between countries have weights that might show trade volumes. For example, Argentina trades with its neighbors like Bolivia, Brazil, and Chile, while Australia has ties to many countries, including Bangladesh and India. The arrows between countries show which direction the trade flows. Essentially, this graph gives us a glimpse into how countries are connected through trade. Think of it as the starting point for analyzing and visualizing global trade patterns.
+
+# Section 3: Exploratory Data Analysis (EDA)
+
+This section provides an overview of the network’s basic properties.
+
+### 3.1: Basic Network Information
+
+We display the number of nodes (countries), number of edges (trade relationships), and the overall graph density.
+
+```{r}
+cat("Number of nodes (countries):", vcount(g), "\n")
+cat("Number of edges (trade relationships):", ecount(g), "\n")
+cat("Graph density:", edge_density(g), "\n")
+```
+We've got 80 countries (nodes) linked by 998 trade relationships (edges). The graph density of about 0.158 means that roughly 16% of all possible connections between countries actually exist. In other words, while there's a fair amount of trading happening, not every country is trading with every other one.
+
+### 3.2: Degree Metrics and Their Interpretation
+
+>Degree centrality is a measure of how many direct connections each node has. In a directed network like this, we calculate:
+>
+>- **In-degree**: The number of incoming edges, which can be interpreted as the number of import connections.
+>
+>- **Out-degree**: The number of outgoing edges, representing export connections.
+>
+>- **Total Degree**: The sum of in-degree and out-degree, indicating overall connectivity.
+
+```{r}
+deg_in <- degree(g, mode = "in")
+deg_out <- degree(g, mode = "out")
+
+# Combine degree metrics into a data frame for further analysis.
+degree_df <- data.frame(
+  Country = names(deg_in),
+  InDegree = deg_in,
+  OutDegree = deg_out,
+  TotalDegree = deg_in + deg_out
+)
+
+# Display the first few rows of the degree metrics.
+head(degree_df)
+```
+
+### 3.3: Visualizing the Degree Distribution
+
+The histogram below shows how many trade relationships (edges) each country has, providing insight into the connectivity distribution across the network.
+
+```{r}
+ggplot(degree_df, aes(x = TotalDegree)) +
+  geom_histogram(
+    binwidth = 2,
+    fill = "dodgerblue",
+    color = "black",
+    alpha = 0.7
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
+# Section 4: Compute Key Network Metrics
+
+In addition to degree centrality, we compute other important network metrics.
+
+### 4.1: Betweenness Centrality
+
+>Betweenness centrality measures how often a node lies on the shortest paths between other nodes. A high value indicates that a country acts as a crucial intermediary in the trade network.
+
+```{r}
+bet_cent <- betweenness(g, directed = TRUE, normalized = TRUE)
+degree_df$Betweenness <- bet_cent[degree_df$Country]
+```
+
+### 4.2: Clustering Coefficient
+
+>The clustering coefficient (or local transitivity) reflects how closely a country’s neighbors form a complete network. A high clustering coefficient suggests that a country’s trade partners are also trading with each other.
+
+```{r}
+clustering_coeff <- transitivity(g, type = "local")
+degree_df$ClusteringCoeff <- clustering_coeff
+
+# View the updated degree data with computed network metrics.
+head(degree_df)
+```
+
+# Section 5: Community Detection
+
+Community detection helps identify clusters or groups of countries that are more densely interconnected. In this script, we use the Walktrap algorithm, which leverages random walks within the network to identify communities.
+
+> Walktrap detects communities by simulating random walks through the network, assuming that densely connected nodes are more likely to be grouped together.
+
+```{r}
+communities <- cluster_walktrap(g)
+membership <- membership(communities)
+
+# Add community membership information to our degree data frame.
+degree_df$Community <- as.factor(membership[degree_df$Country])
+
+# Output the number of detected communities.
+cat("Number of communities detected:", length(unique(membership)), "\n")
+```
+
+# Section 6: Network Visualization
+
+Visualizing the network helps to better understand its structure and the position of key nodes.
+
+### 6.1: Basic Visualization with igraph
+
+A quick plot of the network using basic `igraph` plotting functions.
+Need to specify the layout for the plot. Here, we use the Kamada-Kawai layout algorithm, which positions nodes based on their connectivity.
+
+```{r}
+layout_kk <- layout.kamada.kawai(g)
+plot(g, layout = layout_kk, vertex.size = 5, vertex.label.cex = 0.7,
+     main = "Trade Network Graph (Kamada-Kawai)")
+
+```
+
+
+### 6.2: Advanced Visualization with ggraph and tidygraph
+
+We convert the igraph object into a tidygraph object to create a more advanced visualization. Nodes are colored by their community membership, and the layout is generated using the Kamada-Kawai algorithm.
+
+```{r}
+# Convert igraph object to a tidygraph object.
+tg <- as_tbl_graph(g)
+
+# For reproducible layout, set a random seed.
+set.seed(123)
+layout <- create_layout(tg, layout = "kk")
+
+# Plot the network with nodes colored by community.
+ggraph(layout) +
+  geom_edge_link(alpha = 0.3, color = "gray30", width = 0.2) +
+  geom_node_point(aes(color = as.factor(membership)), size = 5) +
+  geom_node_text(aes(label = name), repel = TRUE, size = 3, color = "white") +
+  scale_color_manual(values = c("#FF00FF",  "#00FFFF")) +
+  labs(title = "Global Trade Network",
+       color = "Community") +
+  theme_graph(background = "black") +  # Set black background
+  theme(plot.title = element_text(color = "white", size = 14, face = "bold"),
+        legend.text = element_text(color = "white"),
+        legend.title = element_text(color = "white"))
+
+
+
+
+# Remove layout to avoid conflicts with other plots
+layout <- NULL
+```
+
+# Section 7: Save Analysis Results (Optional)
+
+Finally, we save the computed network metrics—including degree, betweenness centrality, clustering coefficient, and community membership—into a CSV file for further analysis or reporting.
+
+```{r}
+write.csv(degree_df, "trade_network_metrics.csv", row.names = FALSE)
+```
+
+
+# Task: Author Network
+
+For today's task, we will be working with a co-authorship network. The network is based on a dataset of scientific papers in the field of network science, where nodes represent authors and edges represent co-authorship relationships. The dataset is stored in a Pajek file named `NetScience.net`.
+
+Start by loading the file into R as an igraph object named 'n'.
+
+```{r}
+# Load the network from a Pajek file.
+# Replace the filename with the correct relative or absolute path.
+n <-
+
+# Check the structure of the graph.
+
+```
+## Basic Network Information
+Great! We've loaded the co-authorship network. Let's start by examining some basic properties of the network.
+
+### Number of nodes (authors)
+How many authors are there in the network?
+
+```{r}
+
+```
+
+### Number of edges (co-authorship relationships)
+How many co-authorship relationships exist between them?
+```{r}
+
+```
+
+### Graph density
+How dense is the network? And what does this tell us about the connections between authors?
+```{r}
+
+```
+### Bonus question: Simplify the network
+Do you think we should simplify the network? Why or why not?
+
+## Degree Metrics
+Let's calculate the degree metrics for the authors in the co-authorship network.
+
+### In-degree
+Calculate the in-degree and display the first 10 values. What does the in-degree of an author represent in this context?
+```{r}
+deg_in <-
+
+```
+
+### Out-degree
+Calculate the out-degree and display the first 10 values. What does the out-degree of an author represent in this context?
+```{r}
+deg_out <-
+```
+
+Let's compare the in-degree and out-degree of the authors. What do you observe?
+```{r}
+# Compare in-degree and out-degree
+head(data.frame(Author = names(deg_in), InDegree = deg_in, OutDegree = deg_out))
+
+# Check if in-degree and out-degree are always the same
+all(deg_in == deg_out)
+```
+
+
+### Total Degree
+Calculate the total degree and display the first 5 rows. What does the total degree of an author represent in this context?
+```{r}
+degree_df <- data.frame(
+  Author = names(deg_in),
+  InDegree = deg_in,
+  OutDegree = deg_out,
+  TotalDegree =
+)
+
+head(degree_df)
+```
+### Visualizing the Degree Distribution
+Let's visualize the distribution of in-degree or out-degree (since they are the same) for the authors in the network.
+
+```{r}
+
+```
+
+### Bonus question: Find Albert-László Barabási
+In today's lecture, we discussed the work of Albert-László Barabási, a prominent network scientist. Can you find the row in the degree data frame that corresponds to him? What do you infer from his degree metrics?
+
+`Hint: You can use the grepl function to search for his name in the data frame.`
+
+```{r}
+# Find the row whose name contains Barabasi in the network
+
+```
+
+## Centrality Metrics
+Now, let's calculate some centrality metrics for the authors in the co-authorship network.
+
+### Betweenness Centrality
+```{r}
+bet_cent <-
+degree_df$Betweenness <-
+```
+
+### Clustering Coefficient
+Now, let's calculate the clustering coefficient for each author in the network.
+What does the clustering coefficient of an author represent in this context?
+
+```{r}
+clustering_coeff <-
+degree_df$ClusteringCoeff <-
+
+# View the updated degree data with computed network metrics.
+head(degree_df)
+```
+
+## Community Detection
+Let's identify communities within the co-authorship network using the Walktrap algorithm.
+
+```{r}
+# Use the Walktrap algorithm to detect communities.
+communities <-
+
+# Extract the community membership.
+membership <-
+
+# Output the number of detected communities.
+cat("Number of communities detected:", length(unique(membership)), "\n")
+```
+
+
+## Author Network Visualization
+Let's visualize the co-authorship network to better understand its structure and the relationships between authors.
+
+### Simple Visualization
+Visualize the author network using the Kamada-Kawai layout algorithm. Remove the author labels for a cleaner visualization using `vertex.label = NA` in the function.
+
+
+```{r}
+layout_kk <-
+
+# Plot
+```
+
+### Colouring Nodes by Community
+We can further beautify the visualization by coloring the nodes based on the communities detected earlier.
+
+```{r}
+# Ensure that the 'membership' attribute exists
+if (!"membership" %in% vertex_attr(n)) {
+  communities <- cluster_walktrap(n)
+  n <- set_vertex_attr(n, "membership", value = membership(communities))  # Attach community labels
+}
+
+# Generate the Kamada-Kawai layout
+layout_kk <- layout.kamada.kawai(n)
+
+# Define a color palette for communities
+num_communities <- length(unique(V(n)$membership))
+colors <- rainbow(num_communities, alpha = 0.8)  # Semi-transparent colors
+
+# Plot the network
+plot(n,
+     layout = layout_kk,
+     vertex.size = 5,            # Adjust node size
+     vertex.label = NA,          # Remove labels
+     vertex.color = colors[V(n)$membership],  # Color by community
+     edge.color = "gray80",      # Light gray edges for clarity
+     edge.arrow.size = 0.5,      # Adjust edge arrow size
+     edge.width = 0.3,           # Thinner edges
+     main = "Author Network Graph (Kamada-Kawai)")
+
+```
+
+# Appendix: Basic Graph Examples
+
+Below are several examples of creating and visualizing simple graphs. These examples demonstrate how to build basic network structures and may serve as a reference for understanding different graph types or as a starting point for a simple network visualization you may want to construct for e.g. your thesis.
+
+### Example 1: Basic Undirected Graph
+```{r}
+g1 <- graph( edges=c(1,2, 2,3, 3,1), n=3, directed=FALSE )
+plot(g1)
+```
+
+### Example 2: Directed Graph with More Vertices Than Edges
+```{r}
+g2 <- graph( edges=c(1,2, 2,3, 3,1), n=10 ) # Directed by default
+plot(g2)
+```
+
+### Example 3: Graph with Named Nodes
+```{r}
+g3 <- graph( c("Marie-Lou", "Rachel", "Gen Z", "Marie-Lou", "Rachel", "Gen Z"))
+plot(g3)
+```
+
+### Example 4: Named Vertices with Isolates
+```{r}
+g4 <- graph( c("John", "Jim", "Jim", "Jack", "Jim", "Jack", "John", "John"),
+             isolates=c("Jesse", "Janis", "Jennifer", "Justin") )
+set.seed(1)
+plot(g4, edge.arrow.size=.5, vertex.color="gold", vertex.size=15,
+     vertex.frame.color="gray", vertex.label.color="black",
+     vertex.label.cex=1.5, vertex.label.dist=2, edge.curved=0.2)
+```
+
+### Example 5: Graphs from Literal Descriptions
+```{r}
+plot(graph_from_literal(a---b, b---c))  # Undirected ties (number of dashes doesn't matter)
+plot(graph_from_literal(a--+b, b+--c))   # Directed ties with arrows
+plot(graph_from_literal(a+-+b, b+-+c))    # Symmetric ties
+plot(graph_from_literal(a:b:c---c:d:e))
+plot(graph_from_literal(a--b:c:d))
+plot(graph_from_literal(a:e--b:c:d))
+```
+
+### Example 6: Special Graph Structures
+
+**Empty Graph:**
+```{r}
+eg <- make_empty_graph(40)
+plot(eg, vertex.size=10, vertex.label=NA)
+```
+
+**Full Graph:**
+```{r}
+fg <- make_full_graph(40)
+plot(fg, vertex.size=10, vertex.label=NA)
+```
+
+**Tree Structure:**
+```{r}
+tr <- make_tree(40, children = 3, mode = "undirected")
+plot(tr, vertex.size=10, vertex.label=NA)
+```
+
+**Star Graph:**
+```{r}
+st <- make_star(40)
+plot(st, vertex.size=10, vertex.label=NA)
+```
+
+**Ring Graph:**
+```{r}
+rn <- make_ring(40)
+plot(rn, vertex.size=10, vertex.label=NA)
+```
