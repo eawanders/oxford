@@ -1,0 +1,73 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: pdf_document
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}  # Adjust the number for desired line spacing
+---
+
+### "Poverty causes civil war." Discuss.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The onset, duration, and termination of civil wars have gone in waves since the Second World War, with a peak of active civil wars towards the end of the Cold War before a decline in the 1990s and 2000s. Academic and international communities have extensively debated the causes of civil war, with the hope that if there are clearly identifiable causes, then civil war onset can be prevented through Peacekeeping Operations (PKOs). However, such PKOs have been particularly ineffective—especially within the Middle East—as the causes of civil war are more opaque than initially expected [@fearon2017b]. One of the primary points of focus has been poverty, with peacekeeping missions often focusing on economic development as a means of preventing civil war [@kalyvas2019]. This essay seeks to assess the relationship between poverty and civil war, arguing that poverty is neither a necessary cause of civil war nor a sufficient condition for civil war. Instead, this essay argues that poverty is a contributing factor that interacts with other potential causes to increase the likelihood of civil war onset. In making this principal argument, this essay first outlines the conditions, assumptions, and theoretical background of poverty's relationship with civil war. Secondly, it makes three explanatory arguments to show why poverty cannot be concretely considered the cause of civil war. Evidence shows that civil wars have occurred in states where poverty is not significantly prevalent, as well as in peaceful nations with high levels of poverty. Despite this, this essay argues that we cannot directly attribute poverty as an exogenous cause of civil war in causal analysis. There is clear evidence of confounding variables such as ethnic relations, state weakness, and transitional governments that interact with poverty to increase the likelihood of civil war onset, making it a reductionist argument to claim that poverty causes civil war. Finally, this essay considers the implications for policymakers and international organisations in light of this argument, suggesting that a more nuanced approach to understanding the causes of civil war is necessary to prevent future conflicts.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To clarify the forthcoming arguments, this essay takes poverty as a measure of low levels of income (GDP per capita), as is done in much of the literature, with most authors assessing aggregate levels of low income across a nation [@djankov2010]. Additionally, this essay considers civil war as a conflict "fought between domestic factions within a state, sometimes in the name of political and social change and sometimes to promote a secessionist agenda and the creation of a new state” [@kalyvas2019: 17]. This is a deliberate distinction from cartel-based fighting, which, despite conflict with the state, does not seek to seize power [@lessing2015a: 1488]. Moreover, to help with the understanding of 'causes', this essay examines civil war onset rather than incidence, which conflates onset and the duration of civil conflicts. This allows for a focus on how exogenous shocks to relative levels of poverty can be directly attributed to the onset of civil war [@fearon2010: 5; @holland1986].
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The conclusion of @kalyvas2019 was that "poorer countries face a higher risk of civil war onset," an outcome particularly attributed to the post-World War II wave of class-based civil wars [@walter2017: 471]. This argument is supported by a number of influential papers in the literature. Notably, amongst other factors, both @fearon2003 and @collier2004 provisionally show that civil war onset increases with greater levels of poverty. However, it is not ostensibly intuitive that poverty would cause civil war. One must look at rational choice theoretical arguments regarding the self-interested person [@popkin1980]. On the one hand, those in poverty may feel hard done by and poorly catered for and therefore want to rebel against the government. On the other hand, rebels who disagree with and want change from the existing government may target those in poverty to join the rebellion by offering a relatively better life as an attractive incentive. These two perspectives offer the two primary explanations of the mechanisms for civil war: 'grievance' and 'opportunity' [@fearon2010: 41]. Grievance as a mechanism for poverty's effect on civil war is a more limited explanation, as it is notably intertwined with other possible conditions for civil war. Opportunistic accounts of civil war, however, argue that commitment problems between governments and their opponents mean bargained deals are easy to break. These windows of opportunity are easier to exploit when a country has greater levels of poverty, as "the threshold that makes fighting a worthwhile gamble" is lower [@fearon2010: 41; @fearon2007]. With these theoretical contexts of poverty's relationship with civil war, this essay can now elaborate on this understanding of poverty through three arguments to show why poverty cannot be considered the cause of civil war.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Now that its theoretical context and mechanisms are understood, the first issue arises through constraints of causal inference when searching for poverty’s role in causing civil wars. To identify a causal relationship between poverty and civil war onset, we would require variations in poverty to occur exogenously from any other factors while controlling for all observed and unobserved confounding variables. This is nearly impossible due to confounding variables that are correlated both with poverty and civil war onset. Moreover, as civil wars often occur at multiple points throughout a nation's history, it is difficult to disentangle whether theories are derived from their outcomes—i.e., reverse causality of civil war causing poverty [@kalyvas2006]. This empirical issue is highlighted by @djankov2010, who shows that the aforementioned seminal papers from @fearon2003 and @collier2004 fail to account for the endogeneity of poverty in their models, rebutting the evidence suggesting low incomes affect civil war onset. When accounting for this endogeneity, it is shown that the relationship between poverty and civil war is a spurious one, accounted for by historical, ethnic, and political factors, with @cederman2013 emphasising the relative scales of these horizontal inequalities. Despite this argument, evidence from @miguel2004 shows a significant relationship between poverty and civil war onset while accounting for economic development as an exogenous shock to other confounders. They use rainfall across 41 African countries as an instrumental variable causing exogenous variation in poverty levels to identify a causal relationship between poverty and civil war onset. However, this argument is limited in its external validity, as it cannot be postulated to all cases of civil war onset. While the cases assessed by @miguel2004 may be similar in nature, the political, social, and cultural contexts of other civil wars may be different, meaning the relationship between poverty and civil war onset may not be generalisable.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yet, based on the theoretical arguments and the question's statement that poverty causes civil war, one would expect poverty to be a necessary condition for civil war: i.e., where there is civil war, there must be poverty in all cases. In addition, the statement's isolation of poverty implies that poverty is a sufficient condition for civil war: i.e., where there is poverty, there must be civil war. However, the evidence does not support these claims. Firstly, there have been civil wars in nations where poverty is not a heavily significant issue. Examples include the civil wars in Yugoslavia during the 1990s, Lebanon in the 1970s, and the Troubles in Northern Ireland lasting nearly 30 years up to 1998. These nations were not particularly poor, with Yugoslavia and Lebanon having relatively high GDP per capita levels, and Northern Ireland being part of the United Kingdom, which had a high GDP per capita level, yet all still experienced civil conflict. Secondly, civil wars have not always followed in states where poverty is significantly prevalent. For example, Bangladesh has seen high levels of persistent poverty across the nation since its independence through the Liberation War of 1971; yet, it has not seen a civil war since [@shamshad2018].
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Explanations for why the causes of civil war vary across country and time cannot be solely and directly attributed to poverty but instead lie in the competing evidence of ethnic, state, and political struggles. The role of ethnic diversity and marginalisation is a significant factor in civil war onset [@lewis2017]. With power being distributed across ethnic groups, rulers will often employ ethnic exclusion despite the risk of it increasing the likelihood of civil war onset. This is due to the ethnonational principles of political legitimacy, whereby the state is ruled by ethnically defined people and rulers attempt to protect 'their own' by excluding those who could stage a coup, generating ethnic grievances [@roessler2011: 301; @cederman2013]. By making the state the centre of analysis, we can then see how ethnic exclusion is correlated with state weakness. If a state is weak, it is likely to exclude others in an attempt to protect its own power. However, this breeds windows of opportunity for insurgents who can mobilise to exploit the state's weakness [@schubiger2021]. The ability to mobilise is, as previously discussed, a function of a lower threshold of poverty, making it easier for rebels to recruit, showing the interaction between poverty and confounding factors. These conditions were particularly prevalent after decolonisation, which left former colonies in a state of transitional governments with neither a functioning democracy nor a strong autocracy. This again follows the opportunistic argument of civil war onset, where rebels exploit the lack of commitments made by a transitioning state to form insurgencies [@cederman2010].
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;These arguments of ethnic exclusion, state weakness, and transitioning governments show how interconnected the factors of civil war onset are and how poverty can be seen as a function of these factors rather than a direct cause. Moreover, a different combination at different scales is likely present across different nations, making it difficult to generalise the causes of civil war. This is particularly important for policymakers and international organisations seeking to prevent civil war onset. Before deciding on a PKO, policymakers must understand the context of the nation and the primary drivers of that particular civil war. This essay has also shown that identifying the causes of conflict, whether poverty-based or other, is particularly difficult due to the way multiple factors interact. Given this, and empirical evidence to substantiate the argument, poverty cannot be either a necessary or sufficient condition for civil war onset. Instead, it is a contributing factor that interacts with other potential causes and should be seen as a factor that likely, but not necessarily, increases the likelihood of civil war onset.
+
+---
+
+`Word Count: 1,710`
+```{r Word Count, include=FALSE}
+library(stringr)
+
+# Read the RMarkdown file
+rmd_text <- readLines(
+    "/Users/edwardanders/Documents/GitHub/oxford/comp_gov/violence_essay.Rmd",
+    warn = FALSE
+)
+
+# Convert to a single text block
+rmd_text <- paste(rmd_text, collapse = "\n")
+
+# Extract only the text before the "Bibliography" heading (handling case variations)
+extracted_text <- str_extract(rmd_text, "(?s)^.*?(?=^#\\s*[Bb]ibliography)")
+
+# Debug: Print extracted text to check if it's correctly extracted
+cat("Extracted Text:\n", extracted_text, "\n")
+
+# Ensure extracted text is valid before processing
+if (!is.na(extracted_text) && extracted_text != "") {
+    # Remove markdown syntax and properly escape dollar signs
+    extracted_text <- str_replace_all(
+        extracted_text,
+        "\\*\\*|\\*|\\$begin:math:display\\$.*?\\$end:math:display\\$|\\$begin:math:text\\$.*?\\$end:math:text\\$|`|#|_",
+        ""
+    )
+
+    # Count words (counts sequences of alphanumeric characters)
+    word_count <- str_count(extracted_text, "\\w+")
+} else {
+    word_count <- 0 # If extraction fails, set word count to 0
+}
+
+# Print the result in the document
+cat(word_count)
+```
+
+\newpage
+
+# Bibliography
