@@ -1,15 +1,17 @@
 ---
-output: html_document
+output: pdf_document
 header-includes:
   - \usepackage{multicol}   # Include the multicol package
   - \pagenumbering{gobble}
+  - \usepackage{titlesec}
 ---
 
-\centerline{\Large \textbf{Edward Anders}} \ 
+\centerline{\Large \textbf{Edward Anders}} \
 \centerline{Email: edward.anders@politics.ox.ac.uk | Phone: +44 (0) 07942 927727} \
-Startup operator with multiple years of experience building early-stage, venture-capital-backed companies working as a deliberate generalist across product, strategy and growth. Interested in building projects at the intersection of artificial intelligence, political economy, and democracy.
+Researching AI's effects on attitudes. Experience of building early-stage, AI companies working as a deliberate generalist across product, strategy and growth. Interested in the intersection of artificial intelligence, political economy, and democracy.
 
 ## Education
+\vspace{-3mm}
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
@@ -22,8 +24,9 @@ MPhil in Politics (Comparative Government)
 2024-2026
 
 \end{multicols}
-Casual effects of AI-generated misinformation on political attitudes and voting behaviour. \
-\textit{Supervisor: Prof. Rachel Bernhard, Nuffield College, Oxford.}
+\vspace{-3mm}
+Research: Effects of AI-generated content on political attitudes and voting behaviour. \
+Supervisor: Prof. Rachel Bernhard, Nuffield College, Oxford.
 
 \begin{multicols}{2}  % Start two-column environment
 
@@ -39,7 +42,7 @@ BSc Economics and Politics, 1st-Class Honours
 \end{multicols}
 
 ## Professional Experience
-
+\vspace{-3mm}
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
@@ -92,6 +95,6 @@ BCG Project, Carnall Farrar, Strategy\&
 - Selected onto Jumpstart's startup-graduate matching programme (top ~1% of 5000+ applicants)
 
 ## Skills \& Tooling
-- Quantitative research methods inc. machine learning techniques.
+- Quantitative and computational research methods inc. machine learning techniques.
 - Python, R, Stata, SQL, Git, CSS, Javascript (basic).
 - Segment, Webflow, Figma, GitHub.
