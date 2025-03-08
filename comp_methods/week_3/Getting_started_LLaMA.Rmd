@@ -1,0 +1,91 @@
+---
+title: "Getting started with LLaMA in R"
+subtitle: "Intermediate Computational Methods, DPIR, University of Oxford"  
+author: "Rachel Bernhard & Marie-Lou Sohnius"
+date: "Hilary 2025"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    default_style: "dark"
+    downcute_theme: "chaos"
+    code_folding: show
+    fig_crop: false
+---
+# 🚀 Get Started with Mall & Ollama
+
+This guide helps you **set up Mall and Ollama** so you can work with **large language models (LLMs)** in R. Let's get started! 🎉  
+
+
+## 🛠 Step 1: Install `mall` in R
+
+Install `mall` from **CRAN**:
+```{r, eval=FALSE}
+install.packages("mall")
+```
+
+
+## 💾 Step 2: Install Ollama
+
+Ollama lets you run **LLMs (Large Language Models) locally** on your machine. Follow these steps:
+
+### 1️⃣ **Download Ollama**
+Go to the **[official Ollama website (https://ollama.com/)](https://ollama.com/)** and download the version for your operating system.
+
+### 2️⃣ **Install Ollama**
+- **Windows**: Run the installer (`.exe` file) and follow the prompts.
+- **Mac**: Open the `.dmg` file and drag **Ollama** into your Applications folder.
+- **Linux**: Run the following command in your terminal:
+
+```{sh, eval=FALSE}
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+### 3️⃣ **Verify Installation**
+After installation, open a **new terminal (Mac/Linux) or Command Prompt (Windows)** and type:
+
+```{sh, eval=FALSE}
+ollama --version
+```
+
+If you see a version number, **Ollama is installed successfully! 🎉**
+
+> Opening a new terminal:
+>
+> - **Windows**: Press `Win + R`, type `cmd`, and press `Enter`.
+>
+> - **Mac**: Press `Cmd + Space`, type `Terminal`, and press `Enter`.
+>
+> - **Linux**: Press `Ctrl + Alt + T`.
+
+## 🏗 Step 3: Download the 3.2 LLM Model
+
+Ollama doesn’t come with any models pre-installed. You need to **download** one! 🧠
+
+To get **Llama 3.2**, run this command in R:
+
+```{r, eval=FALSE}
+ollamar::pull("llama3.2")
+```
+
+This will download the **3.2 billion parameter LLM** model to your machine. 🚀 The model has a size of **~2GB**, so downloading might take a while.
+
+You can alternatively also download the model using the following command in your terminal:
+
+```{sh, eval=FALSE}
+ollama pull llama3.2
+```
+
+## ✔️ Step 4: Check Installation
+
+To check if everything is set up correctly, run the following code in **the terminal (Mac/Linux) or Command Prompt (Windows)**:
+
+```{sh, eval=FALSE}
+ollama list
+```
+
+This should show you a list of available models on your machine, including the **Llama 3.2** model you just downloaded.
+
+## ✅ All Set!
+You're now ready to **experiment with LLMs** in R! 🚀 
+
+Need help? Check out the **[Ollama Documentation](https://ollama.com/library/llama3.2)**.

@@ -1,0 +1,380 @@
+---
+title: "LLaMA in R"
+subtitle: "Intermediate Computational Methods, DPIR, University of Oxford"
+author: "Rachel Bernhard & Marie-Lou Sohnius"
+date: "Hilary 2025"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    default_style: "dark"
+    downcute_theme: "chaos"
+    code_folding: show
+    fig_crop: false
+---
+
+```{r setup, include=FALSE}
+options(repos = c(CRAN = "https://cran.r-project.org"))
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# Install and load required packages efficiently
+required_packages <- c(
+  "mall",
+  "httr2",
+  "ollamar",
+  "tibble",
+  "rvest",
+  "tidyverse",
+  "jsonlite",
+  "purrr",
+  "ellmer"
+)
+
+new_packages <- required_packages[!(required_packages %in% installed.packages()[, "Package"])]
+if (length(new_packages)) install.packages(new_packages)
+
+invisible(lapply(required_packages, library, character.only = TRUE))
+```
+
+# Introduction to LLaMA and Running LLMs Locally
+
+## What is LLaMA?
+LLaMA (Large Language Model Meta AI) is an advanced generative AI model developed by Meta. It’s designed for efficient natural language processing and, unlike cloud-based solutions (such as OpenAI’s GPT), is optimized for **local deployment**. This means you can run it **on your own machine** without relying on external APIs.
+
+Think of it as owning a personal, powerful AI assistant instead of renting one from a tech giant!
+
+![](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExazF1NnN4OXEzZWk4eDZodnNmb2J5eThwYWw2OWxnNHJqb2szc21zZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l4pSUq8RVJg4trzPy/giphy.gif)
+
+## Why Run LLaMA Locally?
+Running LLaMA on your own computer offers several major advantages:
+
+- **Privacy**: Your data stays on your device. No external servers see it!
+
+- **Customization**: Fine-tune and experiment freely with the model.
+
+- **Cost Efficiency**: No API fees—just computational power.
+
+# Setting Up LLaMA in R
+Before using LLaMA, we need to download the model and check that the backend is correctly configured.
+
+```{r}
+ollamar::pull("llama3.2") # Download the LLaMA model
+ollamar::test_connection() # Check if the backend is running
+```
+
+Now, we initialize the model with specific settings:
+
+```{r}
+llm_use(
+  backend = "ollama",
+  model = "llama3.2",
+  seed = 123456,
+  temperature = 0 # Setting temperature to 0 ensures deterministic outputs
+)
+```
+
+# Key Functions and Their Use Cases
+Now that our LLaMA model is ready, let’s explore some of the **cool things** we can do with it!
+
+## Sentiment Analysis
+Imagine we have a list of adjectives and want to analyze their sentiment—whether they convey **positive** or **negative** emotions.
+
+```{r}
+tib <- tibble(
+  id = 1:4,
+  adjective = c("painful", "hungry", "cheerful", "exciting")
+)
+
+tib |>
+  llm_sentiment(col = adjective) # Classifies sentiment of adjectives
+```
+
+## Text Classification
+Let's say we have different fruits and want to categorize them by color.
+
+```{r}
+tibble(fruit = c("orange", "apple", "blueberry", "kiwi", "avocado", "strawberry")) %>%
+  llm_classify(col = fruit, labels = c("red", "green", "yellow", "orange"))
+```
+
+
+## Working with a Larger Dataset
+We now introduce a dataset containing customer reviews.
+
+```{r}
+data("reviews") # Load a dataset of reviews
+reviews
+```
+
+### Sentiment Analysis on Reviews
+```{r}
+reviews |> # Pipe the dataset into the function, |> is a piping operator in the same way as %>% in dplyr
+  llm_sentiment(review) # Determines the sentiment of each review
+```
+
+### Summarizing Text
+Let’s generate **short summaries** of customer reviews.
+
+```{r}
+reviews |>
+  llm_summarize(review, max_words = 5) # Summarizes reviews into 5 words
+```
+
+### Classifying Reviews into Categories
+```{r}
+reviews |>
+  llm_classify(review, c("appliance", "computer"))
+```
+
+### Extracting Key Information
+Want to know what product each review is talking about? No problem.
+
+```{r}
+reviews |>
+  llm_extract(review, "product")
+```
+
+### Verifying Customer Satisfaction
+We can determine if the review indicates a **satisfied customer**.
+
+```{r}
+reviews |>
+  llm_verify(review, "is the customer happy with the purchase")
+```
+
+### Translating Reviews into French
+```{r}
+reviews |>
+  llm_translate(review, "french")
+```
+
+### Custom Prompting with LLaMA
+We can define **custom prompts** for more specific tasks.
+
+```{r}
+my_prompt <- paste(
+  "Answer a question.",
+  "Return only the answer, no explanation",
+  "Acceptable answers are 'yes', 'no'",
+  "Answer this about the following text, is this a happy customer?:"
+)
+
+reviews |>
+  llm_custom(review, my_prompt)
+```
+
+# Prompt Engineering with LLaMA
+Let's get back to the fruit classification from earlier! Performance was rather poor, so we'll try to improve it by **engineering a better prompt**.
+
+```{r}
+# Let's try out a few prompts and compare the results
+
+# Expanded fruit dataset
+fruit_df <- tibble(
+  fruit = c(
+    "orange", "apple", "blueberry", "kiwi", "avocado", "strawberry",
+    "banana", "mango", "papaya", "pineapple", "grape", "cherry",
+    "watermelon", "pear", "peach", "plum", "pomegranate", "lemon"
+  ),
+  true_color = c(
+    "orange", "red", "red", "green", "green", "red",
+    "yellow", "orange", "orange", "yellow", "red", "red",
+    "green", "green", "orange", "red", "red", "yellow"
+  )
+)
+
+# Prompt 1
+prompt1 <- paste(
+  "Classify the following fruits based on their dominant color.",
+  "Respond with only the color name.",
+  "Possible colors: red, green, yellow, orange."
+)
+
+# Prompt 2
+prompt2 <- paste(
+  "For each fruit, classify it based on its dominant skin color.",
+  "Use only these colors: red, green, yellow, orange.",
+  "Do not return any other colors. Respond with just one word.",
+  "Examples:",
+  "kiwi -> green",
+  "strawberry -> red",
+  "banana -> green", # Let's add false information here to see what happens
+  "orange -> orange",
+  "Now classify the following fruits."
+)
+
+# Prompt 3
+prompt3 <- paste(
+  "Classify each fruit based on its dominant skin color.",
+  "Respond with only the color name, and nothing else.",
+  "Use one of these categories: red, green, yellow, orange.",
+  "Do not use any other colors, and do not explain your answer.",
+  "Ensure your response strictly follows the given categories.",
+  "Examples:",
+  "kiwi", "green",
+  "strawberry", "red",
+  "banana", "yellow",
+  "orange", "orange",
+  "Now classify the following fruits."
+)
+
+# Apply multiple prompts
+fruit_classification_1 <- fruit_df %>% llm_custom(fruit, prompt1)
+fruit_classification_2 <- fruit_df %>% llm_custom(fruit, prompt2)
+fruit_classification_3 <- fruit_df %>% llm_custom(fruit, prompt3)
+
+# Combine results for comparison
+fruit_classification_results <- bind_cols(
+  fruit = fruit_df$fruit,
+  true_color = fruit_df$true_color,
+  classification_1 = tolower(fruit_classification_1$.pred),
+  classification_2 = tolower(fruit_classification_2$.pred),
+  classification_3 = tolower(fruit_classification_3$.pred)
+)
+
+# Calculate accuracy rates
+fruit_classification_results <- fruit_classification_results %>%
+  mutate(
+    accuracy_1 = classification_1 == true_color,
+    accuracy_2 = classification_2 == true_color,
+    accuracy_3 = classification_3 == true_color
+  )
+
+accuracy_rates <- fruit_classification_results %>%
+  summarise(
+    prompt_1_accuracy = round(mean(accuracy_1) * 100, digits = 2),
+    prompt_2_accuracy = round(mean(accuracy_2) * 100, digits = 2),
+    prompt_3_accuracy = round(mean(accuracy_3) * 100, digits = 2)
+  )
+
+print(accuracy_rates)
+
+# Prepare data for heatmap
+fruit_accuracy_long <- fruit_classification_results %>%
+  select(fruit, accuracy_1, accuracy_2, accuracy_3) %>%
+  rename(
+    "Prompt 1" = accuracy_1,
+    "Prompt 2" = accuracy_2,
+    "Prompt 3" = accuracy_3
+  ) %>%
+  pivot_longer(cols = -fruit, names_to = "Prompt Type", values_to = "Correct") %>%
+  mutate(`Prompt Type` = factor(`Prompt Type`, levels = c("Prompt 1", "Prompt 2", "Prompt 3")))
+
+# Create heatmap
+ggplot(fruit_accuracy_long, aes(x = `Prompt Type`, y = fruit, fill = Correct)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("TRUE" = "#006164", "FALSE" = "#DB4324")) +
+  labs(
+    title = "Fruit Classification Accuracy by Prompt Type",
+    x = "",
+    y = "Fruit",
+    fill = "Correct?"
+  ) +
+  theme_minimal()
+```
+
+
+# Chatting with LLaMA using Ellmer
+Ellmer is a conversational interface that allows us to **interact** with LLaMA in a more **conversational** way.
+
+```{r}
+# Start a chat session with LLaMA
+chat <- chat_ollama(
+  model = "llama3.2",
+  seed = 123
+) # Update to the correct version of LLaMA if needed
+
+# Ask for three jokes about political scientists
+chat$chat("Tell me three jokes about political scientists.")
+
+# Ask for advice on a sunny day
+chat$chat("The sun is out, what should I do?")
+```
+
+
+
+# Bringing It All Together: Scraping and Cleaning Research Papers
+Let’s analyze research paper titles **automatically** using LLaMA.
+
+## Scraping the data
+This part has already been done for you. We scraped the titles from Rachel's research page.
+
+```{r}
+url <- "https://rachelbernhard.com/research"
+webpage <- read_html(url)
+
+titles <- html_text(html_nodes(webpage, "h3"), trim = TRUE)
+```
+
+## Cleaning the data
+Before we can analyze the titles, we need to clean them up a bit. Can you spot titles that don't belong?
+Remove them from the dataset, and store the cleaned titles in a new data frame called `papers_df`.
+
+```{r, eval=FALSE}
+papers_df <- data.frame(title = titles, stringsAsFactors = FALSE) %>%
+  filter(!grepl("View CV", title))
+```
+
+
+## Extracting Information from Titles
+Let's use LLaMA to extract structured information from the research paper titles. Find a way to **extract** the following information from each title:
+
+- Journal: The name of the publisher or journal
+
+- Year: The publication year
+
+- Co-authors: A list of co-authors
+
+- Status: One of published, under review, revising, or in progress
+
+- Main title: The title without co-authors, journal, or status
+
+- Research field: The academic discipline
+
+Think about how you can structure your prompt to get the desired output and how to optimize the number of prompts needed.
+
+```{r}
+# Define a custom prompt to extract the information
+extract_prompt <- paste(
+  "Extract the following information from the title:",
+  "Journal:",
+  "Year:",
+  "Co-authors:",
+  "Status:",
+  "Main title:",
+  "Research field:",
+  "Title:"
+  "Provide the output in a JSON file format with no introduction."
+)
+
+# Extract information from the titles
+extracted_info <- papers_df %>%
+  llm_custom(title, extract_prompt)
+
+# Split the extracted information into separate columns
+papers_df <- bind_cols(
+  papers_df,
+  extracted_info %>%
+    separate(.pred, into = c("Journal", "Year", "Co-authors", "Status", "Main title", "Research field"), sep = "\n")
+)
+
+# Display the cleaned and structured data
+papers_df
+
+# Convert data frame to a tibble
+papers_df <- as_tibble(papers_df)
+
+# Display tibble
+papers_df
+
+# Export the structured data to a CSV file
+write_csv(papers_df, "/Users/edwardanders/Documents/GitHub/oxford/comp_methods/week_3/papers_data.csv")
+```
+
+# Conclusion
+LLaMA enables us to **analyze, classify, and extract** meaningful insights from text directly in R. This tutorial showcases:
+- **Basic NLP tasks** (sentiment, classification, summarization)
+- **Advanced applications** (scraping research papers, structured extraction)
+- **Custom prompts** for flexible AI interactions
+
+This is just the beginning—next steps could include **fine-tuning** models or exploring **multi-modal** (text + image) applications!
