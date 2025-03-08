@@ -1,0 +1,506 @@
+---
+title: "Week 7: Sharp RDD Sharp - Solutions"
+date: HT 2025
+author: Tanisha Mohapatra & Fernando Sanchez Monforte
+output:
+  pdf_document:
+    number_sections: false
+---
+
+
+
+```{r, eval = T, echo = F}
+knitr::opts_chunk$set(warning = F, message = F, error = F, echo = FALSE)
+```
+
+
+# Introduction
+
+In this lab session, our focus will be on **Regression Discontinuity Designs** (RDDs) -- a group of statistical methods applied when the treatment of interest varies quasi-randomly around a cut-off or threshold value.
+
+More formally, RDDs exploit the fact that in certain situations treatment assignment is governed by a known **assignment rule** that determines whether units are assigned to the treatment. In RDD, all units in the study receive a score, usually called *running variable*, *forcing variable* or *index*. Treatment is assigned to those units whose score is on one side of the cut-off value (Cattaneo et al 2019).
+
+
+In a *sharp RDD*, the running variable decides -  _deterministically_ - whether the unit is receiving treatment or control condition. The assignment rule can sometimes only increase the probability that the treatment will be received though. Those cases are analysed using *fuzzy RDD* and will be our focus next week.
+
+However, when we only look at the running variable and the treatment assigned based on the cut-off value, we are still facing the fundamental problem of causal inference. Namely, we can only observe the untreated outcome for the units in the control condition and the treated outcome for the units in the treatment.
+
+What we need to assume to get our LATE estimates is the continuity. We would expect that observations in a small neighborhood around the cut-off will have very similar potential outcomes. In that case, whether or not they fall on either side of the cut-off is likely to be unrelated to their potential outcomes, i.e. their assignment to treatment is quasi-random. Thus, this would justify using observations just below the cut-off as a reasonable proxy of what would be the outcome for those units just above the cut-off had received the control condition instead of the treatment (i.e. counterfactual).
+
+The main challenge of RDD is to adequately perform the comparison of the average outcomes of treated and control units at the cutoff.
+
+
+In this **seminar**, we will run RDD step-by-step by:
+
+* Explore the data using simple summary functions
+
+* Estimate the treatment effect around the discontinuity using OLS with constant and varying slopes
+
+* Compare linear and high-order polynomial models estimating the same treatment effect
+
+* Fit RDD model using rdrobust (non-parametric estimation)
+
+* Conduct robustness/falsification using tests for:
+    + sensitivity (bandwidth, kernels)
+    + continuity (imbalance test, placebo cut-offs)
+    + sorting
+
+
+**Before starting this seminar**
+
+1. Create a folder called `Lab7`.
+2.  Download the data (`islamic_women.csv`) from Canvas.
+3.  Save the data in our `Lab7` folder.
+4.  Open the RMarkdown file (either download it from Canvas or start your own).
+5.  Set your working directory using the `setwd()` function or by clicking on \"More\".
+6.  Prepare your R environment using the Setup chunk.
+
+
+```{r Setup}
+# Let's get started!
+
+## Global options
+knitr::opts_chunk$set(cache = FALSE, echo = FALSE, warning = FALSE, message = FALSE)
+
+library(pacman)
+
+## Load (and install) packages needed for the analyses
+pacman::p_load(
+  tidyverse, # Cleaning data, plotting pretty plots ;)
+  stargazer, # Neat regression tables
+  kableExtra, # Yet another package for tables
+  tableone, # This one is for summary/balance tables
+  ggplot2, # Plots!
+  sjPlot, # Other plots!
+  foreign, # Read different file formats
+  rdrobust, # RDD estimation
+  rddensity, rdd # Density tests
+)
+```
+
+
+# Islamic Rule and the Empowerment of the Poor and Pious
+
+Meyersson (2014) studies the effect of Islamic parties' control of local governments on women's education.\footnote{Meyersson M. (2014). [Islamic Rule and the Empowerment of the Poor and Pious](https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA9878)} The paper focuses on the secondary school completion rate for young women in Turkey. The objective is to compare the municipalities where the Islamic party won to those where they lost.
+
+The challenge is quite clear in this case. One would expect that municipalities controlled by Islamic parties would systematically differ from those that are controlled by a secular mayor. Particularly, if religious conservatism affects BOTH the electoral vote and the educational outcomes of women. However, we can use RDD to isolate the treatment effect of interest from all systematic differences between treated and untreated units.
+
+How? We can exploit *close elections*, i.e. compare municipalities where the Islamic party barely won the election versus municipalities where the Islamic party barely lost it. This reveals the causal (local) average treatment effect of Islamic party control on women's educational attainment 6 years later. Given that the electoral victory determines who gets to be in power in a strongly deterministic way (one could expect few, if any, non-compliers), sharp RDD is the way to go.
+
+The data used in this study - `islamic_women.csv` - comes from the 1994 mayoral election in Turkey. The unit of analysis is the municipality, and the running variable is the electoral margin of Islamic parties compared to secular parties. The outcome of interest is the educational attainment of women who attended high school during 1994-2000, calculated as a percentage of the cohort of women aged 15 to 20 in 2000 who had completed high school by 2000. Couple of other variables are included in the dataset. We will use them in the later parts of this exercise.
+
+
+Table: Variables of interest in the 'Islamic Rule and the Empowerment of the Poor and Pious' dataset from [Meyersson (2014)](https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA9878)
+
+| **Variable**    | **Description**  |
+|----------|--------------------------------------------------------------|
+| `margin` | Margin of victory of Islamic parties in the 1994 elections |
+| `school_women` | Secondary school completion rate for women aged 15-20 |
+| `school_men` | Secondary school completion rate for men aged between 15 and 20  |
+| `sex_ratio` | Gender ratio of the municipality in 1994 |
+| `log_pop` | Log of the municipality population in 1994  |
+| `log_area` | Log of the municipality area in 1994	 |
+
+
+## Getting to know the data
+
+```{r load data}
+dta <- read.csv("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/week_7/islamic_women.csv")
+glimpse(dta) # Negative values of the vote share come from centering the running variable which has been recentered around the cut-off (cut-off minus the margin of victory)
+```
+
+
+### Task 0
+
+Identify the outcome variable and the running variable. What does the running variable look like for treated and untreated municipalities?
+
+The outcome variable is called `school_women` and the running variable is called `margin`. For treated municipalities (i.e., where an Islamic party was elected), the running variable has values: `margin >= 0` and for untreated municipalities, `margin < 0`.
+
+### Task 1
+
+Let's visualize the data first:
+
+\begin{enumerate}
+  \item{Create a new binary treatment variable based on the threshold values of the running variable. It will come in handy to determine which areas got to be 'treated', that is ruled by an Islamic mayor.}
+  \item{Create a scatterplot of the running variable against the outcome, coloured by the value of the binary treatment. }
+\end{enumerate}
+
+ This is often the first step towards exploring the data in an RDD set-up. What does the plot tell us?
+
+
+\textit{Hint:} You might want to add trend lines to the plot, in which case `geom_smooth` function can be handy.
+
+
+```{r task1}
+dta$treat <- ifelse(dta$margin > 0, 1, 0)
+
+ggplot(aes(x = margin, y = school_women, group = treat, colour = treat), data = dta) +
+  # Add trend lines
+  geom_smooth(method = "lm") + # use 'loess' to get local polynomial fit lines - does that change the results?
+  # Make points small and semi-transparent since there are lots of them
+  geom_point(size = 0.5, alpha = 0.5, position = position_jitter(width = 0, height = 0.25, seed = 1234)) + # Jittering is nudging up or down the points to avoid overplotting
+  # Add vertical line
+  geom_vline(xintercept = 0) +
+  # Add labels
+  labs(
+    x = "Margin of 1994 Islamic party victory (running variable)",
+    y = "Secondary school completion rate for women aged 15-20",
+    title = "Figure: Relationship between the margin of Islamic party victory\nand women's high school completion rates"
+  ) +
+  # Turn off the color legend, since it's redundant
+  guides(color = FALSE) +
+  # Define plot theme
+  theme_bw()
+
+# Note: the untreated are on left, treated on the right
+```
+
+
+### Task 2
+
+The plot from Task (1) will suggest several important trends:
+
+* Considerably more municipalities elect a secular mayor than an Islamic mayor
+* Municipalities electing a secular mayor appear to have higher educational attainment for girls
+* The difference doesn't appear to be particularly stark though, especially at the cut-off
+
+
+How would you test for each of these trends more formally in R? (no regression or RDD for now)
+
+```{r task2}
+# Proportion of municipalities with secular vs. Islamic mayor
+table(dta$treat)
+table(dta$treat) / nrow(dta)
+
+# Educational attainment by electoral margin of Islamist parties
+cor(dta$school_women, dta$margin, use = "complete.obs")
+
+# Educational attainment by electoral victory of Islamist parties
+tapply(dta$school_women, dta$treat, function(x) mean(x, na.rm = T)) %>% round(4)
+
+# Or...
+t.test(school_women ~ treat, data = dta)
+
+# Difference at the cut-off -> that's what the rest of this exercise is about!
+# Simplistically we could try something like:
+t.test(school_women ~ treat, data = dta %>% filter(abs(margin) < 0.01)) # manually set cut-off?
+# t.test(school_women ~ treat, data = dta %>% filter(abs(margin) < 0.5*sd(dta$margin, na.rm=T))) # relative to variance of running variable?
+```
+
+
+
+## Parametric estimation
+
+As we discussed in the lecture, there are different ways to estimate the causal effect using RDD. These different approaches differ in the range of observations they include as well as how they estimate the average outcome for those units just above the cut-off and below the cut-off
+
+### Task 3
+
+Let's begin with a simple (simplistic?) way to estimate the effect of the treatment using OLS. Remember, what we essentially strive for is the difference between the two lines of best fit at the cut-off (see the plot you created above).
+
+*Hint*: Think how you can get to use OLS to model the two lines as in the plot above.
+
+```{r task3, results='asis', warning = FALSE}
+# Intuition is to fit two separate regressions either side of the cutoff (but this is not how it works in practise, too simplistic)
+
+### First approach is to estimate the lines separately and then compare their intercepts
+model3a1 <- summary(lm(school_women ~ margin, data = dta, subset = margin > 0))
+# model3a1$coefficients[1]
+model3a2 <- summary(lm(school_women ~ margin, data = dta, subset = margin <= 0))
+# model3a2$coefficients[1]
+diff3a <- model3a1$coefficients[1] - model3a2$coefficients[1]
+diff3a
+
+## Second approach is to interact the running variable and treatment assignment
+model3b <- (lm(school_women ~ treat * margin, data = dta))
+
+stargazer(model3b,
+  type = "latex", header = FALSE,
+  dep.var.labels = "",
+  dep.var.caption = "Secondary school completion rates (women 15-20)",
+  omit = c("Constant", "ed_id"),
+  omit.stat = c("ser", "f"),
+  title = "OLS estimation of treatment (Islamic party rule)"
+)
+```
+
+Based on this approach the difference between the intercepts (or alternatively the coefficient of the 'treat' dummy in the interaction model) is the estimated effect of an Islamic party being in power in a municipality. The effect suggests there is a  `r round(diff3a, 3) * 100` percentage decrease in women's educational attainment as a result.
+
+Above we relied on linear model. However, it is to be expected that the relationship between the running and outcome variables is not linear. That might be even more likely if we run the model using all the data available, not only those close to the cut-off. You can see how much closer a smooth line of best fit would be in the plot above by specifying `geom_smooth(method = 'loess')`.
+
+### Task 4
+So why not use a high-order polynomial to retrieve LATE? Let's re-run the analysis with a third-order polynomial regression function.
+
+
+*Hint*: Running a polynomial requires either i) using `poly()` function in the model formula or ii) adding each polynomial term separately into the regression forumula, raising each to the desired power using `^n`, where n is the power of interest, and then putting coefficient expontiated in this way inside `I()`.
+
+
+```{r task4, results='asis', warning=FALSE}
+model4 <- (lm(school_women ~ treat * poly(margin, 3, raw = T), data = dta)) # would also not do this in practise
+
+stargazer(model4,
+  type = "latex",
+  dep.var.labels = "",
+  dep.var.caption = "Secondary school completion rates (women 15-20)",
+  omit = c("Constant"),
+  omit.stat = c("ser", "f"),
+  title = "Polynomial estimation of treatment (Islamic party rule)"
+)
+```
+
+The estimated effect is now slightly smaller, at `r round(summary(model4)$coefficients[2], 3) * 100` percentage points. But it's in different direction! The Islamic party's win is found to have positive effect on girls' secondary school education (notice this positive direction is indeed the finding of the original paper).
+
+Also, notice how the models fitted above use all of the available observations. Yet RDD presumes that the observations are only comparable 'close' to the cut-off point.
+
+### Task 5
+Re-run the polynomial regression model with only a subset of observations close to the cut-off. You are welcome to decide how wide of a bandwidth you want to use and whether you want to experiment with more than one.
+
+
+```{r task5, results='asis', warning=FALSE}
+model5a <- (lm(school_women ~ treat * poly(margin, 3, raw = T),
+  data = dta %>% filter(abs(margin) < .05)
+))
+
+model5b <- (lm(school_women ~ treat * poly(margin, 3, raw = T),
+  data = dta %>% filter(abs(margin) < .10)
+))
+
+model5c <- (lm(school_women ~ treat * poly(margin, 3, raw = T),
+  data = dta %>% filter(abs(margin) < .20)
+))
+
+
+stargazer(model5a, model5b, model5c,
+  type = "latex", header = FALSE,
+  dep.var.labels = "",
+  dep.var.caption = "Secondary school completion rates (women 15-20)",
+  omit = c("Constant"),
+  omit.stat = c("ser", "f"),
+  column.labels = c("BW=5%", "BW=10%", "BW=20%"),
+  title = "Polynomial estimation of treatment (Islamic party rule)"
+)
+
+# model3b = (lm(school_women~treat*margin, data = dta %>% filter(abs(margin) < 0.2)))
+```
+
+
+
+Note: Evidence against using high-order polynomial seems to be quite robust [(see here for a discussion on high-order polynomials)](https://www.tandfonline.com/doi/abs/10.1080/07350015.2017.1366909). In short, the issues with using high-order polynomials is that they leads to noisy estimates, they are sensitivity to the degree of the polynomial, and they have poor coverage of confidence intervals. Perhaps more relevantly for this particular model, we still haven't moved closer to the cut-off, but have been using all data points, both close and far away from it.
+
+
+
+## Non-parametric estimation (rdrobust)
+
+Let's now estimate the LATE using a non-parametric estimator. Conveniently, we can easily do so by using the `rdrobust` package. As the name indicates, the package allows us to estimate robust measurements of uncertainty such as standard errors and confidence intervals.
+
+It is based on theoretical and technical work by Calonico, Cattaneo and Titiunik. `rdrobust` estimates robust bias-corrected confidence intervals that address the problem of undersmoothing conventional confidence intervals face in RDDs. In other words, a small bias would be required for them to be valid, which might not be the case. Moreover, they also address the poor performance of (non-robust) bias-corrected confidence intervals.
+
+As suggested by the authors and somewhat counter-intuitively, we therefore use the point estimate provided by the conventional estimator, but robust standard errors, confidence intervals and p-values to make statistical inferences.
+
+The function also allows users to adjust RDD specification along multiple parameters. The main one and the first one we will look at more closely is the *bandwidth* - how far away from the cut-off can the observations be? Let's start with a cut-off of 5%. This is not a huge margin of victory and should leave us with quite a few observations to work with. We will see how to pick the optimal bandwidth in a moment.
+
+### Task 6
+Estimate the LATE using `rdrobust`  on either side of the cutoff. Interpret your results
+
+*Hint*: The `rdrobust` function has the following basic syntax. You can use `rdrobust(y=dependent_var, x = running_var, , c = cutoff_value, h = bandwidth_value)`
+
+```{r task6}
+model5 <- rdrobust( # RD robust estimation assigns triangular kernel by default
+  y = dta$school_women, x = dta$margin,
+  c = 0, h = .05 # bandwidth of 5% on either side of the cut-off and cut-off at 0
+)
+# Can add in all=TRUE to get all the bandwidths that were tried (only then report the optimal bandwidth)
+# If we remove h, the function will estimate the optimal bandwidth
+
+summary(model5)
+```
+
+
+Our point estimate is `0.023`. That is, a victory of an Islamic party would be associated with an increase in the rate of women who complete school by `2.3%` - however, the p-value and confidence intervals indicate that the estimate is not statistically significant. Therefore, based on this model, we would conclude that winning an election does _not_ have a an effect on women schooling.
+
+
+# Robustness checks
+
+## Sensitivity tests
+
+### Bandwidth selection
+
+A bandwidth of 5% seems about reasonable. But we should better check different ones, too. Let's see what happens if we halve the bandwidth.
+
+### Task 7
+Try different bandwidth values to estimate RDD. Do your results change? How?
+
+```{r task7}
+model6a <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, h = .025)
+summary(model6a)
+
+model6b <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, h = .1)
+summary(model6b)
+
+model6c <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, h = .2)
+summary(model6c) # Here the SE are smaller because we have more observations; all=TRUE would show the additional values
+```
+
+Well, we can see that the number of observations used to estimate the effect is varying noticeably between the models using different bandwidths. This is reasonable and we should be aware of the potential effects the sample size might have on our estimate. However, the we can observed that the point estimate did not change much and, as before, we find that there is in fact no significant effect at the cutoff.
+
+Selecting bandwidths manually is possible and using our original 5% bandwidth might seem reasonable in this case. But so would several others. How can we know what bandwidth we should use to estimate our effect?
+
+Recall the trade-off we are facing when choosing bandwidths that was discussed in the lecture: On the one hand we know that more narrow bandwidths are associated with less biased estimates - we rely on units that are indeed comparable: their distance in the running variable being as-if random the closer we get to the cut-off. On the other hand: the wider the bandwidths, the smaller the variance. As in several cases before, the structure of our data, such as the number of observations, plays an important role. Even if small bandwidths are desirable, it can be hard, or even impossible, to estimate a robust and significant effect if the number of observations around the cut-off is very small - even if there is a true causal effect.
+
+Luckily, the `rdrobust` package provides a remedy for this. The packages allows us to specify that we want to use bandwidths that are optimal given the data input. The `rdrobust` command then picks the bandwidth that optimises the _mean square error_ - in other words, _MSE-optimal_ bandwidths. Note that this is the default bandwidth if you don't specify any. Let's try to find out what this would be in our case.
+
+### Task 8
+
+Estimate the LATE using `rdrobust` and MSE-optimal bandwidths. To specify the model, replace the `h` argument with `bwselect="mserd"`.**
+
+*Hint*: use `bwselect="mserd` instead of specifying `h` in the function.
+
+```{r task8}
+model7 <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, bwselect = "mserd") # Should always report MSERD bandwidth at a minimum
+summary(model7)
+```
+
+
+This now looks very different. We estimate a LATE of about `3%`, which  is significant at the 90% level. Note that the optimal bandwidths has been estimated to be `17.2%-points` on either side of the cut-off, with a separate optimal bandwidth for bias correction. Note that the _MSE-optimal_ bandwidth is optimal in statistical terms - we should always make sure to asses the bandwidths against our theory. Here, we'd compare parties' winning margins up to `17%-points`.
+
+Note that, so far, we have used a single bandwidth for data below and above the cut-off. We can also specify different ones - both manually and in terms of optimal bandwidths. As the structure of our data might differ, different bandwidths might be optimal. We can specify two different _MSE-optimal_ bandwidth selectors by specifying `bwselect="msetwo"`.
+
+### Task 9
+Estimate the LATE using `rdrobust` and two MSE-optimal bandwidths. Interpret your results and compare it the model with a single optimal bandwidth.
+
+```{r task9}
+?poly
+model8 <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, bwselect = "msetwo")
+summary(model8)
+```
+
+
+This now looks pretty similar to the single optimal bandwidth, which is a good sign. In fact, the optimal bandwidth for data points above the cut-off remains virtually unchanged. For the ones below the cut-off, the bandwidths is slightly extended. The point estimate and measures of uncertainty also remain virtually unchanged. If specifying two optimal bandwidths alters the results significantly, this is an indicator that the data should be inspected closely for the cause of the diverging bandwidths.
+
+## Kernels (weights)
+
+One of the advantages of the non-parametric RDD is that observations can be weighted based on their proximity to the cutoff. This is based on the idea that those closer to the cut-off provide better comparisons than those further away. Think of victory margins as a running variable: If we look at municipalities just around the cut-off, it is fair to say that victory is _as-if random_. The farther away we move, the less plausible this statement becomes.
+
+As you learned in the lecture, there are different ways to do so. The default kernel used by the `rdrobust` package is a _triangular_ kernel - which continuously assigns higher weight to observations closer to the cut-off. This is the one we have been using so far as we didn't explicitly specify the kernel. Other possible options include _uniform_ and  _epanechnikov _ kernels. These can be specified via the `kernel` argument.
+
+### Task 10
+
+Re-estimate the LATE using `rdrobust` with two MSE-optimal bandwidths using two alternative kernel specifications. Do the results differ?
+
+```{r task10}
+model91 <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, bwselect = "msetwo", kernel = "uniform") # Uniform kernel provides equal weight to all observations within the bandwidth
+summary(model91)
+
+model92 <- rdrobust(y = dta$school_women, x = dta$margin, c = 0, bwselect = "msetwo", kernel = "epanechnikov")
+summary(model92)
+```
+The estimates change very little, both in terms of coefficient size and significance levels. However, it is possible that with different data the weighting method does lead to noticeable differences in the results, so it is not a bad practice to check different RDD specifications
+
+
+## Continuity tests
+
+## Imbalance check (placebo outcomes)
+
+One important falsification test is examining whether near the cut-off treated units are similar to control units in terms of observable characteristics, not unlike the balance we check for in, say, an RCT. The logic of this test also allows us to identify if units cannot manipulate the score they receive. If that is the case, there we might expect some systematic differences between untreated and treated units on some observable variables.
+
+We can also think about continuity tests using placebo outcomes - if our assignment rule is valid for RDD, it should only affect the values of the outcome of interest, not any other outcomes we might think of. Those should be continuous around the cut-off point. If that's not the case, we might suspect that the assignment rule affects the units through more than one mechanism, which might present a challenge to our claims of causality.What is the most likely placebo outcome to use in this example?
+
+
+### Task 11
+Let's check for balance around the cutoff. Focus on these variables: `log_pop`, `sex_ratio`, `log_area`, and `school_men`
+
+```{r task11}
+summary(rdrobust(y = dta$log_pop, x = dta$margin, c = 0, bwselect = "mserd"))
+summary(rdrobust(y = dta$sex_ratio, x = dta$margin, c = 0, bwselect = "mserd"))
+summary(rdrobust(y = dta$log_area, x = dta$margin, c = 0, bwselect = "mserd"))
+
+summary(rdrobust(y = dta$school_men, x = dta$margin, c = 0, bwselect = "mserd"))
+```
+
+### Placebo cut-off
+
+Another falsification test is to identify treatment effects at artificial or placebo cut-off values. Recall from the lecture that one of the identifying assumptions is the continuity (or lack of abrupt changes) of the regression functions for the treated and control units around the cut-off. While we cannot empirically test this assumption, we can test continuity apart from the threshold. Although this does not imply the continuity assumption hold at the cut-off, it helps to rule out discontinuities other than the cut-off.
+
+This test implies looking at the outcome variable but using different cut-offs where we should not expect changes in the outcome. Thus, the estimates from this test should be near zero (and not statistically significant). One **important** step to conduct this test is that you need to split the sample for those observations that are above the cut-off and those that are below. We do this to avoid "contamination" due to the real treatment effects. It also ensures that the analysis of each placebo cut-off is conducted using only observations with the same treatment status.
+
+### Task 12
+Conduct placebo cut-off test using the following placebo values: -0.2 and -0.25 for the placebo tests below the cut-off. Conduct the same test above the cut-off using the following placebo values: 0.20, and 0.25. Remember to subset the data.
+
+
+```{r task12}
+dta_above <- dta %>% filter(margin >= 0)
+dta_below <- dta %>% filter(margin < 0)
+
+summary(rdrobust(dta_above$school_women, dta_above$margin, c = 0.2, bwselect = "mserd")) # -0.044
+summary(rdrobust(dta_above$school_women, dta_above$margin, c = 0.25, bwselect = "mserd")) #-0.025
+
+summary(rdrobust(dta_below$school_women, dta_below$margin, c = -0.2, bwselect = "mserd")) # 0.063
+summary(rdrobust(dta_below$school_women, dta_below$margin, c = -0.25, bwselect = "mserd")) # -0.008
+```
+
+We find that for almost all the placebo cut-off values, the coefficients are all nearly zero and not statistically significant (with the exception of -0.2, which we would want to investigate further). This evidence suggests that the assumption of continuity is likely to hold in this case.
+
+
+## Sorting tests
+
+### McCrary's density test
+
+The final identification assumption of RDDs that we are going to look at stipulates that there is no _sorting_ on the running variable. That is, the running variable must be continuous around the threshold. If this is not the case, we have a problem: Then there's a good chance that the observations close to the threshold (or on either side of the threshold) are not random. In other words: Presence of sorting is usually interpreted as empirical evidence of self-selection or non-random sorting of units into control and treatment status. Let’s check if sorting is problem here. We can do this using _density checks_. This means we're looking at the density of the running variable.
+
+There are several ways to check for sorting. Let's start with _McCrary's density test_. We can use the `DCdensity` command to conduct both a visual test and statistical test.
+
+### Task 13
+Use `DCdensity` to estimate McCrary's density test.
+
+```{r task13}
+DCdensity(dta$margin, cutpoint = 0, plot = TRUE, ext.out = F)
+title(xlab = "Margin of 1994 Islamic party victory (running variable)", ylab = "Density") # add labels (always add labels. Really. Always.)
+abline(v = 0, lty = 1) # Adding a vertical line at the cutoff
+```
+
+
+The test provides relatively clear visual evidence that sorting is not a problem in this case. There is a clear overlap of the confidence intervals at the cut-off, so the continuity assumption holds. This command provides also statistical tests. You can see that information on the individual cells - or bins - and the number of observations within them is provided. For now, we focus on the inference test for sorting. The p-value of about `0.52` makes clear that we do not reject the null hypothesis of continuity at the cut-off.
+
+
+
+### Local polynomial density estimators
+
+Let's further explore the structure of our data and check if sorting really isn't a problem here. Recall, we want to make sure the density of units should be continuous near the cut-off. We can use the `rddensity` package to do so. This package applies a different test than the one we used before. It also is somewhat more powerful and provides additional information.
+
+The command is straightforward. You only have to insert the running variable as argument and, if different from 0, the cutoff. Note that you can optionally specify bandwidths, as above, using the `h` argument. Otherwise, an optimal bandwidth will be specified automatically. You can then save this as an object and run the `summary` command to see the output.
+
+### Task 14
+Use `rddensity` to estimate sorting based on local polynomial density estimators
+
+```{r task14}
+rdd <- rddensity(dta$margin, c = 0)
+summary(rdd)
+
+# Plot the results
+rdplotdensity(rdd, dta$margin, # basic arguments needed for the function
+  plotRange = c(-.2, 0.2), # determine x-axis limits
+  plotN = 100,
+  CIuniform = TRUE # determine whether 95% CI should be displayed as continuous bands
+)
+```
+
+This output looks clearer. Note that the test is based on _quadratic_ local polynomial functions. We also get a different bandwidth - recall that we are solely looking at the density of the running variable here.
+
+Importantly, the test reveals a p-value of `0.357`. We again do not reject the null hypothesis of continuity around the cut-off. Both tests indicating the same result gives us confidence in doing so.
+
+The second part of the output indicates the results of binomial tests for the allocation of observations around the cut-off for different windows. The number of observations is indicated as well as individual p-values for significance tests, with the null hypothesis being equal distribution on either side of the cut-off. Note that this can give us an indication, but modest unbalance - at such disaggregate level - is not evidence for sorting.
+
+```{r, eval = F}
+
+# Default uniform kernel, 4th degree polynomial (but can change these)
+myband =
+rdplot(
+  dta$school_women,
+  dta$margin,
+  h=myband, 
+  kernel="triangular",
+  p=1,
+  subset = dta$margin-myband & dta$margin<myband,
+  binselect="es"
+)
+
+```
