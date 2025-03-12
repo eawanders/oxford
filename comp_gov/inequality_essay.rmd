@@ -1,0 +1,96 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: pdf_document
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}  # Adjust the number for desired line spacing
+---
+
+### "The ideology of political parties is irrelevant for explaining variation in welfare state retrenchment." Discuss.
+
+Welfare state retrenchment is a particularly precarious political strategy for governments. It involves reducing social safety-net spending or restructuring welfare programmes to shift ‘social provision in a more residualist direction’ [@starke2008: 15]. This can lead to negative implications for both the state's society and leaders. The society loses out on previously guaranteed benefits, and leaders risk losing their political power as more of the population becomes dissatisfied with the government. Then, why would leaders choose welfare state retrenchment as a policy, and why would it vary across different states? This essay focuses specifically on the role of political party ideology in explaining welfare state retrenchment. Here, ideology is understood as a set of political beliefs, values, and worldviews that justify policy choices [@freeden2016; @inglehart1997]. From a rational-choice perspective, ideology serves as a heuristic that parties use to signal their position along a left-right spectrum, helping voters quickly identify policy preferences [@downs1957]. This perspective assumes voters act rationally and respond strategically to parties’ policy offerings [@evans2012].
+
+Beyond ideology, alternative explanations for welfare retrenchment include fiscal crises, and perceptions of risk inequality. Although evidence does not strongly support ideology as the sole explanation for variations in welfare retrenchment, this essay argues that ideology remains significant and is *not* irrelevant. Specifically, while fiscal crises, and risk inequality may trigger retrenchment, ideology fundamentally shapes the scale and direction of these policies. Ideology guides political leaders' priorities and informs their choices when conditions justify retrenchment. This essay firstly outlines theoretical and empirical support for ideology as a primary factor influencing retrenchment. It then examines the competing explanations, demonstrating how ideology drives the response to each of these possible retrenchment triggers. However, this conclusion implies that parties pursuing retrenchment risk undermining their own goals, as these unpopular policies may lead to electoral defeat.
+
+### Ideological Explanations for Welfare State Retrenchment
+
+Traditional understandings of left- versus right-learning ideologies would suggest that parties with left-leaning ideologies of liberal, social, and an accommodating state would support welfare state expansion. On the other hand, right-leaning parties encourage the role of the individual and private provisions, and therefore would support retrenchment. Empirical evidence generally supports this trend. For example, the United Kingdom's Conservative government under Margaret Thatcher and the United States's Republican government under Ronald Reagan in the 1980s both pursued welfare state retrenchment, while the left-leaning Swedish government significantly expanded welfare states in the same period [@pierson1994]. Further evidence of such trend is found across a range of liberal democracies, with left-of-centre parties spending more on welfare [@cusack1997; @blais1993]. Ostensibly, this evidence of correlation would imply that ideology is not irrelevant in explaining welfare state retrenchment as different ideology present different welfare packages.
+
+However, the theoretical model explaining the ideological (or spatial) position of a party would suggest that no party would take an ideological stance of retrenchment at all. Under Downs' (1957) median voter theorem, the ideological position of parties follow the preferences of the median voter, who is assumed homogenous. Under assumptions of heterogeneous voter preferences, parties orientate policies towards their partisans, explaining competing ideologies being used as a guiding heuristic by parties [@herwartz2017]. Now, assuming a model of voting along the spatial dimension of redistribution preferences, @romer1975 and @meltzer1981 argue the primary determinant of the size of the welfare state is the inequality between the median and mean incomes of a population. As the median voter's income distribution is below that of the mean, the vote-winning strategy for a rational party is to adopt left-leaning redistribution policies. Here, the preferences of the median voter dictate the supply of welfare, assuming voter preferences are homogenous, and voters below the mean income level mobilise and turnout to vote. However, this theory cannot intuitively answer why a state would reduce redistribution. The median voter's income would have to lie at, or above, that of the mean on the distribution of income. Under this scenario, the median voter does not benefit from redistribution and prefers fewer welfare benefits at their expense of higher taxes, whilst also assuming they have a high degree of tolerance for risk, an argument explored later.
+
+So, taking this theoretical model of ideology's role in welfare retrenchment, it implies that ideology would not explain welfare state retrenchment as under the model's assumptions, retrenchment is not an optimal, rational strategy. Given this, the prior evidence presented suggesting that ideology does play a role in welfare retrenchment may be misleading or spurious. Indeed, @herwartz2017 finds that ideology has little unconditional role in welfare expenditure, and no empirical examples where the majority of voters have income above the mean exist, even in highly equal Scandinavian nations. Moreover, critics of ideology's role in welfare retrenchment would point out that ideology is one of many factors affecting political decision making, and cannot easily be exogenously tested. Instead, it may be the conditions which trigger retrenchment or determine the leading party which explain the variation in welfare retrenchment. Alternatively, theoretical models, such as the RMR model, are premised on strict assumptions of one-dimensional voting behaviour; whereas, in reality, many factors determine how parties and voters behave, with redistribution preferences being only one of many. For example, in the UK dealignment in class- or ideological-based voting has stemmed from ‘weakening of the left-right ideological signals sent to voters by the two main parties and a consequent decline in the impact of voters’ positions on inequality and redistribution on their party choice’ [@evans2012: 974]. This rebuttal to the view that retrenchment could not stem from rational voting shows that despite reduced ideological signals, ideology can still be considered as a relevant explanation for welfare state retrenchment.
+
+### Fiscal Triggers of Retrenchment
+
+The economic argument for retrenchment is perhaps clearer and more intuitive than that of ideology. @starke2008 sees fiscal crises as a necessary factor behind welfare state retrenchment, arguing that although political conviction is required, the unpopular nature of retrenchment is inevitable in cases when expansionary fiscal policies have led to excessive debt, or external fiscal shocks lead to the welfare state's automatic stabilisers being triggered. In these cases, spending has far exceeded revenues such that the only option is to reduce spending in order to stabilise the economy. At least this was the argument made by the post-financial-crisis Conservative government under David Cameron and George Osbourne in the UK, who argued that the UK's deficit was unsustainable and that austerity was necessary to prevent a Greek-style debt crisis. Here, the fiscal crisis was the trigger for retrenchment. However, it would be wrong to conclude the the nature of a country's finances are the cause to retrenchment and that ideology is irrelevant. In fact, this essay argues that the very conditions provided by economic crises are the perfect opportunity for parties to implement their ideological preferences. The Conservative Party knew that their measures would be unpopular, yet still chose to do them, suggesting that ideology was a key factor in their decision making. This neoclassical, Friedman approach to solving the debt crisis was a political choice following the government's worldview that a small state with market incentives is better than a Keynsian, expansionary approach to kickstart the economy. Therefore, ideology is the very reason why there is variation to the extent of retrenchment - parties with different ideologies will respond differently to the same fiscal crisis.
+
+Opposition to this argument comes from the fact that parties may be tied to a specific economic response. They can only act with the levers available to them, which often are determined by the economic conditions they inherit. The levers available are often self-defined though. The leaders themselves are the ones to define which levers, retrenchment or expansion, they are willing to pull, with these decisions driven by ideology. For example, when facing the same financial crisis as the UK, China chose an expansionary fiscal policy in an attempt for growth, showing how their left-wing ideology could be seen as partly responsible to the variance in welfare state spending compared to other nations. Another rebuttal comes from @pierson1994 who notes that retrenchment can be systemically driven by the political system which previous office holders have entrenched. For example, Thatcher tried to encourage social enterprise and weaken the interest groups (i.e., unions) who would otherwise oppose retrenchment policies. This, in fact, reinforces the idea that ideology is a relevant factor in the variation of welfare retrenchment. Previous governments are able to shape the conditions under which future governments can act, forcing an ideology to persist even once out of office. So, despite parties believing they are tied, often they are tied to their own ideology, or even that of their predecessors.
+
+### Risk Inequality & Ideology's Interactions
+
+A final factor to consider when discussing the relevance of ideology in welfare state retrenchment is the perception of risk inequality. @rehm2016 shows that social policy retrenchment occurs when risk inequality increases significantly. This implies that when there is high risk inequality, particularly amongst elites — the likelihood of requiring welfare state provisions is low for elites but high for other groups — then this leads to weakened political coalitions in favour of welfare generosity, creating conditions for governments to reduce or dismantle welfare provisions. An illustrative example is post-reunification Germany, where increased risk inequality following the merging of East and West German risk pools facilitated significant welfare retrenchment via the Hartz labour market reforms. This is an extension of the previous rational-choice argument, but with a focus on the risk tolerance of the median voter. Here, the median voter is assumed to have a high tolerance for risk, and therefore is less likely to support welfare provisions. However, as consistent with the rest of this essay's arguments, the ideology of the incumbent acts as a moderator for the extent of retrenchment. For example, The Hartz reforms were a product of the social democrats, greens, and liberals, a left-leaning coalition, showing retrenchment does not follow clear rational expectations along ideological lines.
+
+This essay has considered the role of ideology in explaining welfare state retrenchment, arguing that ideology is not irrelevant to explaining the variation in welfare state retrenchment. Instead, this essay has placed ideology as a central moderator and driver of welfare state retrenchment in response to the interplay between voter preferences, fiscal crises, and risk inequality amongst the breadth of potential factors. Despite the rational-choice model suggesting that ideology would not explain welfare state retrenchment, it is this very same model which raises awareness of the implications for ideology affecting retrenchment. If parties are to pursue retrenchment, they risk undermining their own goals, as these unpopular policies may lead to electoral defeat. Voters may be further disillusioned by the party's actions, but also pushed further away from the mean in the income distribution making it more unlikely for a party seeking retrenchment to be re-elected, unless they have a strong ideological base, and retrenchment policies improve economic outcomes in the long run.
+
+```{r word-count, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+library(knitr)
+library(stringr)
+
+# Load document text
+if (!is.null(knitr::current_input())) {
+    doc_text <- readLines(knitr::current_input())
+} else {
+    doc_text <- readLines("/Users/edwardanders/Documents/GitHub/oxford/comp_gov/inequality_essay.rmd")
+}
+
+# Find boundaries
+start_line <- grep("^### ", doc_text)[1]
+end_line <- grep("^\\\\newpage", doc_text)[1]
+
+# Extract text between headers
+if (!is.na(start_line) && !is.na(end_line)) {
+    main_text <- doc_text[(start_line + 1):(end_line - 1)]
+} else {
+    main_text <- character(0)
+}
+# Identify lines with ```
+code_chunk_lines <- grep("^```", main_text)
+
+# Remove lines between each pair of ```
+if (length(code_chunk_lines) >= 2) {
+    remove_lines <- unlist(mapply(seq,
+        from = code_chunk_lines[seq(1, length(code_chunk_lines), 2)],
+        to = code_chunk_lines[seq(2, length(code_chunk_lines), 2)]
+    ))
+    main_text <- main_text[-remove_lines]
+}
+
+# Combine lines into single string
+main_text_combined <- paste(main_text, collapse = " ")
+
+# Remove markdown formatting characters (#, *, _, `, etc.)
+main_text_combined <- str_remove_all(main_text_combined, "[#*_`>]")
+
+# Remove LaTeX commands (\command{})
+main_text_combined <- str_remove_all(main_text_combined, "\\\\[a-zA-Z]+\\{.*?\\}")
+
+# Remove extra spaces
+main_text_combined <- str_squish(main_text_combined)
+
+# Count words
+word_count <- str_count(main_text_combined, boundary("word"))
+
+# Display word count
+cat("Word count:", word_count)
+
+```
+
+\newpage
+
+## Bibliography
