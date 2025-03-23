@@ -6,7 +6,8 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(dplyr, tidyr, readr)
 
 # Steps Required:
-
+# Export Halifax data from online banking and rename the file to 'halifax.csv'
+# Export American Express data from online banking and rename the file to 'amex.csv'
 # 1. Load Halifax data
 
 halifax_data <- read.csv("/Users/edwardanders/Desktop/halifax.csv")
