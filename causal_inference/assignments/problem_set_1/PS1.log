@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.24)  28 MAR 2025 16:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.24)  28 MAR 2025 17:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -743,7 +743,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 <PS1_files/figure-latex/Matching Plot-1.pdf, id=79, 413.545pt x 270.00874pt>
 File: PS1_files/figure-latex/Matching Plot-1.pdf Graphic file (type pdf)
 <use PS1_files/figure-latex/Matching Plot-1.pdf>
-Package pdftex.def Info: PS1_files/figure-latex/Matching Plot-1.pdf  used on input line 544.
+Package pdftex.def Info: PS1_files/figure-latex/Matching Plot-1.pdf  used on input line 545.
 (pdftex.def)             Requested size: 413.54398pt x 270.00807pt.
 
 
@@ -770,7 +770,7 @@ Package tabularray Warning: Table width is too small, need 7.74557pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (7.74557pt too wide) in paragraph at lines 701--702
+Overfull \hbox (7.74557pt too wide) in paragraph at lines 702--703
  [][] 
  []
 
@@ -802,7 +802,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  89i,13n,107p,359b,1306s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on PS1.pdf (12 pages, 271465 bytes).
+Output written on PS1.pdf (12 pages, 271609 bytes).
 PDF statistics:
  235 PDF objects out of 1000 (max. 8388607)
  191 compressed objects within 2 object streams

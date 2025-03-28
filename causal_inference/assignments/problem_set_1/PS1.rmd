@@ -290,14 +290,14 @@ balance_check <- print(balance_check) %>%
   rename(
     Control = `0`,
     Treatment = `1`,
-    `P Value` = p
+    `p-value` = p
   ) %>%
   rownames_to_column("Variable") %>%
   dplyr::filter(Variable != "n") %>%
   mutate(Variable = str_replace(Variable, " \\(mean \\(SD\\)\\)", "")) %>%
   mutate(
-    `P Value` = as.numeric(`P Value`),
-    Signif. = if_else(`P Value` < 0.05, "***", "-")
+    `p-value` = as.numeric(`p-value`),
+    Signif. = if_else(`p-value` < 0.05, "***", "-")
   )
 ```
 
@@ -311,7 +311,8 @@ kable(balance_check,
   footnote(
     general = "* p <0.1, ** p <0.05, *** p <0.01. The table shows the means and standard deviations of the covariates for the treatment and control groups. The p-values are from t-tests comparing the means of the covariates between the treatment and control groups.",
     threeparttable = TRUE
-  )
+  ) %>%
+  kable_styling(latex_options = "hold_position")
 ```
 
 ## Question 2
@@ -421,7 +422,7 @@ Which covariates should you use in the matching procedure and why? **[10 points]
 
 When looking at the effects of bombings on hamlet control, we want to estimate the average causal (treatment) effect of the bombing in September 1969 on the control of hamlets by the Viet Cong in December 1969. To estimate this average causal effect, we should compare the hamlets that were bombed in September 1969 to those that were not; however, as the bombings were not randomised, we need to identify suitable control hamlets where covariates are similar to those that were bombed. We can do this through a matching procedure to find hamlets which are as similar to one another as possible, other than whether they were bombed or not. Before selecting a matching technique to identify hamlets, a suitable set of covariates should be selected for use in the matching procedure.
 
-The covariates selected to be included in the matching analysis are those which are heterogeneous across the treated and control hamlets. These covariates should be observable and relevant to the treatment assignment. The covariates selected for this analysis are `std`, `score`, `lnhpop`, `mod2a_1ajul`, and `mod2a_1admn`. These covariates are selected as a balance test shows them to be statistically significantly different between the treatment and control groups.
+The covariates selected to be included in the matching analysis are those which are heterogeneous across the treated and control hamlets. These covariates should be observable and relevant to the treatment assignment. The covariates selected for this analysis are `std`, `score`, `lnhpop`, `mod2a_1ajul`, and `mod2a_1admn`. These covariates are selected as a balance test shows them to be statistically significantly different between the treatment and control groups, shown by a p-value `<0.05`.
 
 ```{r Matching Covariates Table, echo=FALSE, results='hide'}
 # Create a balance table for some socio-demographic variables
@@ -445,7 +446,7 @@ covariates_check <- print(covariates_check) %>%
   rename(
     Control = `0`,
     Treatment = `1`,
-    `P Value` = p
+    `p-value` = p
   ) %>%
   rownames_to_column("Covariate") %>%
   dplyr::filter(Covariate != "n") %>%
@@ -460,7 +461,7 @@ kable(covariates_check,
   caption = "Balance Table of Matching Covariates",
 ) %>%
   footnote(
-    general = "* p <0.1, ** p <0.05, *** p <0.01. The table shows the means and standard deviations of the covariates for the treatment and control groups. The p-values are from t-tests comparing the means of the covariates between the treatment and control groups.",
+    general = "The table shows the means and standard deviations of the covariates for the treatment and control groups. The p-values are from t-tests comparing the means of the covariates between the treatment and control groups.",
     threeparttable = TRUE
   ) %>%
   kable_styling(latex_options = "hold_position")
