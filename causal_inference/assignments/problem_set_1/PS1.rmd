@@ -15,6 +15,8 @@ header-includes:
   - \setstretch{1.25}
   - \usepackage{caption}
   - \captionsetup[figure]{position=above}
+  - \usepackage{threeparttable}
+  - \usepackage{float}
 citation_package: biblatex
 csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
 bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
@@ -23,7 +25,9 @@ link-citations: true
 
 ```{r File Setup, include=FALSE}
 # Set working directory
-setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/assignments/problem_set_1")
+setwd(
+  "/Users/edwardanders/Documents/GitHub/oxford/causal_inference/assignments/problem_set_1"
+)
 
 # Set global options
 knitr::opts_chunk$set(
@@ -46,7 +50,8 @@ pacman::p_load(
   haven, # Read .dta files
   MatchIt, # Matching estimators
   cobalt, # Balance assessment
-  Matching # Used in Genetic matching estimators
+  Matching, # Used in Genetic matching estimators
+  tableone # Balance table
 )
 
 knitr::knit_hooks$set(inline = function(x) {
@@ -64,7 +69,7 @@ We will examine how randomized experiments work by creating an imaginary experim
 
 ```{r Problem 1 Data Setup, echo=FALSE, results='hide'}
 # Load the dataset
-load("experiment-1.Rda")
+load(("experiment-1.Rda"))
 
 # Assign the dataset to a new variable (for converting to .csv)
 experiment_data <- a
@@ -85,7 +90,7 @@ Find the “true” Average Treatment Effect across all units. **[5 points]**
 \hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r True ATE, echo=FALSE}
-# Calculate the average treatment effect (ATE) across all units, i
+# Calculates the true average treatment effect across all units
 true_ate <- mean(data$y1 - data$y0)
 ```
 
@@ -109,7 +114,8 @@ data$rand <- sample(c(1:100))
 # Re-order the dataset from lowest to highest value of rand
 data <- data[order(data$rand), ]
 
-# Create a treatment variable named tr that equals 1 for the first 50 units and 0 for the second 50
+# Create a treatment variable named tr that equals 1 for the first 50
+# units and 0 for the second 50
 data$tr <- c(rep(1, 50), rep(0, 50))
 
 # View the variables in the dataset
@@ -117,21 +123,23 @@ glimpse(data)
 ```
 
 ```{r Test for Randomisation, echo=FALSE, results='hide'}
-# Testing whether randomisation has given us equivalent potential outcomes under control
+# Testing whether randomisation has given us
+# equivalent potential outcomes under control
 
-## Mean potential outcomes under control for treatment group
+# Mean potential outcomes under control for treatment group
 mean_y0_tr <- mean(data$y0[data$tr == 1])
 
-## Mean potential outcomes under control for control group
+# Mean potential outcomes under control for control group
 mean_y0_ctrl <- mean(data$y0[data$tr == 0])
 
-## Calculate a t-test to compare average potential outcomes under control
+# Calculate a t-test to compare average potential outcomes under control
 control_t_test <- t.test(data$y0[data$tr == 1], data$y0[data$tr == 0])
+control_t_test
 ```
 
 To assess whether the randomisation succeeded in creating treatment and control groups with equivalent potential outcomes under control, we compare whether the average potential outcomes under control for the treatment and control groups are statistically different. The mean potential outcomes under control for the treatment group is **``r mean_y0_tr``** and for the control group is **``r mean_y0_ctrl``**. A t-test comparing the average potential outcomes under control for the treatment and control groups gives a p-value of **``r control_t_test$p.value``**.
 
-Therefore, randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control. The null hypothesis is that the average potential outcomes under control are equal between the treatment and control groups. Given that **``p(`r control_t_test$p.value`) > 0.05``**, we cannot reject the null hypothesis as the treatment and control groups are not statistically different from one another.
+The null hypothesis is that the average potential outcomes under control are equal between the treatment and control groups. Given that **``p(`r control_t_test$p.value`) > 0.05``**, we cannot reject this null hypothesis as the treatment and control groups are not statistically different from one another. Therefore, randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control.
 
 ## Question 3
 
@@ -140,6 +148,7 @@ Estimate the Average Treatment Effect based on your experiment. How similar is i
 \hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Estimated ATE, echo=FALSE, results='hide'}
+# Calculate the estimated Average Treatment Effect (ATE)
 estimated_ate <- mean(data$y1[data$tr == 1] - data$y0[data$tr == 0])
 
 # Calculate the difference between the true and estimated ATE
@@ -151,8 +160,7 @@ percent_diff_ate <- (diff_ate / true_ate) * 100
 
 Since we have now randomised the distribution of the treatment and control groups, we can calculate the estimated Average Treatment Effect (ATE) to give the expected difference in outcomes between the treated and the 'comparable control'.
 
-The estimated ATE is **``r estimated_ate``**. This is calculated by taking the mean difference between the potential outcomes under treatment ($Y_1i$) of the treatment group and the potential outcomes under control ($Y_0i$) of the control group. The esimated ATE is lower than the true ATE **``r estimated_ate` < `r true_ate``**
-by **``r percent_diff_ate``%** because the treatment and control groups are not perfectly balanced. However, the estimated ATE is still close to the true ATE because the randomisation has created treatment and control groups with equivalent potential outcomes under control, as shown in `1.2`.
+The estimated ATE is **``r estimated_ate``**. This is calculated by taking the mean difference between the potential outcomes under treatment ($Y_1i$) of the treatment group and the potential outcomes under control ($Y_0i$) of the control group. The estimated ATE is lower than the true ATE **``r estimated_ate` < `r true_ate``** by **``r percent_diff_ate``%** because the treatment and control groups are not perfectly balanced. However, the estimated ATE is still close to the true ATE because the randomisation has created treatment and control groups with equivalent potential outcomes under control, as shown in `1.2`.
 
 ## Question 4
 
@@ -163,16 +171,18 @@ What is the average estimated ATE across your 10,000 experiments? Does this sugg
 \hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Repeated Randomisation, echo=FALSE, results='hide'}
-# Create a function that takes in the dataset `data`, carries out a randomized experiment, and reports the estimated ATE.
-
+# Create a function that takes in the dataset `data`,
+# carries out a randomized experiment, and reports the estimated ATE.
 randomised_experiment <- function(data) {
   # Assign each unit a random number between 0 and 100 in a new column
   data$rand <- sample(c(1:100))
 
   # Re-order the dataset from lowest to highest value of rand
+  # Note: the ', ' means keep all the columns; this is a data frame subset
   data <- data[order(data$rand), ]
 
-  # Create a treatment variable named tr that equals 1 for the first 50 units and 0 for the second 50
+  # Create a treatment variable named tr that equals 1
+  # for the first 50 units and 0 for the second 50
   data$tr <- c(rep(1, 50), rep(0, 50))
 
   # Calculate the estimated ATE
@@ -182,14 +192,15 @@ randomised_experiment <- function(data) {
 }
 
 # Run the function 10,000 times, and store these results in a variable.
-
-replicated_results <- replicate(10000, randomised_experiment(data))
+replicated_results <- replicate(
+  10000, randomised_experiment(data)
+)
 
 # Calculate the average estimated ATE across the 10,000 experiments
 mean_replicated_results <- mean(replicated_results)
 ```
 
-The mean estimated ATE across the 10,000 experiments is **``r mean_replicated_results``**. This suggests that the estimator is unbiased because the average estimated ATE across the repeated randomisations is very close to the true ATE, **``r true_ate``**, a difference of ``r abs(mean_replicated_results - true_ate)``. The repeated randomisations improve our mean estimate of the ATE significatly from the single ransomisation sample done in `1.3`.
+The mean estimated ATE across the 10,000 experiments is **``r mean_replicated_results``**. This suggests that the estimator is unbiased because the average estimated ATE across the repeated randomisations is very close to the true ATE, **``r true_ate``**, a difference of ``r abs(mean_replicated_results - true_ate)``. The repeated randomisations improve our mean estimate of the ATE significantly from the single randomisation sample done in `1.3`.
 
 ## Question 5
 
@@ -198,16 +209,17 @@ Repeat Task (4), calculating the mean difference in potential outcomes under con
 \hspace{0pt}\rule{100pt}{0.25pt}
 
 ```{r Mean Difference in Potential Outcomes, echo=FALSE, results='hide'}
-# Function to calculate the mean difference in potential outcomes under control between the treatment and control groups.
-
-randomised_mean_diff_experiment <- function(data) {
+# Function to calculate the mean difference in potential outcomes
+# under control between the treatment and control groups.
+rand_mean_diff_experiment <- function(data) {
   # Assign each unit a random number between 0 and 100 in a new column
   data$rand <- sample(c(1:100))
 
   # Re-order the dataset from lowest to highest value of rand
   data <- data[order(data$rand), ]
 
-  # Create a treatment variable named tr that equals 1 for the first 50 units and 0 for the second 50
+  # Create a treatment variable named tr that equals 1
+  # for the first 50 units and 0 for the second 50
   data$tr <- c(rep(1, 50), rep(0, 50))
 
   # Calculate the mean difference in potential outcomes under control
@@ -217,18 +229,20 @@ randomised_mean_diff_experiment <- function(data) {
 }
 
 # Run the function 10,000 times, and store these results in a variable.
+replicated_mean_diff <- replicate(
+  10000, rand_mean_diff_experiment(data)
+)
 
-replicated_mean_diff_results <- replicate(10000, randomised_mean_diff_experiment(data))
-
-# Calculate the average mean difference in potential outcomes under control across the 10,000 experiments
-mean_replicated_mean_diff_results <- mean(replicated_mean_diff_results)
+# Calculate the average mean difference in potential outcomes
+# under control across the 10,000 experiments
+average_mean_diff <- mean(replicated_mean_diff)
 ```
 
-The mean difference in potential outcomes under control between the treatment and control groups across the 10,000 experiments is **``r round(mean_replicated_mean_diff_results, digits = 5)``**. This signifies that the randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control. The mean difference in potential outcomes under control is close to zero, indicating that the treatment and control groups are not statistically different from one another. This is consistent with the results from `1.2`.
+The mean difference in potential outcomes under control between the treatment and control groups across the 10,000 experiments is **``r round(average_mean_diff, digits = 5)``**. This signifies that the randomisation has succeeded in creating treatment and control groups with equivalent potential outcomes under control. The mean difference in potential outcomes under control is close to zero, indicating that the treatment and control groups are not statistically different from one another. This is consistent with the results from `1.2`.
 
 # Problem 2
 
-Past research suggests that ballot secrecy influences turnout. A recent field experiment sent emails to a random group of nonvoters around the 2014 election in Mississippi, reminding them that their vote was secret.
+Past research suggests that ballot secrecy influences turnout. A recent field experiment sent emails to a random group of non-voters around the 2014 election in Mississippi, reminding them that their vote was secret.
 
 For this exercise, we wish to establish if the results of this experiment hold when we focus on the female subsample (instead of the full sample).
 
@@ -252,62 +266,51 @@ Confirm that the randomization process was successful by making sure that women 
 
 \hspace{0pt}\rule{100pt}{0.25pt}
 
-```{r Randomisation Check, echo=FALSE, results='hide'}
-randomisation_check <- function(female_data, variables) {
-  # Create an empty data frame to store results
-  results_df <- data.frame(
-    Variable = character(),
-    T_Test = numeric(), # Use underscores instead of hyphens
-    P_Value = numeric(),
-    stringsAsFactors = FALSE
-  )
+To test whether the women in treatment and control groups are similar in all relevant aspects, a balance test across all relevant observable covariates is conducted to see whether the groups were statistically significantly different from one another. Table 1 shows the results of comparing the characteristics of women in the treatment and control groups. The null hypothesis is that the average values of the variables are equal between the treatment and control groups. The p-values are all greater than 0.05 indicating we cannot reject the null hypothesis. This suggests that the randomisation process was successful in creating treatment and control groups with similar characteristics as there are no statistically significant differences between groups. Although differences between observed variables across groups is found, there could still be selection bias from unobserved variables; however, this is unlikely if randomisation was successful.
 
-  # Loop through each variable
-  for (variable in variables) {
-    # Perform t-test
-    t_test <- t.test(
-      female_data[[variable]][female_data$mail == 1],
-      female_data[[variable]][female_data$mail == 0]
-    )
-
-    # Store results in the data frame
-    results_df <- rbind(
-      results_df,
-      data.frame(
-        Variable = variable,
-        T_Test = t_test$statistic,
-        P_Value = t_test$p.value
-      )
-    )
-  }
-  return(results_df)
-}
-
-# Run the function on selected variables
-randomisation_results <- randomisation_check(
-  female_data,
-  variables = c("d_age", "d_race_blk", "d_race_hsp", "d_race_oth", "never_voted", "vote_year")
+```{r Balance Table, echo=FALSE, results='hide'}
+# To check post-randomisation balance, we can use a balance test
+balance_check <- CreateTableOne(
+  vars = c(
+    "d_age",
+    "d_race_blk",
+    "d_race_hsp",
+    "d_race_oth",
+    "never_voted",
+    "vote_year"
+  ),
+  strata = "mail",
+  data = female_data
 )
+
+# Print the balance table and pipe results to be styled using kable()
+balance_check <- print(balance_check) %>%
+  as.data.frame() %>%
+  dplyr::select(1:3) %>%
+  rename(
+    Control = `0`,
+    Treatment = `1`,
+    `P Value` = p
+  ) %>%
+  rownames_to_column("Variable") %>%
+  dplyr::filter(Variable != "n") %>%
+  mutate(Variable = str_replace(Variable, " \\(mean \\(SD\\)\\)", "")) %>%
+  mutate(
+    `P Value` = as.numeric(`P Value`),
+    Signif. = if_else(`P Value` < 0.05, "***", "-")
+  )
 ```
 
-To test whether the women in treatment and control groups are similar in all relevant aspects, t-tests were conducted to see whether the groups were statostically significantly different from one another on each variable of interest. Table 1 shows the results of t-tests comparing the characteristics of women in the treatment and control groups. The null hypothesis is that the average values of the variables are equal between the treatment and control groups. The p-values are all greater than 0.05 indicating we cannot reject the null hypothesis. This suggests that the randomisation process was successful in creating treatment and control groups with similar characteristics as there are no statistically significant differences between groups. Although differences between observed variables across groups is found, there could still be selection bias from unobserved variables; however, this is unlikely if randomisation was successful.
-
-```{r Randomisation Table, echo=FALSE}
-# Add the results to a table
-randomisation_results %>%
-  mutate(across(c(T_Test, P_Value), ~ round(.x, 3))) %>%
-  rename("t-test" = T_Test, "p-value" = P_Value) %>%
-  kable(
-    format = "latex",
-    booktabs = TRUE,
-    caption = "t-test and p-value Results for Variables",
-    row.names = FALSE,
-    align = c("l", "r", "r") # Align first column left, others right
-  ) %>%
-  kable_styling(latex_options = "hold_position") %>%
+```{r Balance Table Print, echo=FALSE}
+# Print the balance table using kable
+kable(balance_check,
+  format = "latex",
+  booktabs = TRUE,
+  caption = "Balance Table of Female Covariates",
+) %>%
   footnote(
-    general = "Note: significance values * p < 0.05, ** p < 0.01, *** p < 0.001.",
-    general_title = ""
+    general = "* p <0.1, ** p <0.05, *** p <0.01. The table shows the means and standard deviations of the covariates for the treatment and control groups. The p-values are from t-tests comparing the means of the covariates between the treatment and control groups.",
+    threeparttable = TRUE
   )
 ```
 
@@ -335,7 +338,8 @@ t_test_no_covariates <- t.test(
   female_data$vote2014[female_data$mail == 0]
 )
 
-# Regression model for Estimated Average Treatment Effect (ATE) without covariates
+# Regression model for Estimated Average Treatment
+# Effect (ATE) without covariates
 model_1 <- lm(
   vote2014 ~ mail,
   data = female_data
@@ -352,7 +356,7 @@ model_2 <- lm(
 ```
 
 ```{r ATE Table, echo=FALSE}
-# Goodness-of-fit statistics to add to table table
+# Goodness-of-fit statistics to add to table
 custom_gof <- tibble::tribble(
   ~raw, ~clean, ~fmt,
   "nobs", "Num. Obvs", 0,
@@ -361,7 +365,8 @@ custom_gof <- tibble::tribble(
   "fstatistic", "F-statistic", 3
 )
 
-# Create a table comparing the Estimated ATE for Mail Treatment with and without covariates
+# Create a table comparing the Estimated ATE
+# for Mail Treatment with and without covariates
 modelsummary(
   list(
     "ATE without Covariates" = model_1,
@@ -385,7 +390,7 @@ modelsummary(
 )
 ```
 
-The ATE without covariates is **``r (ate_no_covariates)``**. This tells us the difference in probability that someone voted between the treatment and control groups. Therefore, as the `vote_2014` is binary, those who received mail reminding them their vote was a secret saw a decreased probability of voting of **``r (ate_no_covariates)*100``** percentage points compared to the control group,a very small amount. The t-test for the ATE without covariates gives a p-value of **``r t_test_no_covariates$p.value``** meaning the results are also not statistically significant. Whilsy ballot secrecy may theoretically influence voting turnout, the effects seen are neither large nor statistically significant.
+The ATE without covariates is **``r (ate_no_covariates)``**. This tells us the difference in probability that someone voted between the treatment and control groups. Therefore, as the `vote_2014` is binary, those who received mail reminding them their vote was a secret saw a decreased probability of voting of **``r (ate_no_covariates)*100``** percentage points compared to the control group,a very small amount. The t-test for the ATE without covariates gives a p-value of **``r t_test_no_covariates$p.value``** meaning the results are also not statistically significant. Whilst ballot secrecy may theoretically influence voting turnout, the effects seen are neither large nor statistically significant.
 
 The second model accounts for the covariates which were shown to be similar across treatment and control groups in `2.1`. The inclusion of covariates does not change the estimated ATE significantly, with the ATE with covariates being **``r (summary(model_2)$coefficients[2, 1])``**. The p-value for the ATE with covariates is **``r summary(model_2)$coefficients[2, 4]``**, showing signs of weak significance, unlike when estimated without covariates. The inclusion of covariates controlling for black voters and those who have never voted before are the most significant. The model with covariates also has a higher R-squared value of **(``r summary(model_2)$r.squared` > `r summary(model_1)$r.squared``)** compared to the model without covariates. This suggests that the inclusion of covariates improves the model's explanatory power, but whilst the estimated ATE's are similar and neither is significantly robust, the inclusion of covariates is not necessary when calculating the ATE in this case, but should be included to ensure a more robust model.
 
@@ -400,7 +405,6 @@ The data comes from various sources. The United States compiled a gazetteer of S
 ```{r Problem 3 Dataset, echo=FALSE, results='hide'}
 # Load the dataset (using the read_dta function from the haven package)
 vietnam_data <- read_dta("Vietnam_matching-1.dta")
-file.exists("Vietnam_matching-1.dta")
 
 # Summary of the data
 str(vietnam_data)
@@ -415,44 +419,53 @@ Which covariates should you use in the matching procedure and why? **[10 points]
 
 \hspace{0pt}\rule{100pt}{0.25pt}
 
-When looking at the effects of bombings on hamlet control, we want to estimate the average causal (treatment) effect of the bombing in September 1969 on the control of hamlets by the Viet Cong in December 1969. To estimate this average causal effect, we should compare the hamlets that were bombed in September 1969 to those that were not; however, as the bombings were not randomised, we need to identify suitable control hamlets where covariates are similar to those that were bombed. We can do this through a matching procedure to find hamlets which are as similar to one another as possible, other than whether they were bombed or not. Before selecting a matching technique to identify hamlets, a suitable set of covariates should be selected for use in the marching procedure.
+When looking at the effects of bombings on hamlet control, we want to estimate the average causal (treatment) effect of the bombing in September 1969 on the control of hamlets by the Viet Cong in December 1969. To estimate this average causal effect, we should compare the hamlets that were bombed in September 1969 to those that were not; however, as the bombings were not randomised, we need to identify suitable control hamlets where covariates are similar to those that were bombed. We can do this through a matching procedure to find hamlets which are as similar to one another as possible, other than whether they were bombed or not. Before selecting a matching technique to identify hamlets, a suitable set of covariates should be selected for use in the matching procedure.
 
-There are three primary types of covariates that should be considered for the matching procedure:
+The covariates selected to be included in the matching analysis are those which are heterogeneous across the treated and control hamlets. These covariates should be observable and relevant to the treatment assignment. The covariates selected for this analysis are `std`, `score`, `lnhpop`, `mod2a_1ajul`, and `mod2a_1admn`. These covariates are selected as a balance test shows them to be statistically significantly different between the treatment and control groups.
 
-- covariates likely associated with the treatment (bombing) and the outcome (hamlet control),
-- covariates that occur pre-treatment, and
-- covariates which are unaffected by the treatment (bombing).
-
-Firstly, we should control for all covariates which determine both bombings and hamlet control as these are likely confounders. We want to control for confounders as these variables are ones which may infuence the likelihood of bombing or hamlet control, and therefore may bias the estimated effect of the bombingm giving spurious results. Secondly, covariates which are pre-treatment measures should be included to avoid post-treatment measures being affected by the treatment. And thirdly, only covariates which are not affected by the treatment should be included.
-
-The following covariated should therefore be included in the matching procedure:
-
-```{r Matching Covariates Table, echo=FALSE}
-# Table of covariates to be used in the matching procedure and why
-covariates_table <- data.frame(
-  Covariate = c(
-    "Rough terrain (``std``)",
-    "Distance to boundary (``ln_dist``)",
-    "Development index (``score``)",
-    "Hamlet population (``lnhpop``)",
-    "Pre-bombing control (``mod2a_1admn``)"
+```{r Matching Covariates Table, echo=FALSE, results='hide'}
+# Create a balance table for some socio-demographic variables
+covariates_check <- CreateTableOne(
+  vars = c(
+    "std", # Rough terrain
+    "ln_dist", # Distance to boundary
+    "score", # Development index
+    "lnhpop", # Hamlet population
+    "mod2a_1ajul", # Pre-bombing control
+    "mod2a_1admn" # Pre-bombing control
   ),
-  Explanation = c(
-    "More difficult terrain may influence both bombing likelihood and hamlet control.",
-    "Hamlets closer to international borders may have strategic importance affecting
-    both bombing decisions and control.", "More developed hamlets may have been targeted
-    differently and had different control conditions.", "Larger hamlets may be more
-    strategically important, affecting both bombing decisions and control dynamics.",
-    "If a hamlet was already contested or insurgent-controlled before bombing,
-    this could affect both the likelihood of being bombed and later control."
-  )
+  strata = "bombed_969_bin",
+  data = vietnam_data
 )
 
-# Displaying the table
-kable(covariates_table, format = "latex", booktabs = TRUE, align = "l") %>%
-  kable_styling(latex_options = c("hold_position")) %>%
-  kableExtra::column_spec(2, width = "10cm")
+# Print the balance table and pipe results to be styled using kable()
+covariates_check <- print(covariates_check) %>%
+  as.data.frame() %>%
+  dplyr::select(1:3) %>%
+  rename(
+    Control = `0`,
+    Treatment = `1`,
+    `P Value` = p
+  ) %>%
+  rownames_to_column("Covariate") %>%
+  dplyr::filter(Covariate != "n") %>%
+  mutate(Covariate = str_replace(Covariate, " \\(mean \\(SD\\)\\)", ""))
 ```
+
+```{r Covariates Table Print, echo=FALSE}
+# Print the balance table using kable
+kable(covariates_check,
+  format = "latex",
+  booktabs = TRUE,
+  caption = "Balance Table of Matching Covariates",
+) %>%
+  footnote(
+    general = "* p <0.1, ** p <0.05, *** p <0.01. The table shows the means and standard deviations of the covariates for the treatment and control groups. The p-values are from t-tests comparing the means of the covariates between the treatment and control groups.",
+    threeparttable = TRUE
+  ) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
 
 ## Question 2
 
@@ -467,7 +480,7 @@ The most strict matching estimator of exact matches returns ``No exact matches f
 ```{r Matching Estimators, echo=FALSE, results='hide'}
 # Nearest neighbour matching (without replacement)
 nearest_neighbour_matching <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -476,7 +489,7 @@ nearest_neighbour_matching <- matchit(
 
 # Nearest neighbour matching (with replacement)
 nearest_neighbour_matching_replace <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -485,7 +498,7 @@ nearest_neighbour_matching_replace <- matchit(
 
 # Mahalanobis distance matching (without replacement)
 mahalanobis_matching <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -496,7 +509,7 @@ mahalanobis_matching <- matchit(
 
 # Mahalanobis distance matching (with replacement)
 mahalanobis_matching_replace <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn, ,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -507,7 +520,7 @@ mahalanobis_matching_replace <- matchit(
 
 # Mahalanobis distance matching (with replacement, ratio = 2)
 mahalanobis_matching_ratio2 <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -520,7 +533,7 @@ exists("mahalanobis_matching_ratio2")
 
 # Propensity score matching (without replacement)
 propensity_score_matching <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -530,7 +543,7 @@ propensity_score_matching <- matchit(
 
 # Propensity score matching (with replacement)
 propensity_score_matching_replace <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -540,7 +553,7 @@ propensity_score_matching_replace <- matchit(
 
 # Normalised Euclidean distance matching (without replacement)
 euclidean_matching <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -550,7 +563,7 @@ euclidean_matching <- matchit(
 
 # Normalised Euclidean distance matching (with replacement)
 euclidean_matching_replace <- matchit(
-  bombed_969_bin ~ std + ln_dist + score + lnhpop + mod2a_1admn,
+  bombed_969_bin ~ std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data,
   method = "nearest",
   estimand = "ATT",
@@ -623,7 +636,7 @@ results_table <- bind_rows(
 )
 ```
 
-Based on these results, the Mahalanobis distance matching estimator with replacement has the lowest MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement)"]``. Given this result, an additional model where the ratio of control to treated units is 2 is also considered to try and increase the number of matched observations. This model has a slightly higher MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]``, but has a much higher number of matched observations of ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]`` compared to the next best model matching ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement)"]``. The Mahalanobis distance matching estimator with replacement and a many-to-one matching approach is therefore chosen as the best matching estimator for the dataset as it best optimises the balance between treated and control groups and maximises the number of matched observations, helping to reduce bias and increase the precision of the estimated causal effect.
+Based on these results, the Mahalanobis distance matching estimator with replacement has the lowest MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement)"]``. Given this result, an additional model where the ratio of control to treated units is 2 is also considered to try and increase the number of matched observations. This model has a slightly higher MASD value of ``r results_table$MASD[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]``, but has a much higher number of matched observations of ``r results_table$Matched[results_table$Model == "Mahalanobis (Replacement, Ratio = 2)"]`` compared to the next best model matching ``r results_table$Matched[results_table$Model == "Mahalanobis (No Replacement)"]``. The Mahalanobis distance matching estimator with replacement and a many-to-one matching approach is therefore chosen as the best matching estimator for the dataset as it best optimises the balance between treated and control groups and maximises the number of matched observations, helping to reduce bias and increase the precision of the estimated causal effect.
 
 This model's balance is then asssessed across covariates using the Mean Standardised Difference before and after matching, shown in Figure 1. We see from this figure that all post-matching covariates fall within the accepted range of balance of ``<0.1`` which implies that as a result of this matching process, the groups are comparable on average, with respect to these observable factors.
 
@@ -693,7 +706,7 @@ matched_data <- match.data(mahalanobis_matching_ratio2)
 
 # Estimate ATT Model (OLS)
 att_model <- lm(
-  mod2a_1adec ~ bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  mod2a_1adec ~ bombed_969 + std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = matched_data,
   weights = weights
 )
@@ -701,7 +714,7 @@ att_model <- lm(
 # Ordered Logistic Model
 logistic_att_model <- polr(
   factor(mod2a_1adec) ~
-    bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+    bombed_969 + std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = matched_data,
   weights = weights,
   method = "logistic"
@@ -725,6 +738,7 @@ modelsummary(models,
   estimate = "estimate",
   statistic = "std.error",
   stars = c("*" = 0.05, "**" = 0.01, "***" = 0.001),
+  table_options = "H",
   gof_omit = "IC|Log|Adj", # Hides unnecessary model fit stats
   output = "latex", # Output in LaTeX format
   title = "Comparison of Causal Effect Estimates
@@ -759,7 +773,7 @@ How does the comparison between matching and OLS regression change when you incl
 ```{r Causal Effect Estimates with Covariates, echo=FALSE}
 # Estimate ATT Model (OLS)
 att_model <- lm(
-  mod2a_1adec ~ bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  mod2a_1adec ~ bombed_969 + std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = matched_data,
   weights = weights
 )
@@ -767,7 +781,7 @@ att_model <- lm(
 # Ordered Logistic Model
 logistic_att_model <- polr(
   factor(mod2a_1adec) ~
-    bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+    bombed_969 + std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = matched_data,
   weights = weights,
   method = "logistic"
@@ -781,7 +795,7 @@ ols_model <- lm(
 
 # Simple OLS regression with covariates
 ols_model_covariates <- lm(
-  mod2a_1adec ~ bombed_969 + std + ln_dist + score + lnhpop + mod2a_1admn,
+  mod2a_1adec ~ bombed_969 + std + score + lnhpop + mod2a_1ajul + mod2a_1admn,
   data = vietnam_data
 )
 
