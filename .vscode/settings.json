@@ -26,5 +26,6 @@
   ],
   "latex-workshop.latex.recipe.default": "xelatex",
 
-  "cSpell.language": "en-GB"
+  "cSpell.language": "en-GB",
+  "cSpell.words": ["pacman"]
 }
