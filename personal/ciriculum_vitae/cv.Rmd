@@ -8,7 +8,7 @@ header-includes:
 
 \centerline{\Large \textbf{Edward Anders}} \
 \centerline{Email: edward.anders@politics.ox.ac.uk | Phone: +44 (0) 07942 927727} \
-Researching AI's effects on attitudes. Experience of building early-stage, AI companies working as a deliberate generalist across product, strategy and growth. Interested in the intersection of artificial intelligence, political economy, and democracy.
+\vspace{-6mm}
 
 ## Education
 \vspace{-3mm}
@@ -46,7 +46,7 @@ BSc Economics and Politics, 1st-Class Honours
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
-\textbf{\normalsize Securely Technology Limited} \\  % Bold and larger font size
+\textbf{\normalsize Securely Technology Limited (Complyance)} \\  % Bold and larger font size
 Strategy Associate Manager
 
 \columnbreak  % Move to the right column
@@ -58,7 +58,7 @@ Apr. 2024-present
 - Employee \#10 at a seed-stage AI startup building GRC software for the B2B enterprise market.
 - Built a new Post-Sales department with the Chief Strategy Officer and Chief Executive Officer.
 - Architected compliance solutions directly with CISOs and CCOs of Fortune 500 companies.
-- Reduced client onboarding time by 75% through automated backend processes.
+- Reduced client onboarding time by 75% through automated backend processes using PostHog analytics.
 - Led the development of a new growth marketing process, increasing inbound leads by 200%.
 
 \begin{multicols}{2}  % Start two-column environment
@@ -78,23 +78,25 @@ Senior Founder's Associate
 - Owned all aspects of the website, built from scratch using Webflow, Javascript and CSS.
 - Implemented product analytics, working with product and engineering to iterate and deploy feedback.
 - Led many projects with legal, accounting and investor teams, including operations for an acquisition.
+- Helped improve DevOps with engineering and product teams, reducing deployment times.
 
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
-\textbf{\normalsize Strategy Consulting Internships} \\  % Bold and larger font size
+\textbf{\normalsize Strategy Consulting \& Projects} \\  % Bold and larger font size
 BCG Project, Carnall Farrar, Strategy\&
 
 \columnbreak  % Move to the right column
 
 \raggedleft  % Right-align text
-2019-2020
+2019-present
 \end{multicols}
-- Strategy projects across oil \& gas market entry, NHS hospital efficiency and pharmaceutical pricing.
-- Learnt I wanted to be more hands on rather than just making presentations.
-- Selected onto Jumpstart's startup-graduate matching programme (top ~1% of 5000+ applicants)
+- Data projects across oil \& gas market entry, NHS hospital efficiency and pharmaceutical pricing.
+- Applied advanced analytics to client problems, communicating results to senior stakeholders.
+- Selected onto Jumpstart's startup-graduate matching programme (top ~1% of 5000+ applicants).
+- Build personal side projects, including a web app recording College sport results; used JavaScript and the Firebase SDK for real-time data handling and Python Flask for backend for development.
 
 ## Skills \& Tooling
 - Quantitative and computational research methods inc. machine learning techniques.
-- Python, R, Stata, SQL, Git, CSS, Javascript (basic).
-- Segment, Webflow, Figma, GitHub.
+- Python, R, Stata, SQL, Git, CSS, JavaScript (basic).
+- Segment, Webflow, Figma, GitHub, Metabase, PostHog, Firebase.
