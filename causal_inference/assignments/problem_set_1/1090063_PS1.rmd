@@ -1,7 +1,7 @@
 ---
 title: 'University of Oxford: MPhil in Politics'
+subtitle: 'Causal Inference: Problem Set 1'
 author: '1090063'
-date: '`r Sys.Date()`'
 output:
   pdf_document:
     toc: true
@@ -17,17 +17,11 @@ header-includes:
   - \captionsetup[figure]{position=above}
   - \usepackage{threeparttable}
   - \usepackage{float}
-citation_package: biblatex
-csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
-bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
-link-citations: true
 ---
 
 ```{r File Setup, include=FALSE}
 # Set working directory
-setwd(
-  "/Users/edwardanders/Documents/GitHub/oxford/causal_inference/assignments/problem_set_1"
-)
+setwd() # Removed to hide the path which would identify the candidate.
 
 # Set global options
 knitr::opts_chunk$set(
@@ -54,6 +48,7 @@ pacman::p_load(
   tableone # Balance table
 )
 
+# Set knitr options for rounding of values presented from inline code
 knitr::knit_hooks$set(inline = function(x) {
   if (is.numeric(x)) {
     return(format(round(x, 3), nsmall = 3))
@@ -62,10 +57,10 @@ knitr::knit_hooks$set(inline = function(x) {
 })
 ```
 
+\newpage
 # Problem 1
 
 We will examine how randomized experiments work by creating an imaginary experiment. Use the dataset `a` from the file called `experiment.Rda`. For each individual unit ($i$) in our sample, the dataset contains the potential outcome under control ($Y_i^0$ or $Y_0i$) and the potential outcome under treatment ($Y_i^1$ or $Y_1i$) in the columns `a$y0` and `a$y1`, respectively. This is a purely hypothetical scenario. In reality, we never observe potential outcomes under both treatment and control for the same units: we can only observe one of them (the fundamental problem of causal inference). By creating a randomized experiment with this dataset, we’ll demonstrate how experiments overcome this fundamental problem.
-
 
 ```{r Problem 1 Data Setup, echo=FALSE, results='hide'}
 # Load the dataset
@@ -384,7 +379,7 @@ modelsummary(
     "vote_year" = "Years Since Last Vote"
   ),
   stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01), # Custom significance levels
-  statistic = NULL, # Removes default significance legend
+  statistic = "std.error",
   gof_map = custom_gof, # Custom goodness-of-fit statistics
   notes = "Note: Standard errors are in parentheses. Both models are estimated using OLS regressions.",
   output = "latex"
