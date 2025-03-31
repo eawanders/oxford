@@ -1,0 +1,238 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+subtitle: 'Causal Inference: Problem Set 2'
+author: '1090063'
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    includes:
+        in_header: header.tex
+header-includes:
+  - \setlength{\footnotesep}{1em}
+  - \setlength{\skip\footins}{2em}
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+  - \usepackage{threeparttable}
+---
+```{r File Setup, include=FALSE}
+# Set working directory
+setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_inference/assignments/problem_set_2") # Removed to hide the path which would identify the candidate.
+
+# Set global options
+knitr::opts_chunk$set(
+    cache = FALSE, # Prevents caching of code chunks
+    warning = FALSE, # Prevents printing of warnings
+    message = FALSE, # Prevents printing of messages
+    echo = TRUE # Echo set to TRUE will print your code in the output file.
+)
+
+# Load pacman package
+if (!require("pacman")) install.packages("pacman", dependencies = TRUE)
+library(pacman)
+
+# Load (and install) packages needed for the analyses
+pacman::p_load(
+    tidyverse, # Cleaning data, plotting plots
+    knitr, # Knitting documents
+    haven, # Read .dta files
+    AER, # ivreg function
+    modelsummary, # Model summary tables
+    kableExtra # Formatting tables
+)
+
+# Set knitr options for rounding of values presented from inline code
+knitr::knit_hooks$set(inline = function(x) {
+    if (is.numeric(x)) {
+        return(format(round(x, 3), nsmall = 3))
+    }
+    return(as.character(x))
+})
+```
+
+\newpage
+# Problem 1: Institutions and Economic Development [50 points]
+
+The assignment is based on the famous Acemoglu, Johnson & Robinson (AJR) 2001 study on the importance of inclusive institutions for economic development. AJR argue that institutions leave a long imprint on countries’ economic activity. They distinguish between inclusive and extractive institutions. The former diffuses economic returns across different strata of society, whereas the latter facilitates the appropriation of wealth by elites.
+
+To provide evidence for the importance of institutions, they turn to the colonial structures of the 19th and early 20th centuries. Their identification strategy comes from variation in geography and climate, which determined whether colonizers would establish inclusive or extractive institutions. In those areas in which settlers encountered high mortality rates, they built extractive institutions without long-term planning. In areas with low mortality rates, they built inclusive institutions. Assuming that settler mortality rates satisfy the assumptions of an instrumental variable, this allows the authors to identify the causal effect of institutions on economic development over the long term.
+
+```{r Problem 1 Data Setup, echo=FALSE, results='hide'}
+# Load the dataset
+ajr_data <- read_dta("AJR.dta")
+
+# Check the structure of the dataset
+# View(ajr_data)
+
+# View Overview of the dataset
+glimpse(ajr_data)
+summary(ajr_data)
+```
+
+## Correlation
+
+Is there a link between institutions and economic development? This is not a causal question; we are asking if there is any association between the two. Provide a scatterplot to show this is the case.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Correlation Calculation, echo=FALSE}
+# Correlation between institutions and economic development
+## Used pairwise.complete.obs to handle missing values
+correlation <- cor(
+    ajr_data$avexpr, ajr_data$logpgp95,
+    use = "pairwise.complete.obs"
+)
+```
+
+By using the AJR dataset, we can see that there is a correlation between institutions and economic development of **``r correlation``**. The scatterplot in ``Figure 1`` shows the relationship between the average protection against expropriation risk between 1985-1995 `(avexpr)` and logged GDP per capita measured in 1995 `(logpgp95)`. This positive, and relatively high correlation factor shows that we would expect there to be a strong, and possibly causal relationship, between increased protection against expropriation risk (strong institutions) and economic development.
+
+```{r Correlation Scatterplot, echo=FALSE, fig.width=6, fig.height=4, fig.align='center', fig.cap = "Correlation Scatterplot: Institutions and Economic Development", fig.pos='H'}
+# Create a scatterplot
+ggplot(ajr_data, aes(x = avexpr, y = logpgp95)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, color = "black") +
+    labs(
+        x = "Institutions (avexpr)",
+        y = "Economic Development (logpgp95)",
+        caption = "Notes: The correlation factor is calculated with the `pairwise complete.obs` argument to handle missing values."
+    ) +
+    xlim(0, 10) +
+    ylim(0, 10) +
+    scale_fill_grey() + # Grayscale colours
+    theme_classic(base_family = "serif") + # Classic theme with serif font
+    theme(
+        axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = ggplot2::margin(r = 10)),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 9)
+    )
+?ggplot
+```
+
+## Causal relationship
+
+Is this relationship causal? How do mortality rates help in answering this question?
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+We are interested in the relationship between institutions and economic development. This can be modelled by the regression specification shown in (1).
+
+\begin{equation}
+\texttt{logpgp95}_i = \beta_0 + \beta_1 \texttt{avexpr}_i + \varepsilon_i
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $\texttt{logpgp95}_i$ is the log GDP per capita in 1995 for country $i$,
+  \item $\texttt{avexpr}_i$ is the average protection against expropriation risk between 1985–1995 for country $i$,
+  \item $\beta_0$ is the intercept,
+  \item $\beta_1$ captures the effect of institutions on economic development,
+  \item $\varepsilon_i$ is the error term.
+\end{itemize}
+
+For the relationship shown in ``1.1`` to be causal, a number of conditions must hold. Most importantly, the independent variable $\texttt{avexpr}_i$ should not be correlated with the error term $\varepsilon_i$. $\texttt{avexpr}_i$ should therefore be exogenous and isolated from any unobserved confounding variables to ensure conditional independence. However, this is unlikely to be the case. For example, cultural norms of trust and co-operation can influence the quality and strength of institutions, as may colonial and legal legacies. Moreover, the dataset does not include possible confounders such as education which should be included and controlled for in the model as education can be a determinant of both institutions and economic development. Consequently, $\varepsilon_i$ is likely to be correlated with $\texttt{avexpr}_i$ and the model is likely to suffer from omitted variable bias, as well as from the reverse causality of richer countries affording to build better institutions. This means that the estimated coefficient $\hat{\beta_1}$ will be biased and inconsistent if an OLS regression were used, and therefore the relationship shown in ``1.1`` is not causal.:
+
+\begin{equation}
+\mathbb{E}[\hat{\beta}_{OLS}] \ne\beta_{\text{true}}
+\end{equation}
+
+To address this issue, AJR use settler mortality rates as an instrument for institutions. The idea is that settler mortality rates are correlated with the quality of institutions, but not with the error term $\varepsilon_i$. This means that settler mortality rates can be used to isolate the effect of institutions on economic development, ensuring the exogeneity of the independent variable. The authors argue that settler mortality rates are a valid instrument because they are determined by geographical and climatic factors, which are not correlated with the error term. This means that settler mortality rates can be used to identify the causal effect of institutions on economic development, with the expectation being that high mortality rates are correlated with extractive institutions, and lower mortality rates result in inclusive institutions.
+
+## ITT Estimation
+
+Estimate the ITT and interpret it.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r ITT Estimation, echo=FALSE}
+# Reduced-form regression (ITT): Outcome ~ Instrument
+model_itt <- lm(logpgp95 ~ logem4, data = ajr_data)
+ITT_Y <- coef(model_itt)["logem4"]
+
+# Substantive, scaled ITT estimate
+itt_scaled <- coef(model_itt)["logem4"] / sd(ajr_data$logpgp95, na.rm = TRUE)
+```
+
+The ITT estimates the causal effect of the treatment assignment of our instrument, **``logem4``** on the outcome of logged GDP per capita, **``logpgp95``**. The ITT estimate is **``r round(coef(model_itt)["logem4"], 3)``** and is statistically significant. As we have estimated a log-log model, this means that a 1% increase in settler mortality is associated with a 0.5% decrease in GDP per capita. Once we scale the ITT estimate, we find that the ITT estimate is **``r round(itt_scaled, 3)``**. This means that a one standard deviation increase in settler mortality rates is associated with a **``r round(itt_scaled, 3)``** standard deviation decrease in log GDP per capita in 1995 which is a moderate effect size. These two ITT estimates both suggest that higher settler mortality rates are associated with lower economic development, which is consistent with the idea that high mortality rates lead to extractive institutions and lower economic development.
+
+## LATE Estimation
+
+Estimate the LATE, using both a Wald estimator and a 2SLS estimator. Interpret your findings.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Randomisation Check, echo=FALSE, }
+# Model to check whether `avexpr` is randomly assigned based on geographic and economic factors
+randomisation <- lm(
+    logem4 ~ avexpr +
+        africa +
+        lat_abst +
+        rich4 +
+        asia +
+        loghjypl +
+        baseco,
+    data = ajr_data
+)
+
+# Goodness-of-fit statistics to add to table
+custom_gof <- tibble::tribble(
+    ~raw, ~clean, ~fmt,
+    "nobs", "Num. Obvs", 0,
+    "r.squared", "R-squared", 3,
+    "adj.r.squared", "Adj. R-squared", 3,
+    "fstatistic", "F-statistic", 3
+)
+
+# Model summary of randomisation check results
+modelsummary(
+    list("Covariates" = randomisation),
+    title = "Randomisation Check",
+    output = "latex",
+    statistic = "std.error",
+    coef_map = list(
+        "logem4" = "Settler Mortality",
+        "avexpr" = "Institutions (avexpr)",
+        "asia" = "Asia",
+        "loghjypl" = "Log Population Density",
+        "baseco" = "Base Country",
+        "rich4" = "Rich Countries",
+        "lat_abst" = "Latitude (absolute)",
+        "africa" = "Africa"
+    ),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01), # Custom significance levels
+    gof_map = custom_gof, # Custom goodness-of-fit statistics
+    notes = "Note: Standard errors are in parentheses."
+)
+```
+
+```{r LATE Estimation, echo=FALSE}
+# Wald estimator of LATE
+# First stage regression: Instrument ~ Treatment
+model_first_stage <- lm(
+    avexpr ~ logem4 + asia + loghjypl,
+    data = ajr_data
+)
+ITT_D <- coef(model_first_stage)["logem4"]
+
+late_wald <- ITT_Y / ITT_D
+
+# 2SLS (ivreg estimation) estimator of LATE
+model_2sls <- ivreg(
+    logpgp95 ~ avexpr + asia + loghjypl | logem4 + asia + loghjypl,
+    data = ajr_data
+)
+late_2sls <- coef(model_2sls)["avexpr"]
+```
+
+- Interpret Wald estimator
+- Interpret 2SLS estimator
+- Compare the two estimates
+- Discuss the implications of the estimates
+- Review Week 4 lab to see if need to show summary table for results
+
+## IV Assumptions
+
+Assess the plausibility of the IV assumptions in this setting. For each of the assumptions relevant first stage, monotonocity, independence, and eclusion restriction below, explain (in words) what it means substantively in the context of this study and provide a statistical test or verbal argument assessing its plausibility.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
