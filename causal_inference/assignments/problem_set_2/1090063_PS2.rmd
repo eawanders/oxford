@@ -40,7 +40,10 @@ pacman::p_load(
     haven, # Read .dta files
     AER, # ivreg function
     modelsummary, # Model summary tables
-    kableExtra # Formatting tables
+    kableExtra, # Formatting tables
+    fixest, # feols function
+    sandwich, # vcovCL function
+    lmtest, # coeftest function
 )
 
 # Set knitr options for rounding of values presented from inline code
@@ -375,3 +378,208 @@ However, it is important to note that this assumption is not always easy to just
 The exclusion restriction states that the instrument must only affect the outcome through the treatment. In this case, settler mortality rates must only affect GDP per capita through their effect on average protection against expropriation risk **`(avexpr)`**. This means that settler mortality rates should not have a direct effect on GDP per capita, and any correlation between settler mortality rates and GDP per capita should be entirely mediated by average protection against expropriation risk.
 
 However, as the instrument-outcome relationship is not directly observable, this assumption cannot be directly tested. The argument put forward by AJR is that conditional on the controls included in the regression, the mortality rates of settlers have no effect on GDP per capita, other than their effect through institutional development. They argue that settler mortality rates are not the result of local disease environments, which could in turn affect the economic performance of the country. Instead, settler deaths came from a lack of immunity, and therefore local people were not affected by the same diseases, so these diseases would not be the reason the countries were poor. This suggests that settler mortality rates are not directly related to GDP per capita, and therefore the exclusion restriction holds.
+
+\newpage
+
+# Problem 2: Centralisation and Public Investment [50 points]
+
+This question uses data from Malesky, Nguyen, and Tran’s (2014) study of the effect of centralising control of public services in Vietnam. Scholars have long speculated that de-centralised control of public services in developing countries can lead to corruption and ‘capture’ by local politicians who fail to use tax revenue to invest in public services. Centralisation of control may, therefore, lead to increased public investment. This is difficult to test because control of government spending rarely changes hands. But in 2009, Vietnam decided to experiment with re-centralising control of its public services in some areas but not others, placing them under central government control instead of control by local district authorities in around one-fifth of districts nationwide. The authors use a difference-indifferences framework to ask what impact this had on infrastructure spending, comparing changes in treated districts (where spending was re-centralised) to untreated districts (where it remained under local control). They have data on infrastructure spending before the change (in 2006 and 2008) and after the change (in 2010), for small areas called ‘communes’, which are subsets of districts.
+
+```{r Problem 2 Data Setup, echo=FALSE, results='hide'}
+# Load the data
+load("malesky.Rda")
+
+# Assign the data to a variable
+malesky_data <- m
+```
+
+## Dataset Variables
+
+Create a new dataset for the years 2008 and 2010 only. In this dataset, create: (i) a dummy variable called “post” equalling 1 if the year is after the treatment and (ii) a variable for the interaction between post and treatment.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Dataset Variables, echo=FALSE}
+# Filter the dataset for the years 2008 and 2010
+filtered_malesky_data <- malesky_data %>%
+    filter(year %in% c(2008, 2010))
+
+filtered_malesky_data <- filtered_malesky_data %>%
+    mutate(
+        post = ifelse(year == 2010, 1, 0),
+        treat_post = post * treatment
+    )
+```
+
+A new dataset has been created with the years 2008 and 2010 only. The variable **`post`** equals 1 if the year is after the treatment, and the variable **`treat_post`** is the interaction between post and treatment, given by **``treat_post = post * treatment``**. This means that **`treat_post`** equals 1 if the year is 2010 and the commune is in a treated district, and 0 otherwise.
+
+## Difference-in-Differences
+
+Use the dataset and variables you created in a) to calculate a difference-in-difference estimate of the causal effect of centralisation on infrastructure investment. Interpret the resulting coefficient and its statistical significance.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Difference-in-Differences, echo=FALSE, fig.fig.pos='H'}
+# Difference-in-Differences Regression
+## Estimate the model
+model_diff_in_diff <- lm(
+    infra ~ post + treatment + treat_post + lnpopden,
+    data = filtered_malesky_data
+)
+## Extract the coefficient for the interaction term
+diff_in_diff_coef <- coef(model_diff_in_diff)["treat_post"]
+
+# Clustered standard errors for non-fixed effects model
+clustered_se_diff <- vcovCL(model_diff_in_diff, cluster = ~district)
+
+# Difference-in-Differences Model with Fixed Effects
+model_diff_in_diff_fe <- feols(
+    infra ~ treat_post + lnpopden + factor(district) + factor(year),
+    data = filtered_malesky_data,
+    cluster = ~district
+)
+
+# Create a summary table
+modelsummary(
+    list(
+        "Difference-in-Differences" = model_diff_in_diff,
+        "Difference-in-Differences with FE" = model_diff_in_diff_fe
+    ),
+    vcov = list(
+        "Difference-in-Differences" = clustered_se_diff,
+        "Difference-in-Differences with FE" = ~district
+    ),
+    title = "Difference-in-Differences Estimates",
+    output = "latex",
+    statistic = "std.error",
+    coef_map = list(
+        "post" = "Post Treatment",
+        "treatment" = "Treatment Group",
+        "treat_post" = "Treatment Post Interaction",
+        "lnpopden" = "Log Population Density"
+    ),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    gof_map = custom_gof,
+    notes = "Note: Clustered standard errors are in parentheses. Both models cluster standard errors by district."
+)
+```
+
+The difference-in-differences estimate of the causal effect of centralisation on infrastructure investment is **``r round(diff_in_diff_coef, 3)``**. This means that the average infrastructure spending in treated districts increased by **``r round(diff_in_diff_coef, 3)``** units in 2010 compared to untreated districts. This is a statistically significant result, with a p-value of **``r round(summary(model_diff_in_diff)$coefficients["treat_post", "Pr(>|t|)"], 3)``**. This would suggest that re-centralising control of public services in Vietnam led to an increase in infrastructure spending.
+
+However, this first model does not account for the possible unobserved heterogeneity of time-invarient differences between districts which may affect infrastructure spending, as well as the time-based differences across years, such as economic trends. Therefore, a fixed effects model, or first differences model, is required to control for these unobserved factors. The fixed effects model uses **``factor(district)``** and **``factor(year)``** to control for these unobserved factors. When accounting for this unobserved heterogeneity though, we find a statistically insignficant result of **``r round(coef(model_diff_in_diff_fe)["treat_post"], 3)``** which is -ve and thus at odds with the non-fixed effects model and the hypothesis that re-centralisation of control of public services leads to increased infrastructure spending. This insignificant result may be due to a genuine lack of effect, or the high-within district noise such that detecting a treatment effect is harder.
+
+## Parallel Trends
+
+Difference-in-differences estimation relies on the ‘parallel trends’ assumption. Explain what that assumption means in this study.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+The parallel trends assumption states that in the absence of the treatment, the average outcome for the treated and untreated groups would have followed the same trend over time. In this study, this means that if the re-centralisation of control of public services had not occurred, the average infrastructure spending in treated districts would have followed the same trend as in untreated districts. This is shown by:
+
+\begin{equation}
+E[{Y_i^0(1)} \mid D_i = 1] \approx E[Y_i^0(0) \mid D_i = 1] + (E[Y_i^0(1) \mid D_i = 0] - E[Y_i^0(0) \mid D_i = 0])
+\end{equation}
+
+This assumption is important because it allows us to isolate the effect of the treatment on the outcome. If the parallel trends assumption holds, we can attribute any difference in infrastructure spending between treated and untreated districts after the treatment to the re-centralisation of control of public services. If the parallel trends assumption does not hold, then any difference in infrastructure spending could be due to other factors, and we would not be able to attribute it to the treatment.
+
+## Testing the Parallel Trends Assumption
+
+Now, we’ll assess the parallel trends assumption empirically. Return to the full dataset and calculate the means of the outcome variable for 2006, 2008, and 2010 for both the treated and control groups (six means in total). Plot these means separately over time for the treated and control groups. Do you think that the parallel trends assumption holds in this case?
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+**``Figure 3``** shows how the mean infrastructure spend has changed over time between 2006-2010. By looking at the trend of the data between 2006 and 2008, we can see that both the control and treatment groups were on roughly a similar trajectory, with the treated group seeing a sligh reducting in spend compared to the control group. We can assume that the similar trajectories seen between the two groups would have continued through until 2010 supporting the argument for the parallel trends assumption. As expected, parallel trend diverges in 2010, with the treated group seeing a large increase in infrastructure spending compared to the control group after re-centralisation of control of public services.
+
+```{r Parallel Trends Assumption, echo=FALSE, fig.width=6, fig.height=4, fig.align='center', fig.cap = "Mean Infrastructure Spending Over Time by Treatment Group", fig.pos='H'}
+# Calculate the means for each group and year
+means_data <- malesky_data %>%
+    group_by(year, treatment) %>%
+    summarise(mean_infra = mean(infra, na.rm = TRUE))
+
+# Create a line plot of the means over time
+ggplot(means_data, aes(x = year, y = mean_infra, color = factor(treatment))) +
+    geom_line(size = 1) +
+    geom_point(size = 2) +
+    labs(
+        x = "Year",
+        y = "Mean Infrastructure Spending",
+    ) +
+    scale_color_manual(
+        name = "Treatment Group",
+        labels = c("Control", "Treated"),
+        values = c("#939393", "#4b4b4b")
+    ) +
+    ylim(2, 4) +
+    scale_fill_grey() + # Grayscale colours
+    theme_classic(base_family = "serif") + # Classic theme with serif font
+    theme(
+        axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = ggplot2::margin(r = 10)),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 9)
+    )
+```
+
+## Placebo Difference-in-Differences
+
+Create a new dataset for the years 2006 and 2008 only and use it to estimate a placebo difference-in-differences effect before the treatment occurred. What do you conclude about the parallel trends assumption?
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Placebo Difference-in-Differences Dataset, echo=FALSE, fig.fig.pos='H'}
+# Load the data
+load("malesky.Rda")
+
+# Assign the data to a variable
+malesky_data <- m
+
+# Filter the dataset for the years 2006 and 2008
+placebo_malesky_data <- malesky_data %>%
+    filter(year %in% c(2006, 2008))
+
+# Create the placebo post and interaction variables
+placebo_malesky_data <- placebo_malesky_data %>%
+    mutate(
+        post = ifelse(year == 2008, 1, 0),
+        treat_post = post * treatment
+    )
+```
+
+```{r Placebo Difference-in-Differences, echo=FALSE}
+# Placebo Difference-in-Differences Manual Calculation
+placebo_diff_in_diff <- lm(
+    infra ~ post + treatment + treat_post + lnpopden,
+    data = placebo_malesky_data
+)
+
+# Placebo Difference-in-Differences Model with Fixed Effects
+placebo_diff_in_diff_fe <- lm(
+    infra ~ treat_post + lnpopden + factor(year),
+    data = placebo_malesky_data
+)
+
+# Create a summary table
+modelsummary(
+    list(
+        "Difference-in-Differences" = placebo_diff_in_diff,
+        "Difference-in-Differences with FE" = placebo_diff_in_diff_fe
+    ),
+    title = "Placebo Difference-in-Differences Estimates",
+    output = "latex",
+    statistic = "std.error",
+    coef_map = list(
+        "post" = "Post Treatment",
+        "treatment" = "Treatment Group",
+        "treat_post" = "Treatment Post Interaction",
+        "lnpopden" = "Log Population Density"
+    ),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    gof_map = custom_gof,
+    notes = "Note: Standard errors are in parentheses. District fixed effects were excluded due to missing district values in 2006, but year fixed effects were retained to control for time-specific shocks.
+"
+)
+```
+
+The objective of the placebo difference-in-differences calculation is to estimate whether there is a difference in infrastructure spending between the treated and control groups before the treatment occurred, between 2006-2008. The placebo difference-in-differences estimate is **``r round(coef(placebo_diff_in_diff)["treat_post"], 3)``** for the non-fixed effects model, and **``r round(coef(placebo_diff_in_diff_fe)["treat_post"], 3)``** for the fixed effects model. The fixed effects model uses **``factor(year)``** to control for unobserved heterogeneity as **``disrict``** is **``NA``** in 2006.
+
+Since the more robust fixed-effects model is statistically significant, this model suggests treated areas were already on a downward trend vs control pre-treatment. Therefore, this raises concern over whether the parallel trends assumption holds. If there was a statistically significiant divergence in trends before the treatment occurred, then it may have been the case that they would not have been on the same trend between 2008-2010 either.
