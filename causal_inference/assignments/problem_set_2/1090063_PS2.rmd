@@ -15,6 +15,7 @@ header-includes:
   - \usepackage{setspace}
   - \setstretch{1.25}
   - \usepackage{threeparttable}
+  - \usepackage{float}
 ---
 ```{r File Setup, include=FALSE}
 # Set working directory
@@ -107,7 +108,6 @@ ggplot(ajr_data, aes(x = avexpr, y = logpgp95)) +
         legend.title = element_text(size = 10),
         legend.text = element_text(size = 9)
     )
-?ggplot
 ```
 
 ## Causal relationship
@@ -145,33 +145,16 @@ Estimate the ITT and interpret it.
 
 \hspace{0pt}\rule{100pt}{0.25pt}
 
-```{r ITT Estimation, echo=FALSE}
-# Reduced-form regression (ITT): Outcome ~ Instrument
-model_itt <- lm(logpgp95 ~ logem4, data = ajr_data)
-ITT_Y <- coef(model_itt)["logem4"]
+The ITT estimates the causal effect of the treatment assignment of our instrument, **``logem4``** on the outcome of logged GDP per capita, **``logpgp95``**. When doing an instrumental variable causal analysis, we initially assume that the instrument is randomly assigned to those who are treated. However, regressing the instrument **`logem4`** on the relevant geographical covariates, we find that there is a statistically significant relationship between counties in **`africa`** and based on a country's latitude **`(lat_abst)`** and the instrument. This suggests that the instrument is not randomly assigned to those who are treated. We should therefore control for these covariates to ensures that the randomisation assumptions is more likely to hold.
 
-# Substantive, scaled ITT estimate
-itt_scaled <- coef(model_itt)["logem4"] / sd(ajr_data$logpgp95, na.rm = TRUE)
-```
-
-The ITT estimates the causal effect of the treatment assignment of our instrument, **``logem4``** on the outcome of logged GDP per capita, **``logpgp95``**. The ITT estimate is **``r round(coef(model_itt)["logem4"], 3)``** and is statistically significant. As we have estimated a log-log model, this means that a 1% increase in settler mortality is associated with a 0.5% decrease in GDP per capita. Once we scale the ITT estimate, we find that the ITT estimate is **``r round(itt_scaled, 3)``**. This means that a one standard deviation increase in settler mortality rates is associated with a **``r round(itt_scaled, 3)``** standard deviation decrease in log GDP per capita in 1995 which is a moderate effect size. These two ITT estimates both suggest that higher settler mortality rates are associated with lower economic development, which is consistent with the idea that high mortality rates lead to extractive institutions and lower economic development.
-
-## LATE Estimation
-
-Estimate the LATE, using both a Wald estimator and a 2SLS estimator. Interpret your findings.
-
-\hspace{0pt}\rule{100pt}{0.25pt}
-
-```{r Randomisation Check, echo=FALSE, }
-# Model to check whether `avexpr` is randomly assigned based on geographic and economic factors
+```{r Randomisation Check, echo=FALSE, results='asis'}
+# Model to check whether `logem4` is randomly assigned
+# based on geographic and economic factors
 randomisation <- lm(
-    logem4 ~ avexpr +
-        africa +
+    logem4 ~ africa +
         lat_abst +
         rich4 +
-        asia +
-        loghjypl +
-        baseco,
+        asia,
     data = ajr_data
 )
 
@@ -186,31 +169,74 @@ custom_gof <- tibble::tribble(
 
 # Model summary of randomisation check results
 modelsummary(
-    list("Covariates" = randomisation),
-    title = "Randomisation Check",
+    list("Additional Covariates" = randomisation),
+    title = "Randomisation Check of Instrument",
     output = "latex",
     statistic = "std.error",
     coef_map = list(
-        "logem4" = "Settler Mortality",
-        "avexpr" = "Institutions (avexpr)",
-        "asia" = "Asia",
-        "loghjypl" = "Log Population Density",
-        "baseco" = "Base Country",
-        "rich4" = "Rich Countries",
-        "lat_abst" = "Latitude (absolute)",
-        "africa" = "Africa"
+        "asia" = "Countries in Asia",
+        "loghjypl" = "Log Output per Worker",
+        "baseco" = "Base Sample Countries",
+        "rich4" = "Countries in Neo-Europe",
+        "lat_abst" = "Country Latitude",
+        "africa" = "Countries in Africa"
     ),
-    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01), # Custom significance levels
-    gof_map = custom_gof, # Custom goodness-of-fit statistics
-    notes = "Note: Standard errors are in parentheses."
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    gof_map = custom_gof,
+    notes = "Note: Standard errors are in parentheses.",
+    latex_floating = FALSE
 )
 ```
 
-```{r LATE Estimation, echo=FALSE}
+```{r ITT Estimation, echo=FALSE}
+# Reduced-form regression (ITT): Outcome ~ Instrument
+model_itt <- lm(
+    logpgp95 ~ logem4 +
+        lat_abst +
+        africa,
+    data = ajr_data
+)
+ITT_Y <- coef(model_itt)["logem4"]
+
+
+# Summary of the ITT model
+modelsummary(
+    list("ITT Model inc. Covariates" = model_itt),
+    title = "ITT Estimates",
+    output = "latex",
+    statistic = "std.error",
+    coef_map = list(
+        "logem4" = "Log of Settler Mortality",
+        "lat_abst" = "Countries in Asia",
+        "africa" = "Log Output per Worker"
+    ),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    gof_map = custom_gof,
+    notes = "Note: Standard errors are in parentheses."
+)
+
+# Substantive, scaled ITT estimate
+itt_scaled <- coef(model_itt)["logem4"] / sd(ajr_data$logpgp95, na.rm = TRUE)
+```
+
+
+Taking these significant covariates into account, the ITT estimate is **``r round(coef(model_itt)["logem4"], 3)``** and is statistically significant. As we have estimated a log-log model, this means that a 1% increase in settler mortality is associated with a **``r round(coef(model_itt)["logem4"], 3)``**% decrease in GDP per capita. Once we scale the ITT estimate, we find that the ITT estimate is **``r round(itt_scaled, 3)``**. This means that a one standard deviation increase in settler mortality rates is associated with a **``r round(itt_scaled, 3)``** standard deviation decrease in log GDP per capita in 1995 which is a moderate effect size. These two ITT estimates both suggest that higher settler mortality rates are associated with lower economic development, which is consistent with the idea that high mortality rates lead to extractive institutions and lower economic development.
+
+\newpage
+
+## LATE Estimation
+
+Estimate the LATE, using both a Wald estimator and a 2SLS estimator. Interpret your findings.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r LATE Estimation, echo=FALSE, fig.fig.pos='H'}
 # Wald estimator of LATE
 # First stage regression: Instrument ~ Treatment
 model_first_stage <- lm(
-    avexpr ~ logem4 + asia + loghjypl,
+    avexpr ~ logem4 +
+        lat_abst +
+        africa,
     data = ajr_data
 )
 ITT_D <- coef(model_first_stage)["logem4"]
@@ -219,20 +245,133 @@ late_wald <- ITT_Y / ITT_D
 
 # 2SLS (ivreg estimation) estimator of LATE
 model_2sls <- ivreg(
-    logpgp95 ~ avexpr + asia + loghjypl | logem4 + asia + loghjypl,
+    logpgp95 ~ avexpr +
+        lat_abst +
+        africa | logem4 +
+        lat_abst +
+        africa,
     data = ajr_data
 )
 late_2sls <- coef(model_2sls)["avexpr"]
+
+# Extract standard error of 'avexpr' from the 2SLS model
+late_2sls_st <- summary(model_2sls)$coefficients["avexpr", "Std. Error"]
+p_2sls <- summary(model_2sls)$coefficients["avexpr", "Pr(>|t|)"]
 ```
 
-- Interpret Wald estimator
-- Interpret 2SLS estimator
-- Compare the two estimates
-- Discuss the implications of the estimates
-- Review Week 4 lab to see if need to show summary table for results
+The Local Average Treatment Effect (LATE) estimates the causal effect of the treatment on the treated, which in this case is the effect of how extractive institutions are on economic development. The LATE is estimated using two methods: the Wald estimator and the 2SLS estimator, with both methods accounting for the covariates of **`lat_abst`** and **`africa`**.
+
+The Wald estimator is calculated as the ratio of the previously calculated ITT **`(ITT_Y)`** and the ITT of the treatment calculated as the first stage least squares regression of the treatment on the instrument **`(ITT_D)`**. The Wald estimator suggests that a 1% increase in average protection against expropriation risk **`avexpr`** is associated with a **``r round(late_wald, 3)``**% increase in GDP per capita. This is a statistically significant result, but the standard errors are calculated using a delta method which can be more imprecise than the in-built standard errors in the 2SLS estimator.
+
+On the other hand, when calculating the LATE using the 2SLS estimator, we calculate this using the **``ivreg``** function which correctly accounts for bias when calculating the standard errors. Using this method, we find that a 1% increase in average protection against expropriation risk **`avexpr`** is associated with a **``r round(late_2sls, 3)``**% increase in GDP per capita. This is a slightly smaller effect size than the Wald estimator, but it has a greater and more precise statistical significance. The LATE estimates suggest that institutions have a strong positive effect on economic development, such that higher average protection against expropriation risk is associated with higher GDP per capita. This is consistent with the idea that inclusive institutions lead to better economic outcomes.
+
+```{r LATE Estimation Table, echo=FALSE, results='asis'}
+# Extract coefficients and standard errors from ITT_Y
+## Coefficients
+beta_hat <- coef(model_itt)["logem4"]
+pi_hat <- coef(model_first_stage)["logem4"]
+
+## Standard errors
+se_beta <- summary(model_itt)$coefficients["logem4", "Std. Error"]
+se_pi <- summary(model_first_stage)$coefficients["logem4", "Std. Error"]
+
+# Calculate standard error of the Wald estimator using the delta method
+late_wald_st <- sqrt(
+    (se_beta / pi_hat)^2 +
+        ((beta_hat * se_pi) / pi_hat^2)^2
+)
+
+# Calculate p-value for Wald estimator
+p_wald <- 2 * (1 - pnorm(abs(late_wald / late_wald_st)))
+
+# Function to create significance stars
+significance_stars <- function(p) {
+    if (p < 0.01) {
+        return("***")
+    } else if (p < 0.05) {
+        return("**")
+    } else if (p < 0.1) {
+        return("*")
+    } else {
+        return("")
+    }
+}
+
+# Results table for LATE estimates using tibble (with rounding)
+late_results <- tibble::tribble(
+    ~Method, ~Estimate, ~Std.Error, ~p.value, ~Sign.,
+    "Wald Estimator", round(late_wald, 3), round(late_wald_st, 3), round(p_wald, 3), significance_stars(p_wald),
+    "2SLS Estimator", round(late_2sls, 3), round(late_2sls_st, 3), round(p_2sls, 3), significance_stars(p_2sls)
+)
+
+
+kable(late_results,
+    format = "latex",
+    caption = "LATE Estimates",
+    booktabs = TRUE, # For better LaTeX table style
+    col.names = c("Method", "Estimate", "Std. Error", "P-value", "Significance")
+) %>% # Adjust column alignment
+    kable_styling(
+        latex_options = c("hold_position"),
+    ) %>%
+    footnote(general = "* p <0.1, ** p <0.05, *** p <0.01. Standard errors are in parentheses.")
+```
+
+\newpage
 
 ## IV Assumptions
 
 Assess the plausibility of the IV assumptions in this setting. For each of the assumptions relevant first stage, monotonocity, independence, and eclusion restriction below, explain (in words) what it means substantively in the context of this study and provide a statistical test or verbal argument assessing its plausibility.
 
 \hspace{0pt}\rule{100pt}{0.25pt}
+
+**Relevant First Stage**
+
+The relevant first stage assumption states that the instrument must be correlated with the treatment. In this case, settler mortality rates must be correlated with the average protection against expropriation risk **`(avexpr)`**. This is a necessary condition for the instrument to be valid. We have shown this when estimating the ITT **``(ITT_D)``** which gave a statistically significant result of **``r round(ITT_D, 3)``**. This suggests that settler mortality rates are correlated with the average protection against expropriation risk, and therefore the relevant first stage assumption holds.
+
+**Monotonicity**
+
+The monotonicity assumpton in IV estimation means that the instrument moves the treatment in the same direction for all individuals, meaning there are no “defiers” who would do the opposite of what the instrument encourages. In the context of this study, we would therefore expect that for an increase in settler mortaility rates the average protection against expropriation risk would decrease for all countries. An increase in settler mortality should never lead to an increase in institutional quality for any country.
+
+We can show this visually below in ``Figure 2``. The scatterplot shows the relationship between settler mortality rates and average protection against expropriation risk. The fitted line shows a negative relationship, suggesting that higher settler mortality rates are associated with lower average protection against expropriation risk. This is consistent with the idea that higher settler mortality rates lead to extractive institutions, and therefore the monotonicity assumption holds.
+
+```{r Monotonicity Scatterplot, echo=FALSE, fig.width=6, fig.height=3, fig.align='center', fig.cap = "Monotonicity Scatterplot: Settler Mortality and Institutions", fig.pos='H'}
+# Create a scatterplot
+ggplot(ajr_data, aes(x = logem4, y = avexpr)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, color = "black") +
+    labs(
+        x = "Settler Mortality (logem4)",
+        y = "Institution Protection against Expropriation (avexpr)"
+    ) +
+    xlim(0, 10) +
+    ylim(0, 10) +
+    scale_fill_grey() + # Grayscale colours
+    theme_classic(base_family = "serif") + # Classic theme with serif font
+    theme(
+        axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = ggplot2::margin(r = 10)),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 9)
+    )
+```
+
+**Independence**
+
+The conditional independence assumption states that the instrument must be independent of the error term in the outcome equation, such that the instrument is effectively randomly assigned. There should be no omitted variables or unobserved confounders that affect both the instrument and the outcome.
+
+\begin{equation}
+\mathrm{cov}(z_i, \varepsilon_i) = 0
+\end{equation}
+
+In this case, settler mortality rates must be independent of the error term in the regression of average protection against expropriation risk on GDP per capita. This means that settler mortality rates should not be correlated with any unobserved factors that affect economic development.
+
+This assumption is difficult to test directly due to the unobserved nature of the error term. We have deliberately controlled for potential observerd confounders, and mortaility rates are determined by geographical and climatic factors, which are not correlated with the error term in the outcome equation. This suggests that settler mortality rates are independent of the error term, and therefore the independence assumption holds.
+
+However, it is important to note that this assumption is not always easy to justify. For example, if there are unobserved factors that affect both settler mortality rates and economic development, such as cultural norms or historical legacies, then the independence assumption may not hold. This could lead to biased estimates of the causal effect of institutions on economic development.
+
+**Exclusion Restriction**
+
+The exclusion restriction states that the instrument must only affect the outcome through the treatment. In this case, settler mortality rates must only affect GDP per capita through their effect on average protection against expropriation risk **`(avexpr)`**. This means that settler mortality rates should not have a direct effect on GDP per capita, and any correlation between settler mortality rates and GDP per capita should be entirely mediated by average protection against expropriation risk.
+
+However, as the instrument-outcome relationship is not directly observable, this assumption cannot be directly tested. The argument put forward by AJR is that conditional on the controls included in the regression, the mortality rates of settlers have no effect on GDP per capita, other than their effect through institutional development. They argue that settler mortality rates are not the result of local disease environments, which could in turn affect the economic performance of the country. Instead, settler deaths came from a lack of immunity, and therefore local people were not affected by the same diseases, so these diseases would not be the reason the countries were poor. This suggests that settler mortality rates are not directly related to GDP per capita, and therefore the exclusion restriction holds.
