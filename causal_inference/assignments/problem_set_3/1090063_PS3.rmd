@@ -1,0 +1,93 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+subtitle: 'Causal Inference: Take-Home Exam'
+author: '1090063'
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    includes:
+        in_header: header.tex
+header-includes:
+  - \setlength{\footnotesep}{1em}
+  - \setlength{\skip\footins}{2em}
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+  - \usepackage{threeparttable}
+  - \usepackage{float}
+---
+
+```{r File Setup, include=FALSE}
+# Set working directory
+setwd(
+    "/Users/edwardanders/Documents/GitHub/oxford/causal_inference/assignments/problem_set_3"
+) # Removed to hide the path which would identify the candidate.
+
+# Set global options
+knitr::opts_chunk$set(
+    cache = FALSE, # Prevents caching of code chunks
+    warning = FALSE, # Prevents printing of warnings
+    message = FALSE, # Prevents printing of messages
+    echo = TRUE # Echo set to TRUE will print your code in the output file.
+)
+
+# Load pacman package
+if (!require("pacman")) install.packages("pacman", dependencies = TRUE)
+library(pacman)
+
+# Load (and install) packages needed for the analyses
+pacman::p_load(
+    tidyverse, # Cleaning data, plotting plots
+    knitr, # Knitting documents
+    haven, # Read .dta files
+    modelsummary, # Model summary tables
+    kableExtra # Formatting tables
+)
+
+# Set knitr options for rounding of values presented from inline code
+knitr::knit_hooks$set(inline = function(x) {
+    if (is.numeric(x)) {
+        return(format(round(x, 3), nsmall = 3))
+    }
+    return(as.character(x))
+})
+```
+
+\newpage
+
+# Problem 1: Natural Disasters and Voting Behaviour
+
+Natural disasters are often used as exogenous shocks to examine the extent to which incumbents are rewarded for providing services to their constituents (Wolﬁnger and Rosenstone 1980; Mettler and Stonecash 2008; Bechtel and Hainmueller 2011). In this exercise, we aim to evaluate two possible explanations for this phenomenon. On the one hand, voters may reward incumbents after a natural disaster because they are grateful for any help they may have received. On the other hand, voters may perceive politicians as more competent after a natural disaster, especially if they demonstrate skills that helped mitigate the consequences of the disaster.
+
+## Data Collection
+
+Explain what kind of data you would collect. Clearly define your units of analysis as well as your treatment and control group.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+- Answer
+
+## Identification Strategy
+
+Explain and justify your identification strategy for estimating the causal effect of interest. If you are estimating a model (e.g. OLS, DiD, etc.), provide the equation and explain all its terms. What are the identification assumptions of your research design and what do they mean in the context you are studying here? Can you test them? If so, how?
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+- Answer
+
+## Disentangling the Mechanisms
+
+Can your research design disentangle the effects of the two proposed mechanisms, namely (i) the initial central government response to the emergency and (ii) the subsequent transfer of aid? If yes, explain your reasoning in detail. If not, explain how you could modify your originally proposed research design or data collection to separate the two mechanisms.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+- Answer
+
+## Limitations and Threats
+
+Elaborate on your research design’s limitations and threats to causal identification.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+- Answer
