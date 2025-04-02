@@ -19,7 +19,7 @@ header-includes:
 ---
 ```{r File Setup, include=FALSE}
 # Set working directory
-setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_inference/assignments/problem_set_2") # Removed to hide the path which would identify the candidate.
+setwd() # Removed to hide the path which would identify the candidate.
 
 # Set global options
 knitr::opts_chunk$set(
@@ -210,8 +210,8 @@ modelsummary(
     statistic = "std.error",
     coef_map = list(
         "logem4" = "Log of Settler Mortality",
-        "lat_abst" = "Countries in Asia",
-        "africa" = "Log Output per Worker"
+        "lat_abst" = "Country Latitude",
+        "africa" = "Countries in Africa"
     ),
     stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
     gof_map = custom_gof,
@@ -488,7 +488,7 @@ Now, we’ll assess the parallel trends assumption empirically. Return to the fu
 
 \hspace{0pt}\rule{100pt}{0.25pt}
 
-**``Figure 3``** shows how the mean infrastructure spend has changed over time between 2006-2010. By looking at the trend of the data between 2006 and 2008, we can see that both the control and treatment groups were on roughly a similar trajectory, with the treated group seeing a sligh reducting in spend compared to the control group. We can assume that the similar trajectories seen between the two groups would have continued through until 2010 supporting the argument for the parallel trends assumption. As expected, parallel trend diverges in 2010, with the treated group seeing a large increase in infrastructure spending compared to the control group after re-centralisation of control of public services.
+**``Figure 3``** shows how the mean infrastructure spend has changed over time between 2006-2010. By looking at the trend of the data between 2006 and 2008, we can see that both the control and treatment groups were on roughly a similar trajectory, with the treated group seeing a slight reduction in spend compared to the control group. We can assume that the similar trajectories seen between the two groups would have continued through until 2010 supporting the argument for the parallel trends assumption. As expected, parallel trend diverges in 2010, with the treated group seeing a large increase in infrastructure spending compared to the control group after re-centralisation of control of public services.
 
 ```{r Parallel Trends Assumption, echo=FALSE, fig.width=6, fig.height=4, fig.align='center', fig.cap = "Mean Infrastructure Spending Over Time by Treatment Group", fig.pos='H'}
 # Calculate the means for each group and year
