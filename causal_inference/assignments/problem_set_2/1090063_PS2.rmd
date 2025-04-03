@@ -460,7 +460,7 @@ modelsummary(
     ),
     stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
     gof_map = custom_gof,
-    notes = "Note: Clustered standard errors are in parentheses. Both models cluster standard errors by district."
+    notes = "Note: Clustered standard errors are in parentheses. Both models cluster standard errors by district. `lnpopden` is included as it is assumed to not be time-invariant.",
 )
 ```
 
