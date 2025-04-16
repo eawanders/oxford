@@ -42,7 +42,12 @@ pacman::p_load(
     knitr, # Knitting documents
     haven, # Read .dta files
     modelsummary, # Model summary tables
-    kableExtra # Formatting tables
+    kableExtra, # Formatting tables
+    haven, # Read .dta files
+    rdrobust, # Fuzzy regression discontinuity design
+    rddensity, # Density plot function
+    rdd, # Regression discontinuity design
+    dplyr # Explicitly declare to remove linting errors
 )
 
 # Set knitr options for rounding of values presented from inline code
@@ -198,3 +203,772 @@ With this research design comes a few possible limitations and threats to having
 Another threat is the extent and scale of the treatments of the oil spill and the compensation received. A core assumption thus far is that the effects of the oil spill and the compensation are homogenous across all municipalities. However, for example, the severity of the oil spill may have varied across municipalities, leading to different levels of impact on businesses and livelihoods, which could affect voting intentions differently across municipalities. Variation in compensation levels should be less of an issue as all municipalities within Galicia received compensation, and as the unit of analysis is the municipality, the average compensation received should be similar across municipalities.
 
 One of the biggest limitations to the research design comes from the quality and accuracy of the panel data set created to analyses these effects. The nature of the panel data requires the same municipalities to be observed over time, which can be difficult to achieve in practice. If there are missing data points, or differences in how the data is collected over time, this can lead to bias in the estimates. In particular, this will be problematic when estimating the share of the voting intentions for the incumbent party. This will require accurate sampling from an identically and independently distributed sample of the municipality each time period is measured. If the sample is not representative of the population, this can lead to bias in the estimates, with only the final election results showing the true vote shares. This means that the estimates of \textbf{Vote}_{it} may be biased.
+
+# Problem 2: Voter Turnout and the Number of Candidates
+
+Following the 2016 US presidential election, Jill Stein, the defeated Green Party candidate, said in an interview that voter turnout would have been lower if she had not run. When asked about the possibility that her candidacy contributed to Hillary Clinton’s defeat, Stein claimed that her supporters would have abstained if they had not been able to vote for Stein. This intuition is consistent with some political science research: in countries where political competition revolves around a few candidates (such as the United States, the United Kingdom or Canada), people are more likely to abstain from voting if they have preferences that do not align with any of the major candidates, e.g. because they feel alienated from the system (for a review of the literature, see Blais, 2006). As a result, some scholars argue that elections with (i) more than two competitive candidates and (ii) flexible state regulations that facilitate candidacy can increase voter turnout and reduce inequalities in political representation (Gallego, 2014). Several existing comparative and cross-sectional studies have examined this issue. However, their ﬁndings are mixed: some ﬁnd that the number of candidates reduces turnout (e.g. Jackman, 1987), others that it increases turnout (e.g. Taagepera et al., 2013), while others ﬁnd null eﬀects (e.g. Fornos et al., 2004).
+
+\newpage
+
+## Data Summary
+
+Familiarise yourself with the data by answering the following questions: i) What are the units of observation (rows) in the dataset? ii) What types of elections does the dataset cover? iii) How many candidates stood in the first and second rounds in each election? iv) What is the average turnout and null & blank votes in the second round of elections when two and three candidates stand in the second round? v) How many candidates who get the third highest share of votes in the first round qualify for the second round by exceeding the qualifying threshold? How many of them actually run in the second round?
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+```{r Data Setup, echo=FALSE, results=FALSE}
+# Load the dataset
+france_data <- read_dta("france.dta")
+
+# Data Visualisation
+glimpse(france_data)
+summary(france_data)
+```
+
+
+```{r Function Set-up, echo=FALSE, results=FALSE}
+# Split up the election types and threshold groupings
+national_data <- france_data %>%
+    filter(election == "national")
+
+cantonal_data <- france_data %>%
+    filter(
+        election == "cantonal",
+        year != 2011
+    )
+
+cantonal_data_2011 <- france_data %>%
+    filter(
+        election == "cantonal",
+        year == 2011
+    ) %>%
+    filter(!is.na(threshold_party_can3), is.finite(threshold_party_can3))
+
+# Create a list of the different datasets and their cutoffs
+datasets <- list(
+    national = national_data,
+    cantonal = cantonal_data,
+    cantonal_2011 = cantonal_data_2011
+)
+
+cutoffs <- c(
+    national = 0.125,
+    cantonal = 0.10,
+    cantonal_2011 = 0.125
+)
+
+# Create a list of titles
+titles <- c(
+    national = "National Elections",
+    cantonal = "Cantonal Elections",
+    cantonal_2011 = "Cantonal Elections (2011)"
+)
+```
+
+```{r Data Summaries and Wrangling, echo=FALSE, results=FALSE}
+# Determine the number of unique elections
+election_types <- unique(france_data$election)
+
+# Count the number of unique elections in each year
+election_counts <- france_data %>%
+    group_by(year, election) %>%
+    summarise(num_elections = n()) %>%
+    ungroup()
+
+# Convert the year column to integer
+france_data$year <- as.integer(france_data$year)
+```
+
+The following provides a brief summary of the dataset so that we can clearly understand the data and elections. Firstly, each row within the dataset represents a single canton-level (district) election in France at a given time period, thus the unit of observation is the canton-level election. The dataset includes election types of **``cantonal``** and **``national``** elections from **``r sprintf("%d", min(france_data$year))``** to **``r sprintf("%d", max(france_data$year))``**. The elections are held in two rounds, with the first round being a preliminary election to determine which candidates will advance to the second round. Across the **``r sprintf("%d", nrow(france_data))``** district elections in the dataset, the number of candidates in each election in each of the first and second rounds are summarised in **``Table 3``** below:
+
+NOTE: ADD IN SUM FOR EACH ROUND
+
+```{r Candidate Numbers, echo=FALSE, results='asis'}
+# Count the number of candidates in the first round
+first_round_candidates <- summary(france_data$parties_t1)
+
+# Convert selected statistics to a tibble
+first_round_values <- tibble::tibble(
+    Statistic = c("Min", "Median", "Mean", "Max"),
+    Value = round(
+        as.numeric(
+            first_round_candidates[c("Min.", "Median", "Mean", "Max.")]
+        ), 1
+    )
+)
+
+# Count the number of candidates in the second round
+second_round_candidates <- summary(france_data$parties_t2)
+
+# Convert selected statistics to a tibble
+second_round_values <- tibble::tibble(
+    Statistic = c("Min", "Median", "Mean", "Max"),
+    Value = round(
+        as.numeric(
+            second_round_candidates[c("Min.", "Median", "Mean", "Max.")]
+        ), 1
+    )
+)
+
+# Combine into one table
+combined_values <- tibble::tibble(
+    Statistic = c("Min", "Median", "Mean", "Max"),
+    `First Round` = round(
+        as.numeric(
+            first_round_candidates[c("Min.", "Median", "Mean", "Max.")]
+        ), 1
+    ),
+    `Second Round` = round(
+        as.numeric(
+            second_round_candidates[c("Min.", "Median", "Mean", "Max.")]
+        ), 1
+    )
+)
+
+# Print with kable
+knitr::kable(
+    combined_values,
+    caption = "Summary Statistics for Number of Candidates in Each Round",
+    booktabs = TRUE,
+    align = "rcc"
+)
+```
+
+When looking at the second round of elections, in particular when two or three candidates stand, the average turnout and null & blank votes are as follows in **``Table 4``**. The key takeaway here is that the increased number of candidates gives an initial indication that there may be a positive relationship between the number of candidates and the average turnout which will be later tested.
+```{r Turnout and Null Votes, echo=FALSE, results='asis'}
+# Filter the data for the second round with two or three candidates
+filtered_second_round <- france_data %>%
+    select(
+        parties_t2,
+        turnout_t2,
+        blancsnull_t2
+    ) %>%
+    filter(parties_t2 %in% c(2, 3))
+
+# Calculate the average turnout and null & blank votes
+avg_turnout <- filtered_second_round %>%
+    group_by(parties_t2) %>%
+    summarise(
+        avg_turnout = mean(turnout_t2, na.rm = TRUE),
+        avg_blancsnull = mean(blancsnull_t2, na.rm = TRUE)
+    ) %>%
+    mutate(
+        parties_t2 = as.character(parties_t2)
+    )
+
+
+# Calculate the overall average across both groups
+overall_avg <- avg_turnout %>%
+    ungroup() %>%
+    summarise(
+        parties_t2 = "2 or 3 Candidates",
+        avg_turnout = mean(avg_turnout, na.rm = TRUE),
+        avg_blancsnull = mean(avg_blancsnull, na.rm = TRUE)
+    )
+
+# Combine with the original summary
+avg_turnout_combined <- bind_rows(avg_turnout, overall_avg)
+
+# Create a tibble for the results
+avg_turnout_tibble <- tibble::tibble(
+    `Number of Candidates` = as.character(avg_turnout_combined$parties_t2),
+    `Average Turnout` = paste0(round(avg_turnout_combined$avg_turnout * 100, 1), "%"),
+    `Average Null & Blank Votes` = paste0(round(avg_turnout_combined$avg_blancsnull * 100, 1), "%")
+)
+
+# Print with kable
+knitr::kable(
+    avg_turnout_tibble,
+    caption = "Average Turnout and Null & Blank Votes in the Second Round (in %)",
+    booktabs = TRUE,
+    align = "rcc"
+)
+```
+
+\newpage
+
+```{r Candidates Qualifying, echo=FALSE, results=FALSE}
+# Count 3rd-place candidates with vote share >0.125 in national election
+third_place_candidates_national <- france_data %>%
+    filter(
+        election == "national",
+        threshold_party_can3 > 0.125
+    ) %>%
+    group_by(election) %>%
+    summarise(
+        num_qualifying = n(),
+        num_ran = sum(ran_t2_can3 == 1, na.rm = TRUE),
+        perctage_run = round(num_ran / num_qualifying * 100, 1),
+        .groups = "drop"
+    )
+
+# Count 3rd-place candidates with vote share >0.10 in cantonal election (!=2011)
+third_place_candidates_cantonal <- france_data %>%
+    filter(
+        election == "cantonal",
+        threshold_party_can3 > 0.10,
+        year != 2011
+    ) %>%
+    group_by(election) %>%
+    summarise(
+        num_qualifying = n(),
+        num_ran = sum(ran_t2_can3 == 1, na.rm = TRUE),
+        perctage_run = round(num_ran / num_qualifying * 100, 1),
+        .groups = "drop"
+    )
+
+# Count 3rd-place candidates with vote share >0.125 in cantonal election in 2011
+third_place_candidates_cantonal_2011 <- france_data %>%
+    filter(
+        election == "cantonal",
+        threshold_party_can3 > 0.125,
+        year == 2011
+    ) %>%
+    group_by(election) %>%
+    summarise(
+        num_qualifying = n(),
+        num_ran = sum(ran_t2_can3 == 1, na.rm = TRUE),
+        perctage_run = round(num_ran / num_qualifying * 100, 1),
+        .groups = "drop"
+    )
+
+# Combine the results into a single tibble
+third_place_candidates_combined <- tibble::tibble(
+    election = c("National", "Cantonal (2011)", "Cantonal"),
+    num_qualifying = c(
+        third_place_candidates_national$num_qualifying,
+        third_place_candidates_cantonal_2011$num_qualifying,
+        third_place_candidates_cantonal$num_qualifying
+    ),
+    num_ran = c(
+        third_place_candidates_national$num_ran,
+        third_place_candidates_cantonal_2011$num_ran,
+        third_place_candidates_cantonal$num_ran
+    ),
+    perctage_run = c(
+        third_place_candidates_national$perctage_run,
+        third_place_candidates_cantonal_2011$perctage_run,
+        third_place_candidates_cantonal$perctage_run
+    )
+)
+
+# Add total row
+third_place_candidates_combined <- third_place_candidates_combined %>%
+    bind_rows(
+        tibble(
+            election = "Total",
+            num_qualifying = sum(.$num_qualifying, na.rm = TRUE),
+            num_ran = sum(.$num_ran, na.rm = TRUE),
+            perctage_run = round(sum(.$num_ran, na.rm = TRUE) / sum(.$num_qualifying, na.rm = TRUE) * 100, 1)
+        )
+    )
+
+# Add a qualifying threshold column
+third_place_candidates_combined <- third_place_candidates_combined %>%
+    mutate(
+        qualifying_threshold = case_when(
+            election == "National" ~ "> 12.5%",
+            election == "Cantonal (2011)" ~ "> 12.5%",
+            election == "Cantonal" ~ "> 10%",
+            election == "Total" ~ NA_character_
+        )
+    )
+```
+
+To get a final sense of the dataset, we can look at the number of candidates who get the third highest share of votes in the first round and qualify for the second round by exceeding the qualifying threshold. We can also look at how many of these qualified candidates go onto run in the second round. The results are summarised in **``Table 5``** below, where we see the key finding that only **``r sprintf("%.1f%%", third_place_candidates_combined$perctage_run[third_place_candidates_combined$election == "Total"])``** of third-place candidates who qualified went on to run in the second round. This means that the threshold for qualifying for the second round is clearly non-deterministic of whether a candidate will run in the second round, showing a large amuont of one-sided non-compliance at the threshold.
+
+```{r Candidates Qualifying Table, echo=FALSE, results='asis'}
+# Display the Candidate table
+knitr::kable(
+    third_place_candidates_combined,
+    caption = "Number of Third-Place Candidates Qualifying and Running for Round Two",
+    col.names = c("Election Type", "No. Qualified", "No. Running", "% of Qualified Running", "Qualifying Threshold"),
+    booktabs = TRUE,
+    align = "lcccc"
+) %>%
+    kable_styling(latex_options = "hold_position", position = "center") %>%
+    footnote(
+        general = "Note: The qualifying threshold for the national election and cantonal election in 2011 is > 12.5%, while for other cantonal elections it is > 10%. No elections were won outright in the first round to cause a candidate to be automatically elected.",
+        general_title = "",
+        threeparttable = TRUE
+    )
+```
+
+## Fuzzy Regression Discontinuity Design
+
+Think about a causal inference method covered in the course that allows you to investigate, using the data provided, whether increasing the number of candidates standing in an election reduces the abstention rate. Explain why this design is a good choice in this setting. Discuss its identiﬁcation assumption(s) in the context you are studying here.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+We are investigating whether increasing the number of candidates standing in an election reduces the abstention rate (increases turnout). As shown by the analyses of the data so far, we have seen that there is a possible positive relationship between candidate numbers and turnout. In the elections analysed, there is also a clear threshold which determines whether additional candidates are allowed to run in the second round of elections. Based on this, a regression discontinuity design (RDD) is likely best placed to estimate the causal effect of increasing the number of candidates on the abstention rate as the threshold acts as a random assignment mechanism to generate exogeneity in the independent variable. However, in this case, the threshold is not deterministic of whether a candidate will run in the second round, as shown by the large amount of one-sided non-compliance at the threshold meaning a fuzzy regression discontinuity design is most appropriate. Here, we are interested in the intent-to-treat effects, focussing on treatment assignment rather than treatment exposure.
+
+With fuzzy RDD designs, the threshold acts as an instrument to generate exogenous variation in the independent variable and therefore must satisfy the first-stage relevance assumption where:
+
+\begin{equation}
+\operatorname{cov}(Z_i, X_i) \ne 0
+\end{equation}
+
+This assumption clearly holds as the threshold is a determininistic requirement for whether additional candidates can choose to run in the second round. This is shown below for national elections where the cut-off is **``12.5%``**, with a clear discontinuity at the threshold but also a number of **``0``** values where there was non-compliance, demonstrating the need for a fuzzy RDD.
+
+```{r First-Stage Relevance Table, echo=FALSE, results='hide', fig.show='hide'}
+# First-stage: the jump in probability of treatment at the threshold
+rd_first_stage <- rdrobust::rdrobust(
+    y = national_data$ran_t2_can3,
+    x = national_data$threshold_party_can3,
+    c = 0.125,
+    kernel = "triangular",
+    bwselect = "mserd"
+)
+
+# Create an rdplot()
+rd_plot <- rdplot(national_data$ran_t2_can3, national_data$threshold_party_can3,
+    c = 0.125,
+    binselect = "esmv",
+)
+```
+
+```{r First-Stage Plot, echo=FALSE, fig.width=6, fig.height=4, fig.align='center', fig.cap = "First Stage: Discontinuity in Treatment Take-Up", fig.pos='H'}
+# Extract rdplot() data to use in ggplot()
+rd_plot_data <- as.data.frame(rd_plot$vars_bins)
+
+# Create a ggplot() using rd_plot_data
+ggplot(rd_plot_data, aes(x = rdplot_mean_x, y = rdplot_mean_y)) +
+    geom_point(size = 1) +
+    geom_smooth(
+        data = rd_plot_data %>%
+            filter(rdplot_mean_x >= 0.125),
+        method = "loess", span = 1, se = FALSE, colour = "#818181"
+    ) +
+    geom_vline(xintercept = 0.125, linetype = "dashed") +
+    labs(
+        x = "Third Candidate Vote Share (Relative to Threshold)",
+        y = "Probability of Advancing (ran_t2_can3)",
+        caption = "Notes: This example has been done on the set of national elections. Other election types are analysed below."
+    ) +
+    scale_fill_grey() +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = ggplot2::margin(r = 10)),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 9)
+    )
+```
+
+For a fuzzy RDD design, we also need to ensure that there is local independence of the elections just above and below the threshold. This is necessary so that we can confidently argue that turnout changes with candidate numbers as a causal effect of additional candidates rather than some observed or unobserved heterogeneity between parties standing. In this case, this would mean that 3rd-place candidates just above (e.g., 12.6% vote share) are similar to those below the threshold (e.g. 12.4% vote share) in every way other than the fact that one can stand in the second round and one cannot. This is tested for in the next section.
+
+Next, the exclusion restriction assumption should hold whereby the threshold only affects the outcome through the treatment of an additional 3rd-place candidate standing, rather than the threshold affecting turnout through another mechanism such as tactical voting and protest votes. This cannot be directly tested, but effects can be shown to be minimal through a pre-treatment placebo. However, in this context voting bahviour in different rounds (where the first acts as a 'qualification round' more than an outright winner-takes-all) may vary as voters and interest groups mabilise to employ tactical and protest voting behaviours.
+
+The monotonicity assumption cannot be tested either but is likely to hold due to electoral rules. Monotonicity assumes that no candidate is less likely to run after qualifying for the second round after receiving the threshold treatment. This holds as no unqualified candidates can run (hence the one-sided non-compliance), and that there is an implict assumption that candidates who run in the first round do so with the objective of winning the election; therefore, with this objective, candidates would be more likely to run than to abstain upon recieving the treatment in order to maximise their chances of running.
+
+Finally, we assume that there is no sorting and the running variable remains continuous across the threshold. In this case, this means that candidates cannot manipulate their vote share to artificially cross the threshold. If this were to happen, we would see a clustering of candidates with vote shares near to the threshold. This will next be tested to ensure the density of candidate vote shares is smoothly distributed across the threshold.
+
+## Falsification Checks
+
+Conduct at least two empirical tests to show that your choice of research design is internally valid (falsiﬁcation checks).
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+*Note: after assessing the following falsification checks with Cantonal (2011) data, the sample size is too small for many meaningful results. Therefore, the following analyses focus on subsets of **``france_data``** for national and cantonal elections (exc. 2011) only.*
+
+Falsification tests can be used to probe the validity of the identifying assumptions of sorting, the exclusion restriction, and local independence stated above.
+
+Firstly, a density test can help show a smoothly distributed running variable which does not cluster at the threshold such that the sorting assumption holds. This test uses a null hypothesis that the running variable **``threshold_party_can3``** is continuous at the threshold.
+
+```{r Density Tests, echo=FALSE, results='asis'}
+# === Function ===
+
+# Function to generate rdd density tests across different data and cutoffs
+run_density_test <- function(data, cutoff) {
+    rddensity::rddensity(data$threshold_party_can3, c = cutoff)
+}
+# Eempty list to store the results
+density_tests <- list()
+
+# Loop over names in the dataset
+for (name in names(datasets)) {
+    density_tests[[name]] <- run_density_test(datasets[[name]], cutoffs[[name]])
+}
+
+# === Extracting Results ====
+
+# Data frame summarising p-values and test statistics
+density_summary_clean <- data.frame(
+    Dataset = c("National Elections", "Cantonal Elections", "Cantonal Elections (2011)"),
+    Test_Statistic = sapply(density_tests, function(x) round(x$test$t_jk, 3)),
+    P_Value = sapply(density_tests, function(x) round(x$test$p_jk, 4))
+)
+
+# === Function to Add Significance Stars ===
+significance_stars <- function(p_value) {
+    ifelse(p_value < 0.001, "***",
+        ifelse(p_value < 0.01, "**",
+            ifelse(p_value < 0.05, "*",
+                ifelse(p_value > 0.05, "-")
+            )
+        )
+    )
+}
+
+# Add the significance stars column
+density_summary_clean$Significance <- sapply(
+    density_summary_clean$P_Value, significance_stars
+)
+
+# Create a kable table from the dataframe results
+knitr::kable(
+    density_summary_clean,
+    col.names = c("Election Type", "Test Statistic", "P-Value", "Significance"),
+    caption = "Density Test Results by Election Type",
+    booktabs = TRUE,
+    align = "lccc",
+    row.names = FALSE
+) %>%
+    kableExtra::kable_styling(
+        latex_options = "hold_position", position = "center"
+    ) %>%
+    footnote(
+        general = "Significance stars: *** p < 0.001, ** p < 0.01, * p < 0.05",
+    )
+```
+
+ **``Table 6``** shows the results of these density tests across each election type and its threshold. Cantonal elections show no sign of sorting with p-values of **``r sprintf("%.3f", density_tests$cantonal$test$p_jk)``** and **``r sprintf("%.3f", density_tests$cantonal_2011$test$p_jk)``** meaning we cannot reject the null. However, the national elections show a slightly significant p-value of **``r sprintf("%.3f", density_tests$national$test$p_jk)``**. This indicates that there is some evidence of sorting at the threshold in national elections but only with weak significance.
+
+This continuity in the running variable can also be seen in the visual plots below. Note that given the low number of observations around the threshold for Cantonal elections in 2011, this plot is not displayed. Given the low signficance and visually continuous nature of the running variables, it is concluded that sorting at the threshold is not a major concern for using a fuzzy RDD research desgin.
+
+```{r National Density Plots, echo=FALSE, fig.width=6, fig.height=4, fig.align='center', fig.cap = "Density plot of national vote share relative to the 12.5% threshold", fig.pos='H'}
+# Generate density plot for national elections
+rdplot_output <- rdplotdensity(
+    rdd = density_tests$national,
+    X = national_data$threshold_party_can3,
+    plotRange = c(0.05, 0.2),
+    plotN = 25,
+    CIuniform = TRUE,
+    noPlot = TRUE
+)
+
+# Extract the ggplot
+national_plot <- rdplot_output$Estplot
+
+# Apply ggplot2 styling
+national_plot_styled <- national_plot +
+    labs(x = "Running Variable", y = "Density Estimate") +
+    geom_vline(xintercept = 0.125, linetype = "dashed") +
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "none") +
+    scale_fill_grey() +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = ggplot2::margin(r = 10)),
+        legend.position = "none"
+    )
+
+# Print the styled plot
+print(national_plot_styled)
+```
+
+```{r Cantonal Density Plots, echo=FALSE, fig.width=6, fig.height=4, fig.align='center', fig.cap = "Density plot of Cantonal vote share relative to the 10% threshold", fig.pos='H'}
+# Generate density plot for cantonal elections
+rdplot_output_cantonal <- rdplotdensity(
+    rdd = density_tests$cantonal,
+    X = cantonal_data$threshold_party_can3,
+    plotRange = c(0.05, 0.2),
+    plotN = 25,
+    CIuniform = TRUE,
+    noPlot = TRUE
+)
+
+# Extract the ggplot
+cantonal_plot <- rdplot_output_cantonal$Estplot
+
+# Apply ggplot2 styling
+cantonal_plot_styled <- cantonal_plot +
+    labs(x = "Running Variable", y = "Density Estimate") +
+    geom_vline(xintercept = 0.1, linetype = "dashed") +
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "none") +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = ggplot2::margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = ggplot2::margin(r = 10)),
+        legend.position = "none"
+    )
+
+# Print final styled cantonal plot
+print(cantonal_plot_styled)
+```
+
+Next, balance and placebo tests can be used to assess local independence. The **``Table 7``** below tests the local balance near the threshold across the set of pre-treatment covariates to see whether the treated and control groups near the threshold are comparable.
+
+```{r Balance Tests, echo=FALSE, results='asis'}
+# === Function ===
+## Covariates which could determine vote-share characteristics
+covariates <- c(
+    "ideology_can1",
+    "ideology_can2",
+    "ideology_can3",
+    "turnout_t1",
+    "margin_t1"
+)
+
+## Function to run through and test each of the covariates for balance
+balance_results <- list()
+
+for (dataset_name in names(datasets)) {
+    data <- datasets[[dataset_name]]
+    cutoff <- cutoffs[[dataset_name]]
+
+    for (var in covariates) {
+        other_covariates <- setdiff(covariates, var)
+
+        model <- rdrobust(
+            y = data[[var]],
+            x = data$threshold_party_can3,
+            c = cutoff,
+            kernel = "triangular",
+            bwselect = "mserd",
+            cluster = data$id_canton,
+            covs = data[, other_covariates]
+        )
+
+        balance_results[[paste(dataset_name, var, sep = "_")]] <- model
+    }
+}
+```
+
+```{r Balance Test Table, echo=FALSE, results='asis'}
+# Define election types (from your titles)
+election_types <- c("national", "cantonal")
+
+# === Extract and Format Balance Test Results ===
+
+# Function to extract results and add significance stars
+extract_and_format_result <- function(results, election, covariate) {
+    result_name <- paste(election, covariate, sep = "_")
+    result <- results[[result_name]]
+
+    if (is.null(result)) {
+        return(c(NA, NA, "")) # Handle missing results
+    }
+
+    est <- round(result$coef[1], 3)
+    p <- round(result$pv[1], 4)
+
+    stars <- significance_stars(p) # Use the pre-defined function
+
+    return(c(est, p, stars))
+}
+
+# Create the data frame directly
+balance_data <- data.frame(
+    Covariate = rep(covariates, each = length(election_types)), # Correct order
+    Election_Type = rep(election_types, times = length(covariates)), # Correct order
+    Estimate = numeric(length(covariates) * length(election_types)),
+    P_Value = numeric(length(covariates) * length(election_types)),
+    Significance = character(length(covariates) * length(election_types))
+)
+
+# Populate the data frame efficiently
+for (i in seq_along(covariates)) {
+    for (j in seq_along(election_types)) {
+        covariate <- covariates[i]
+        election <- election_types[j]
+        result <- extract_and_format_result(balance_results, election, covariate)
+        row_index <- (i - 1) * length(election_types) + j
+        balance_data[row_index, c("Estimate", "P_Value", "Significance")] <- result
+    }
+}
+# Reshape to wide format
+balance_wide <- balance_data %>%
+    pivot_wider(
+        names_from = Election_Type,
+        values_from = c(Estimate, P_Value, Significance),
+        names_glue = "{.value}_{Election_Type}"
+    )
+
+# Rename columns for better display
+balance_clean <- balance_wide %>%
+    rename(
+        Covariate = Covariate,
+        National_Estimate = Estimate_national,
+        National_P_Value = P_Value_national,
+        National_Significance = Significance_national,
+        Cantonal_Estimate = Estimate_cantonal,
+        Cantonal_P_Value = P_Value_cantonal,
+        Cantonal_Significance = Significance_cantonal
+    )
+
+# Reorder columns
+balance_clean <- balance_clean %>%
+    select(
+        Covariate,
+        National_Estimate,
+        National_P_Value,
+        National_Significance,
+        Cantonal_Estimate,
+        Cantonal_P_Value,
+        Cantonal_Significance
+    )
+
+# Display with kable
+kable(balance_clean,
+    caption = "Balance Test Results: Covariate Discontinuities by Election Type",
+    booktabs = TRUE,
+    col.names = c("Covariate", rep(c("Estimate", "P-Value", "Significance"), 2)),
+    align = "lcccc", # Adjust alignment as needed
+) %>%
+    add_header_above(c(" " = 1, "National" = 3, "Cantonal" = 3)) %>%
+    kable_styling(latex_options = "hold_position", position = "center") %>%
+    footnote(
+        general = "Each row is a covariate. Columns report the RD estimate, p-value, and significance stars. *** p < 0.001, ** p < 0.01, * p < 0.05",
+        general_title = "",
+        threeparttable = TRUE
+    )
+```
+
+The covariates included are variables which could theoretically affect voting behaviour and the turnout/null votes, and are pre-determined independently of the threshold. The **``Estimate``** coefficients in the table show the average difference between the covariate values before and after the threshold to see whether there is a discontinuity, and therefore a possibility that the covariate could be a factor - other than the threshold - which affects the outcome, thus violating the local independence assumption. The only covariate where we see a statistically signficant difference at the threshold is **``ideology_can3``** in national elections with a coefficient of **``-0.477``** and p-value of **``0.006``**. The negative coefficient implies that third-place party candidates above the threshold are more likely to be more left wing (assuming lower on the ideology scale = left). As this covariate is statistically significantly different, the local independence assumption may not hold as stronly in national elections and is therefore included as a control in the fuzzy RDD calculations. However, across other covariates, there appears to be randomness at the threshold for both national and cantonal elections.
+
+Finally, although we cannot test the exclusion restriction directly, placebo tests are used to help verify that the only pathway of affect on the outcome variable is that of an additional candidate given by the threshold treatment and not other factors correlated with the threshold of the running variable. The placebo tests look at the outcome variable at different threshold cut-offs, with the expectation that there would be no changes in the outcome at these different cut-offs - there should be no discontinuities.
+
+\newpage
+
+```{r Placebo Cut-Offs, echo=FALSE, results=FALSE}
+# === Function: Run rdrobust at a Specified Cutoff ===
+run_rdrobust_at_cutoff <- function(
+    data,
+    real_cutoff,
+    placebo_cutoff,
+    direction = c("below", "above"),
+    y_var_name) {
+    direction <- match.arg(direction)
+
+    # Subset the data based on direction and real cutoff
+    data_subset <- if (direction == "below") {
+        data[data$threshold_party_can3 < real_cutoff, ]
+    } else {
+        data[data$threshold_party_can3 >= real_cutoff, ]
+    }
+
+    # Run rdrobust
+    rdrobust_result <- rdrobust::rdrobust(
+        y = data_subset[[y_var_name]],
+        x = data_subset$threshold_party_can3,
+        c = placebo_cutoff,
+        kernel = "triangular",
+        bwselect = "mserd"
+    )
+
+    # Extract and format results
+    return(data.frame(
+        placebo_cutoff = placebo_cutoff,
+        estimate = round(rdrobust_result$coef[1], 3),
+        p_value = round(rdrobust_result$pv[1], 4)
+    ))
+}
+
+# === Main Placebo Test Script ===
+
+# Define parameters
+directions <- c("below", "above")
+outcome_variable <- "turnout_t2" # Define outcome variable
+
+# Control over placebo cutoffs
+num_placebo_cutoffs <- 4
+placebo_cutoff_distance <- 0.01
+
+# Prepare to store results
+placebo_results_all <- list()
+
+# Loop through datasets and directions
+for (dataset_name in c("national", "cantonal")) {
+    data <- datasets[[dataset_name]]
+    real_cutoff <- cutoffs[[dataset_name]]
+
+    for (direction in directions) {
+        # Generate placebo cutoffs
+        placebo_cutoffs <- if (direction == "below") {
+            real_cutoff - seq(placebo_cutoff_distance, num_placebo_cutoffs * placebo_cutoff_distance, by = placebo_cutoff_distance)
+        } else {
+            real_cutoff + seq(placebo_cutoff_distance, num_placebo_cutoffs * placebo_cutoff_distance, by = placebo_cutoff_distance)
+        }
+
+        # Run tests and store results
+        results <- lapply(placebo_cutoffs, function(cut) {
+            run_rdrobust_at_cutoff(data, real_cutoff, cut, direction, outcome_variable)
+        })
+
+        # Combine results and store
+        placebo_results_all[[paste(dataset_name, direction, sep = "_")]] <- do.call(rbind, results)
+
+        # Print a summary of the results
+        print(paste("Placebo results for", dataset_name, direction, ":"))
+        print(placebo_results_all[[paste(dataset_name, direction, sep = "_")]])
+    }
+}
+```
+
+```{r Placebo Test Table, echo=FALSE, results='asis'}
+utils::globalVariables(c("estimate", "placebo_cutoff", "p_value", "Direction", "Significance", "kable"))
+
+# === Placebo Test Table Function ===
+generate_combined_placebo_table <- function(election, placebo_results_all, titles) {
+    # Combine results from above and below
+    results_below <- placebo_results_all[[paste(election, "below", sep = "_")]]
+    results_above <- placebo_results_all[[paste(election, "above", sep = "_")]]
+
+    # Label direction
+    results_below$Direction <- "Below"
+    results_above$Direction <- "Above"
+
+    # Combine both
+    combined_results <- rbind(results_below, results_above)
+
+    # Build table
+    placebo_table_data <- combined_results %>%
+        dplyr::mutate(
+            Significance = significance_stars(p_value)
+        ) %>%
+        dplyr::select(
+            Direction,
+            placebo_cutoff,
+            estimate,
+            p_value,
+            Significance
+        )
+
+    # Display table
+    knitr::kable(placebo_table_data,
+        caption = paste("Placebo Test Results: ", titles[[election]]),
+        booktabs = TRUE,
+        col.names = c("Direction", "Cutoff", "Estimate", "P-value", "Significance"),
+        align = "lcccc"
+    ) %>%
+        kable_styling(latex_options = "hold_position", position = "center") %>%
+        footnote(
+            general = "Columns report RD estimate, p-value, and significance stars. *** p < 0.001, ** p < 0.01, * p < 0.05",
+            general_title = "",
+            threeparttable = TRUE
+        )
+}
+
+for (election in election_types) {
+    print(generate_combined_placebo_table(election, placebo_results_all, titles))
+}
+```
+
+As expected, the estimates from these tests are near zero and not statistically significant across each different cut-off value above and below the threshold, and for both national and cantonal elections. This suggests that the exclusion restriction holds and we have verified the use of a fuzzy RDD approach.
+
+Based on the above three falsification checks, we have shown that the choice of a fuzzy RDD researcg design is generally internally valid. In particular, for cantonal elections we can be very confident of the interal validiy as there was no sign of sorting at the threshold, nor an imalance of covariates giving credence to the local independence assumption, and finally there are no statistically discontinuities at the threshold helping support the exlcusion restriction.
+
+For the final fuzzy RDD analyses, some doubt may be cast on the validity of the results for national elections, but the inclusion of **``threshold_party_can3``** will be used to help mitigate any confounding issues.
+
+## Non-Parametric Fuzzy RDD Estimation
+
+Finally, estimate the causal eﬀect of a third candidate standing in the second round, using the research design of your choice. Consider two main outcome variables: (1) turnout and (2) null and blank votes. Select or construct appropriate variables to operationalise the main outcome variables and the running variable. Interpret the results and discuss the eﬀect size of your estimates in the ﬁrst/second stage and their statistical signiﬁcance.
+
+\hspace{0pt}\rule{100pt}{0.25pt}
+
+- Do at different bandwiths
+- Include a first-stage analysis
+- Table of results across two different outcome variables
+- Consider based on prioir analyses whether to include covariates
+- Consider national and cantonal elections separately
