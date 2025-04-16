@@ -150,7 +150,7 @@ Table: Variables of interest in the 'Staying in the First League: Parliamentary 
 
 ```{r}
 # Set working directory
-setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_analysis/week_8")
+setwd("/Users/edwardanders/Documents/GitHub/oxford/causal_inference/week_8")
 
 # Load the data
 enter <- read.csv("enter.csv")
@@ -207,6 +207,7 @@ rdplot(enter$newsuccess, enter$performance,
   x.label = "Electoral outcome at t (relative to standardized electoral threshold)"
 )
 
+?rdplot
 
 # This plots the equivalent of the first-stage
 # Shows that there is non-compliance as being to the left of the cutoff does
