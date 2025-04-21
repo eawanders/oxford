@@ -7,15 +7,18 @@ header-includes:
 ---
 
 \centerline{\Large \textbf{Edward Anders}} \
+\vspace{-6mm}
 \centerline{Email: edward.anders@politics.ox.ac.uk | Phone: +44 (0) 07942 927727} \
 \vspace{-6mm}
+
+Startup operator with multiple years of experience building early-stage, venture-capital-backed companies working as a deliberate generalist across product, operations and growth.
 
 ## Education
 \vspace{-3mm}
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
-\textbf{\normalsize St Antony's College, University of Oxford} \\  % Bold and larger font size
+\textbf{\normalsize St Antony's College, University of Oxford} \\
 MPhil in Politics (Comparative Government)
 
 \columnbreak  % Move to the right column
@@ -31,7 +34,7 @@ Supervisor: Prof. Rachel Bernhard, Nuffield College, Oxford.
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
-\textbf{\normalsize University of Bristol} \\  % Bold and larger font size
+\textbf{\normalsize University of Bristol} \\
 BSc Economics and Politics, 1st-Class Honours
 
 \columnbreak  % Move to the right column
@@ -46,7 +49,7 @@ BSc Economics and Politics, 1st-Class Honours
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
-\textbf{\normalsize Securely Technology Limited (Complyance)} \\  % Bold and larger font size
+\textbf{\normalsize Securely Technology Limited (Complyance)} \\
 Strategy Associate Manager
 
 \columnbreak  % Move to the right column
@@ -64,7 +67,7 @@ Apr. 2024-present
 \begin{multicols}{2}  % Start two-column environment
 
 \raggedright  % Left-align text
-\textbf{\normalsize Quanterium Technologies (Compose)} \\  % Bold and larger font size
+\textbf{\normalsize Quanterium Technologies (Compose)} \\
 Senior Founder's Associate
 
 \columnbreak  % Move to the right column
@@ -98,5 +101,5 @@ BCG Project, Carnall Farrar, Strategy\&
 
 ## Skills \& Tooling
 - Quantitative and computational research methods inc. machine learning techniques.
-- Python, R, Stata, SQL, Git, CSS, JavaScript (basic).
+- Python, R, Stata, SQL, Git, CSS, JavaScript.
 - Segment, Webflow, Figma, GitHub, Metabase, PostHog, Firebase.
