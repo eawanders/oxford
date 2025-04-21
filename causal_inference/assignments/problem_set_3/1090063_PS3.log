@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.24)  15 APR 2025 16:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.24)  21 APR 2025 12:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -637,27 +637,27 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 <1090063_PS3_files/figure-latex/First-Stage Plot-1.pdf, id=80, 423.5825pt x 279.0425pt>
 File: 1090063_PS3_files/figure-latex/First-Stage Plot-1.pdf Graphic file (type pdf)
 <use 1090063_PS3_files/figure-latex/First-Stage Plot-1.pdf>
-Package pdftex.def Info: 1090063_PS3_files/figure-latex/First-Stage Plot-1.pdf  used on input line 601.
+Package pdftex.def Info: 1090063_PS3_files/figure-latex/First-Stage Plot-1.pdf  used on input line 600.
 (pdftex.def)             Requested size: 423.58147pt x 279.04181pt.
 
 
 [9 <./1090063_PS3_files/figure-latex/First-Stage Plot-1.pdf>]
 
 LaTeX Font Warning: Font shape `T1/lmtt/bx/it' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/sl' tried instead on input line 659.
+(Font)              Font shape `T1/lmtt/b/sl' tried instead on input line 658.
 
-<1090063_PS3_files/figure-latex/National Density Plots-1.pdf, id=93, 423.5825pt x 261.97874pt>
+<1090063_PS3_files/figure-latex/National Density Plots-1.pdf, id=93, 423.5825pt x 225.84375pt>
 File: 1090063_PS3_files/figure-latex/National Density Plots-1.pdf Graphic file (type pdf)
 <use 1090063_PS3_files/figure-latex/National Density Plots-1.pdf>
-Package pdftex.def Info: 1090063_PS3_files/figure-latex/National Density Plots-1.pdf  used on input line 702.
-(pdftex.def)             Requested size: 423.58147pt x 261.9781pt.
+Package pdftex.def Info: 1090063_PS3_files/figure-latex/National Density Plots-1.pdf  used on input line 699.
+(pdftex.def)             Requested size: 423.58147pt x 225.84319pt.
 
 
 [10]
 <1090063_PS3_files/figure-latex/Cantonal Density Plots-1.pdf, id=100, 423.5825pt x 261.97874pt>
 File: 1090063_PS3_files/figure-latex/Cantonal Density Plots-1.pdf Graphic file (type pdf)
 <use 1090063_PS3_files/figure-latex/Cantonal Density Plots-1.pdf>
-Package pdftex.def Info: 1090063_PS3_files/figure-latex/Cantonal Density Plots-1.pdf  used on input line 711.
+Package pdftex.def Info: 1090063_PS3_files/figure-latex/Cantonal Density Plots-1.pdf  used on input line 708.
 (pdftex.def)             Requested size: 423.58147pt x 261.9781pt.
 
 
@@ -667,7 +667,17 @@ Package pdftex.def Info: 1090063_PS3_files/figure-latex/Cantonal Density Plots-1
 
 [13]
 
-[14] (./1090063_PS3.aux)
+[14]
+<1090063_PS3_files/figure-latex/Bandwidth Robustness Tests-1.pdf, id=145, 413.545pt x 268.00125pt>
+File: 1090063_PS3_files/figure-latex/Bandwidth Robustness Tests-1.pdf Graphic file (type pdf)
+<use 1090063_PS3_files/figure-latex/Bandwidth Robustness Tests-1.pdf>
+Package pdftex.def Info: 1090063_PS3_files/figure-latex/Bandwidth Robustness Tests-1.pdf  used on input line 975.
+(pdftex.def)             Requested size: 413.54398pt x 268.00058pt.
+
+
+[15]
+
+[16 <./1090063_PS3_files/figure-latex/Bandwidth Robustness Tests-1.pdf>] (./1090063_PS3.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -677,18 +687,18 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 14484 strings out of 475172
- 232765 string characters out of 5764613
- 638885 words of memory out of 5000000
- 37171 multiletter control sequences out of 15000+600000
+ 14500 strings out of 475172
+ 233492 string characters out of 5764613
+ 639156 words of memory out of 5000000
+ 37183 multiletter control sequences out of 15000+600000
  643837 words of font info for 90 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,15n,93p,703b,560s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 89i,15n,93p,703b,567s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtko10.pfb>
-Output written on 1090063_PS3.pdf (14 pages, 320520 bytes).
+Output written on 1090063_PS3.pdf (16 pages, 340369 bytes).
 PDF statistics:
- 248 PDF objects out of 1000 (max. 8388607)
- 194 compressed objects within 2 object streams
- 40 named destinations out of 1000 (max. 500000)
- 96 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 271 PDF objects out of 1000 (max. 8388607)
+ 211 compressed objects within 3 object streams
+ 44 named destinations out of 1000 (max. 500000)
+ 101 words of extra memory for PDF output out of 10000 (max. 10000000)
 
