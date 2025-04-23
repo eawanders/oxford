@@ -27,5 +27,5 @@
   "latex-workshop.latex.recipe.default": "xelatex",
 
   "cSpell.language": "en-GB",
-  "cSpell.words": ["pacman"]
+  "cSpell.words": ["pacman", "yougov"]
 }
