@@ -1,0 +1,67 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+    pdf_document:
+        fig_width: 6
+        fig_height: 4
+        fig_caption: true
+        toc: true
+        toc_depth: 2
+        number_sections: true
+fontsize: 11pt
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}
+---
+
+\newpage
+
+# Case selection and data gathering
+
+- See pre-analysis plan for details of what to include in this section
+- Case selection (why focus on the UK?)
+    - I am to have external validity to my research/case?
+    - Can I make inferences to other cases?
+- What is the case?
+    - What is the unit of analysis?
+    - What is the time period?
+    - What is the geographical scope?
+    - What are the key variables?
+- What data is being collected?
+- How is the data being collected?
+    - What is the sampling strategy?
+    - Note the UK weighting
+
+- Plan for using agentic modelling
+    - Why would I use agentic modelling?
+    - What is the agentic modelling?
+    - How will I use agentic modelling?
+
+# Data analysis`
+
+The survey experiment was facilitated by YouGov across a representative sample of `2,001` UK adults. The sammple of participants was drawn from YouGov's panel of over `800,000` individuals. The survey was conducted between `October 4th` and `October 5th, 2023`. The sample is weighted to be an identically and inrepresentative of the UK population
+
+## Thermometer Analysis
+
+### Moderator Heterogeneity Analysis
+
+## Outcome Variable Analysis
+
+### Moderator Heterogeneity Analysis
+
+
+\newpage
+
+# Appendix
+
+## Data Cleaning
+
+
+
+## Balance Check
