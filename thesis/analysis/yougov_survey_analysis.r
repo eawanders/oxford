@@ -1,5 +1,5 @@
-# The following code is used to analyze the YouGov survey data
-
+# This script is for the analysis of the YouGov survey data
+# The data is from a survey conducted by YouGov
 # === R Script Setup ===
 
 # Load necessary packages using pacman
@@ -14,7 +14,8 @@ pacman::p_load(
     dplyr,
     emmeans,
     ggplot2,
-    tableone
+    tableone,
+    survey
 )
 
 # Set working directory
@@ -163,9 +164,9 @@ yougov_data <- yougov_data %>%
         levels = c(
             "Almost never",
             "Once in a while",
-            "About hald of the time",
+            "About half of the time",
             "Always",
-            "Most of the time",
+            "Most of the time"
         ),
         ordered = TRUE
     ))
@@ -186,12 +187,35 @@ yougov_data <- yougov_data %>%
         ordered = TRUE
     ))
 
+# Drop levels from `mostlikely` that have no observations
+yougov_data$mostlikely <- droplevels(
+    yougov_data$mostlikely
+)
+
+# === Data Exploration ===
+treatment_receipt <- yougov_data %>%
+    group_by(split) %>%
+    summarise(
+        ai_treatment = sum(ai_treatment, na.rm = TRUE),
+        label_treatment = sum(label_treatment, na.rm = TRUE)
+    )
+# Print treatment receipt
+print(treatment_receipt)
+
+
+# Create summary tables for the outcome variables
+for (outcome in c("agreedisagree", "xtrust", "child")) {
+    for (treatment in c("ai_treatment", "label_treatment")) {
+        cat("\n\n===", outcome, "by", treatment, "===\n")
+        print(table(yougov_data[[outcome]], yougov_data[[treatment]], useNA = "ifany"))
+    }
+}
 
 
 
 # === Balance Check ===
-# Create a balance table for some socio-demographic variables
-# Use function to test across different treatment groups
+# Check the balance of covariates across treatment groups
+# to see if the randomisation was successful
 
 # Define a reusable function for covariate balance checking
 balance_table <- function(data, strata_var, covariates) {
@@ -235,17 +259,73 @@ for (strata_var in treatment_vars) {
 
 
 # === Thermometer Analysis ===
-# Create a new variable for the difference between MLthermo and LLthermo
+# Analysis of the thermometer outcome variables on a continuous scale
+# Analysis done using weighted least squares regression inc. robust standard errors
+
+library(survey)
+
+# Create a new `thermo_gap` variable for the difference between MLthermo and LLthermo
 yougov_data <- yougov_data %>%
     mutate(thermo_gap = MLthermoMean - LLthermoMean)
 
-# Function to run models for different treatment,
-# outcome, and covariate combinations
-thermo_models <- function(data) {
-    treatment_vars <- c("ai_treatment", "label_treatment")
-    outcome_vars <- c("thermo_gap", "MLthermoMean", "LLthermoMean")
+# Define the survey design
+yougov_design <- svydesign(
+    ids = ~1,
+    data = yougov_data,
+    weights = ~weight
+)
 
-    covariates <- c(
+# Flexible function to run linear models for thermometer outcomes
+thermo_models <- function(data,
+                          design,
+                          outcome = c("thermo_gap", "MLthermoMean", "LLthermoMean"),
+                          treatment = c("ai_treatment", "label_treatment"),
+                          covariates = NULL,
+                          moderators = NULL) {
+    for (treat in treatment) {
+        for (out in outcome) {
+            # Start with treatment as predictor
+            rhs <- treat
+
+            # Add covariates (if specified)
+            if (!is.null(covariates)) {
+                rhs <- c(rhs, covariates)
+            }
+
+            # Add moderators and interaction terms (if specified)
+            if (!is.null(moderators)) {
+                rhs <- c(rhs, moderators, paste(treat, moderators, sep = ":"))
+            }
+
+            # Build formula
+            formula_spec <- reformulate(termlabels = rhs, response = out)
+
+            # Print model setup
+            cat(
+                "\n\n=== LINEAR | Outcome:", out,
+                "| Treatment:", treat,
+                "| Covariates:", if (is.null(covariates)) "None" else paste(covariates, collapse = ", "),
+                "| Moderators:", if (is.null(moderators)) "None" else paste(moderators, collapse = ", "), "===\n\n"
+            )
+
+            # Fit model
+            model <- svyglm(formula = formula_spec, design = design)
+            # Cluster SE
+
+            # Output summary
+            print(summary(model))
+        }
+    }
+}
+
+
+# Specify the function call that I want to make
+thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "thermo_gap",
+    covariates = c(
         "age",
         "political_attention",
         "profile_gender",
@@ -254,90 +334,66 @@ thermo_models <- function(data) {
         "pastvote_ge_2024",
         "pastvote_EURef",
         "profile_GOR"
-    )
+    ),
+    moderators = c("mostlikely", "profile_gender")
+)
 
-    for (treatment in treatment_vars) {
-        for (outcome in outcome_vars) {
-            for (include_covariates in c(TRUE, FALSE)) {
-                # Directly define formula terms based on whether covariates are included
-                regression_specification <- reformulate(
-                    termlabels = if (include_covariates) {
-                        c(treatment, covariates)
-                    } else {
-                        treatment
-                    },
-                    response = outcome
-                )
-
-                model <- lm(formula = regression_specification, data = data)
-                print(summary(model))
-            }
-        }
-    }
-}
-
-# Call the function to run the models
-thermo_models(yougov_data)
 
 
 # === Additional Outcome Variable Analysis ===
-ordinal_models <- function(data) {
-    # Define outcome variables (all ordinal factors)
-    outcome_vars <- c("agreedisagree", "xtrust", "child")
 
-    # Define treatment variables
-    treatment_vars <- c("ai_treatment", "label_treatment")
+# Function to run ordinal logistic regression models
+# for the collapsed outcome variables and treatment groups
+ordinal_models <- function(data,
+                           design,
+                           outcome = c("agreedisagree", "xtrust", "child"),
+                           treatment = c("ai_treatment", "label_treatment"),
+                           moderators = NULL,
+                           covariates = NULL) {
+    for (treat in treatment) {
+        for (out in outcome) {
+            # Start with treatment as predictor
+            rhs <- treat
 
-    # Loop over all outcome-treatment combinations
-    for (outcome in outcome_vars) {
-        for (treatment in treatment_vars) {
-            cat("\n\n=== Outcome:", outcome, "| Treatment:", treatment, "===\n\n")
+            # Add covariates (if specified)
+            if (!is.null(covariates)) {
+                rhs <- c(rhs, covariates)
+            }
 
-            # Build regression formula without covariates
-            regression_specification <- reformulate(
-                termlabels = treatment,
-                response = outcome
+            # Add moderators and interactions with treatment
+            if (!is.null(moderators)) {
+                rhs <- c(
+                    rhs, moderators,
+                    paste(treat, moderators, sep = ":")
+                )
+            }
+
+            # Create formula
+            formula_spec <- reformulate(termlabels = rhs, response = out)
+
+            # Print model setup
+            cat(
+                "\n\n=== ORDINAL | Outcome:", out,
+                "| Treatment:", treat,
+                "| Covariates:", if (is.null(covariates)) "None" else paste(covariates, collapse = ", "),
+                "| Moderators:", if (is.null(moderators)) "None" else paste(moderators, collapse = ", "), "===\n\n"
             )
 
-            # Fit ordinal logistic regression model
-            model <- polr(
-                formula = regression_specification,
-                data = data,
-                Hess = TRUE
-            )
+            # Fit model
+            model <- svyolr(formula = formula_spec, design = design)
 
-            # Predicted probabilities by treatment group
-            predicted_probs <- emmeans(
-                model,
-                specs = as.formula(paste0("~", treatment)),
-                mode = "prob",
-                at = list() # prevents generating massive grids
-            )
-
-            # Print predicted probabilities
-            print(predicted_probs)
-
-            # Compare predicted probabilities across treatment groups
-            print(pairs(predicted_probs))
+            # Output summary
+            print(summary(model))
         }
     }
 }
+
 # Call the function to run the models
-ordinal_models(yougov_data)
-
-
-for (outcome in c("agreedisagree", "xtrust", "child")) {
-    for (treatment in c("ai_treatment", "label_treatment")) {
-        cat("\n\n===", outcome, "by", treatment, "===\n")
-        print(table(yougov_data[[outcome]], yougov_data[[treatment]], useNA = "ifany"))
-    }
-}
-
-for (outcome in c("agreedisagree", "xtrust", "child")) {
-    for (treatment in c("ai_treatment", "label_treatment")) {
-        n <- nrow(yougov_data %>% select(all_of(c(outcome, treatment))) %>% drop_na())
-        cat(outcome, "with", treatment, "→ complete cases:", n, "\n")
-    }
-}
-
-## NEXT: combine high and low outcomes into one
+ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "label_treatment",
+    outcome = "child",
+    covariates = c("political_attention", "profile_education_level_recode", "mostlikely", "pastvote_EURef"),
+    moderators = c("pastvote_EURef", "political_attention", "mostlikely", "profile_education_level_recode")
+)
