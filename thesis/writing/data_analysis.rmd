@@ -10,7 +10,7 @@ output:
         toc: true
         toc_depth: 2
         number_sections: true
-fontsize: 9pt
+documentclass: article
 zotero: true
 link-citations: true
 csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
@@ -19,6 +19,7 @@ header-includes:
   - \usepackage{setspace}
   - \setstretch{1.5}
   - \usepackage[para]{threeparttable}
+  - \usepackage[margin=1in]{geometry}
 ---
 
 ```{r Data Setup, include=FALSE}
@@ -45,14 +46,12 @@ pacman::p_load(
     tibble
 )
 
-# Set working directory
-setwd("/Users/edwardanders/Documents/GitHub/oxford/thesis/data/yougov")
-
-
 # === Data Import and Review ===
 
 # Load .csv file into R
-yougov_data <- read_csv("uniom_results.csv")
+yougov_data <- read_csv(
+    "/Users/edwardanders/Documents/GitHub/oxford/thesis/data/yougov/uniom_results.csv"
+)
 
 # View summary of the data
 summary(yougov_data)
@@ -214,6 +213,12 @@ yougov_data <- yougov_data %>%
         ordered = TRUE
     ))
 
+# Rename profile_education_level_recode
+yougov_data <- yougov_data %>%
+    rename(
+        education_recode = profile_education_level_recode
+    )
+
 # Drop levels from `mostlikely` that have no observations
 yougov_data$mostlikely <- droplevels(
     yougov_data$mostlikely
@@ -243,7 +248,7 @@ yougov_data$mostlikely <- droplevels(
     - What is the agentic modelling?
     - How will I use agentic modelling?
 
-# Data analysis`
+# Data analysis
 
 The survey experiment was facilitated by YouGov across a representative sample of `2,001` UK adults. The sample of participants was drawn from YouGov's panel and weighted to be representative of the UK population.
 
@@ -263,7 +268,7 @@ The survey experiment was facilitated by YouGov across a representative sample o
 
 ## Codebook
 
-```{r codebook-table, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+```{r Codebook Table, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 # === Codebook ===
 # Input variable names as plain text (no LaTeX yet)
 
@@ -357,7 +362,7 @@ covariates <- list(
     continuous = c("age", "political_attention"),
     categorical = c(
         "profile_gender",
-        "profile_education_level_recode",
+        "education_recode",
         "profile_work_stat",
         "voted_ge_2024",
         "pastvote_ge_2024",
@@ -390,7 +395,7 @@ create_balance_table <- function(data,
         "political_attention..mean..SD.." = "Political attention",
         "profile_gender...." = "Gender (male)",
         "X" = "Female",
-        "profile_education_level_recode...." = "Education level (High)",
+        "education_recode...." = "Education level (High)",
         "X.1" = "Low",
         "X.2" = "Medium",
         "profile_work_stat...." = "Employment status (Full time student)",
@@ -488,29 +493,36 @@ create_balance_table <- function(data,
 }
 ```
 
-```{r render-balance-tables, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-# === Render Balance Tables ===
-# Create and render balance tables for each treatment variable
-treatment_names <- list(
-    ai_treatment = "AI Treatment Group",
-    label_treatment = "Label Treatment Group"
-)
+```{r balance-ai-treatment, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Render Balance Table for AI Treatment ===
+var_name <- "ai_treatment"
+pretty_name <- "AI Treatment Group"
+caption <- paste0("Balance Table of Covariates by ", pretty_name)
+# You can customize these level names if you prefer, e.g., c("Human-generated", "AI-generated")
+level_names_output <- c("Control", "Treatment")
 
-for (i in seq_along(treatment_vars)) {
-    var_name <- treatment_vars[i]
-    pretty_name <- treatment_names[[var_name]]
+cat(create_balance_table(
+    data = yougov_data,
+    treatment_var = var_name,
+    covariates = covariates,
+    caption_text = caption,
+    treatment_levels = level_names_output
+))
+```
 
-    caption <- paste0("Balance Table of Covariates by ", pretty_name)
+```{r balance-label-treatment, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Render Balance Table for Label Treatment ===
+var_name <- "label_treatment"
+pretty_name <- "Label Treatment Group"
+caption <- paste0("Balance Table of Covariates by ", pretty_name)
+# You can customize these level names if you prefer, e.g., c("Unlabelled", "AI-labelled")
+level_names_output <- c("Control", "Treatment")
 
-    # Define the desired output names for the columns for this specific table
-    level_names_output <- c("Control", "Treatment")
-
-    cat(create_balance_table(
-        data = yougov_data,
-        treatment_var = var_name,
-        covariates = covariates,
-        caption_text = caption,
-        treatment_levels = level_names_output
-    ))
-}
+cat(create_balance_table(
+    data = yougov_data,
+    treatment_var = var_name,
+    covariates = covariates,
+    caption_text = caption,
+    treatment_levels = level_names_output
+))
 ```
