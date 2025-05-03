@@ -1,5 +1,5 @@
 # This script is for the analysis of the YouGov survey data
-# The data is from a survey conducted by YouGov
+# The data is from a survey conducted by YouGov  
 # === R Script Setup ===
 
 # Load necessary packages using pacman
@@ -66,7 +66,7 @@ yougov_data <- yougov_data %>%
         pastvote_ge_2024,
         pastvote_EURef,
         profile_education_level,
-        profile_education_level_recode,
+        education_recode,
         profile_work_stat,
         xconsent,
         mostlikely,
@@ -192,6 +192,13 @@ yougov_data$mostlikely <- droplevels(
     yougov_data$mostlikely
 )
 
+# Rename profile_education_level_recode
+yougov_data <- yougov_data %>%
+    rename(
+        education_recode = profile_education_level_recode
+    )
+
+
 # === Data Exploration ===
 treatment_receipt <- yougov_data %>%
     group_by(split) %>%
@@ -230,14 +237,14 @@ balance_table <- function(data, strata_var, covariates) {
 }
 
 # Define the treatment and control groups to test balance across
-treatment_vars <- c("ai_treatment", "label_treatment")
+treatment_vars <- c("ai_treatment", "label_treatment") 
 
 # Define the covariates for balance checking
 covariates <- list(
     continuous = c("age", "political_attention"),
     categorical = c(
         "profile_gender",
-        "profile_education_level_recode",
+        "education_recode",
         "profile_work_stat",
         "voted_ge_2024",
         "pastvote_ge_2024",
@@ -329,7 +336,7 @@ thermo_models(
         "age",
         "political_attention",
         "profile_gender",
-        "profile_education_level_recode",
+        "education_recode",
         "profile_work_stat",
         "pastvote_ge_2024",
         "pastvote_EURef",
@@ -394,6 +401,6 @@ ordinal_models(
     design = yougov_design,
     treatment = "label_treatment",
     outcome = "child",
-    covariates = c("political_attention", "profile_education_level_recode", "mostlikely", "pastvote_EURef"),
-    moderators = c("pastvote_EURef", "political_attention", "mostlikely", "profile_education_level_recode")
+    covariates = c("political_attention", "education_recode", "mostlikely", "pastvote_EURef"),
+    moderators = c("pastvote_EURef", "political_attention", "mostlikely", "education_recode")
 )
