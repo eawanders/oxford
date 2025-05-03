@@ -10,7 +10,7 @@ output:
         toc: true
         toc_depth: 2
         number_sections: true
-fontsize: 11pt
+fontsize: 9pt
 zotero: true
 link-citations: true
 csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
@@ -18,7 +18,207 @@ bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_librar
 header-includes:
   - \usepackage{setspace}
   - \setstretch{1.5}
+  - \usepackage[para]{threeparttable}
 ---
+
+```{r Data Setup, include=FALSE}
+# The data is from a survey conducted by YouGov  
+# === R Script Setup ===
+
+# Load necessary packages using pacman
+if (!requireNamespace("pacman", quietly = TRUE)) {
+    install.packages("pacman")
+}
+
+pacman::p_load(
+    tidyverse,
+    haven,
+    MASS,
+    dplyr,
+    emmeans,
+    ggplot2,
+    tableone,
+    survey,
+    kableExtra,
+    stringr,
+    purrr,
+    tibble
+)
+
+# Set working directory
+setwd("/Users/edwardanders/Documents/GitHub/oxford/thesis/data/yougov")
+
+
+# === Data Import and Review ===
+
+# Load .csv file into R
+yougov_data <- read_csv("uniom_results.csv")
+
+# View summary of the data
+summary(yougov_data)
+str(yougov_data)
+glimpse(yougov_data)
+
+
+# === Data Cleaning and Transformation ===
+
+# Check for missing values
+## The only missing values are found in pastvote_ge_2024
+## But these are as a result of voted_ge_2024 being
+## 'No, did not vote' or 'Don't know'
+missing_values <- sapply(yougov_data, function(x) sum(is.na(x)))
+
+# Remove columns that are not needed
+yougov_data <- yougov_data %>%
+    dplyr::select(-c(
+        randMOSTLEAST,
+        MLthermo,
+        LLthermo
+    ))
+
+# Convert any values == 'Not asked' to NA
+yougov_data <- yougov_data %>%
+    mutate(across(where(is.character), ~ na_if(., "Not asked")))
+
+# Convert any values == '997' to NA
+yougov_data <- yougov_data %>%
+    mutate(across(where(is.character), ~ na_if(., "997")))
+
+# Convert character columns to factors
+yougov_data <- yougov_data %>%
+    mutate(across(c(
+        profile_gender,
+        profile_GOR,
+        voted_ge_2024,
+        pastvote_ge_2024,
+        pastvote_EURef,
+        profile_education_level,
+        profile_education_level_recode,
+        profile_work_stat,
+        xconsent,
+        mostlikely,
+        leastlikely,
+        agreedisagree,
+        xtrust,
+        child,
+    ), as.factor))
+
+# Convert relevant columns to numeric
+yougov_data <- yougov_data %>%
+    mutate(across(c(
+        MLthermo_KB,
+        MLthermo_KS,
+        MLthermo_NF,
+        MLthermo_ED,
+        MLthermo_CD,
+        MLthermo_AR,
+        LLthermo_KB,
+        LLthermo_KS,
+        LLthermo_NF,
+        LLthermo_ED,
+        LLthermo_CD,
+        LLthermo_AR
+    ), ~ as.numeric(as.character(.))))
+
+# Remove rows where 'xconsent == I do not with to continue with this study'
+yougov_data <- yougov_data %>%
+    filter(xconsent != "I do not wish to continue with this study")
+
+
+# Create new MLthermo and LLthermo mean variables
+# Variable is mean of values in MLthermo/LLthermo columns
+yougov_data <- yougov_data %>%
+    mutate(
+        MLthermoMean = rowMeans(pick(starts_with("MLthermo_")), na.rm = TRUE),
+        LLthermoMean = rowMeans(pick(starts_with("LLthermo_")), na.rm = TRUE)
+    )
+
+# Remove rows where 'mostlikely == None of these'
+# and 'leastlikely == None of these'
+yougov_data <- yougov_data %>%
+    filter(mostlikely != "None of these" & leastlikely != "None of these")
+
+
+# Create a new treatment status variable for AI-generated content
+## Where treatment == 1, the respondent was shown AI-generated content
+## Where treatment == 0, the respondent was shown human-generated content
+## When 'split == 1 or 2', the respondent was shown AI-generated content
+yougov_data <- yougov_data %>%
+    mutate(ai_treatment = case_when(
+        split == 1 ~ 1,
+        split == 2 ~ 1,
+        split == 3 ~ 0,
+        split == 4 ~ 0,
+        TRUE ~ NA_real_
+    ))
+
+# Create a new treatment status variable for AI-labelled content
+## Where treatment == 1, respondents shown content labelled as AI-generated
+## Where treatment == 0, respondents shown content labelled as human-generated
+## When 'split == 2 or 3', the respondent was shown AI-labelled content
+yougov_data <- yougov_data %>%
+    mutate(label_treatment = case_when(
+        split == 2 ~ 1,
+        split == 3 ~ 1,
+        split == 1 ~ 0,
+        split == 4 ~ 0,
+        TRUE ~ NA_real_
+    ))
+
+# Refactor child variable
+yougov_data <- yougov_data %>%
+    mutate(child = na_if(child, "Don't know")) %>%
+    mutate(child = na_if(child, "Not Asked"))
+
+yougov_data <- yougov_data %>%
+    mutate(child = factor(child,
+        levels = c(
+            "Extremely upset",
+            "Somewhat upset",
+            "Neither happy nor upset",
+            "Somewhat happy",
+            "Extremely happy"
+        ),
+        ordered = TRUE
+    ))
+
+# Refactor xtrust variable
+yougov_data <- yougov_data %>%
+    mutate(xtrust = na_if(xtrust, "Don't know"))
+
+yougov_data <- yougov_data %>%
+    mutate(xtrust = factor(xtrust,
+        levels = c(
+            "Almost never",
+            "Once in a while",
+            "About half of the time",
+            "Always",
+            "Most of the time"
+        ),
+        ordered = TRUE
+    ))
+
+# Refactor agreedisagree variable
+yougov_data <- yougov_data %>%
+    mutate(agreedisagree = na_if(agreedisagree, "Don't know"))
+
+yougov_data <- yougov_data %>%
+    mutate(agreedisagree = factor(agreedisagree,
+        levels = c(
+            "Strongly disagree",
+            "Tend to disagree",
+            "Neither agree nor disagree",
+            "Tend to agree",
+            "Strongly agree"
+        ),
+        ordered = TRUE
+    ))
+
+# Drop levels from `mostlikely` that have no observations
+yougov_data$mostlikely <- droplevels(
+    yougov_data$mostlikely
+)
+```
 
 \newpage
 
@@ -45,7 +245,7 @@ header-includes:
 
 # Data analysis`
 
-The survey experiment was facilitated by YouGov across a representative sample of `2,001` UK adults. The sammple of participants was drawn from YouGov's panel of over `800,000` individuals. The survey was conducted between `October 4th` and `October 5th, 2023`. The sample is weighted to be an identically and inrepresentative of the UK population
+The survey experiment was facilitated by YouGov across a representative sample of `2,001` UK adults. The sample of participants was drawn from YouGov's panel and weighted to be representative of the UK population.
 
 ## Thermometer Analysis
 
@@ -58,10 +258,259 @@ The survey experiment was facilitated by YouGov across a representative sample o
 
 \newpage
 
+
 # Appendix
+
+## Codebook
+
+```{r codebook-table, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+# === Codebook ===
+# Input variable names as plain text (no LaTeX yet)
+
+codebook <- tribble(
+    ~Variable, ~Type, ~Description, ~Values,
+    "identity_client", "Identifier", "Unique identifier for the respondent", "Alphanumeric string",
+    "weight", "Continuous", "Survey weight to ensure national representativeness", "Continuous float (e.g., 0.982, 1.034)",
+    "age", "Continuous", "Age of the respondent", "Integer values, typically 18–90",
+    "profile_gender", "Categorical", "Gender of the respondent", "Female; Male",
+    "profile_GOR", "Categorical", "Government Office Region (region of residence)", "East Midlands; East of England; London; North East; North West; Scotland; South East; South West; Wales; West Midlands; Yorkshire and the Humber",
+    "voted_ge_2024", "Categorical", "Did the respondent vote in the 2024 General Election?", "Don’t know; No, did not vote; Yes, voted",
+    "pastvote_ge_2024", "Categorical", "How the respondent voted in the 2024 General Election", "Conservative; Don't know; Green; Labour; Liberal Democrat; Other; Plaid Cymru; Reform UK; Scottish National Party (SNP); Skipped",
+    "pastvote_EURef", "Categorical", "How the respondent voted in the 2016 EU Referendum", "Can’t remember; I did not vote; I voted to Leave; I voted to Remain",
+    "education_recode", "Categorical", "Re-coded education level (grouped)", "High; Medium; Low",
+    "profile_work_stat", "Categorical", "Employment status", "Full time student; Not working; Other; Retired; Unemployed; Working full time (30+ hrs); Working part time (8–29 hrs); Working part time (<8 hrs)",
+    "political_attention", "Continuous", "How much attention the respondent pays to politics", "Scale (e.g., 0–10 or continuous values)",
+    "split", "Categorical", "Randomly assigned treatment group (1–4)", "1 = AI-generated, not labelled as AI-generated; 2 = AI-generated and labelled as AI-generated; 3 = Human-generated but labelled as AI-generated; 4 = Human-generated, not labelled as AI-generated",
+    "xconsent", "Categorical", "Consent to participate in the survey", "I consent to taking part in this study; I do not wish to continue with this study",
+    "mostlikely", "Categorical", "Most likely party to receive vote", "Conservative Party; Green Party; Labour Party; Liberal Democrats; Reform UK",
+    "leastlikely", "Categorical", "Least likely party to receive vote", "Conservative Party; Green Party; Labour Party; Liberal Democrats; Reform UK; None of these; Not Asked",
+    "MLthermo_KB", "Continuous", "Thermometer rating for Kemi Badenoch (most likely party)", "0–100",
+    "MLthermo_KS", "Continuous", "Thermometer rating for Keir Starmer", "0–100",
+    "MLthermo_NF", "Continuous", "Thermometer rating for Nigel Farage", "0–100",
+    "MLthermo_ED", "Continuous", "Thermometer rating for Ed Davey", "0–100",
+    "MLthermo_CD", "Continuous", "Thermometer rating for Carla Denyer", "0–100",
+    "MLthermo_AR", "Continuous", "Thermometer rating for Adrian Ramsay", "0–100",
+    "LLthermo_KB", "Continuous", "Thermometer rating for Kemi Badenoch (least likely party)", "0–100",
+    "LLthermo_KS", "Continuous", "Thermometer rating for Keir Starmer", "0–100",
+    "LLthermo_NF", "Continuous", "Thermometer rating for Nigel Farage", "0–100",
+    "LLthermo_ED", "Continuous", "Thermometer rating for Ed Davey", "0–100",
+    "LLthermo_CD", "Continuous", "Thermometer rating for Carla Denyer", "0–100",
+    "LLthermo_AR", "Continuous", "Thermometer rating for Adrian Ramsay", "0–100",
+    "agreedisagree", "Ordinal", "Agreement with statement shown in the survey", "Strongly disagree; Tend to disagree; Neither agree nor disagree; Tend to agree; Strongly agree",
+    "xtrust", "Ordinal", "Level of trust in the content shown", "Almost never; Once in a while; About half of the time; Most of the time; Always",
+    "child", "Ordinal", "Respondent's emotional reaction to child-focused content", "Extremely upset; Somewhat upset; Neither happy nor upset; Somewhat happy; Extremely happy",
+    "MLthermoMean", "Continuous", "Average thermometer score for most likely party", "0–100 (row mean of MLthermo scores)",
+    "LLthermoMean", "Continuous", "Average thermometer score for least likely party", "0–100 (row mean of LLthermo scores)",
+    "ai_treatment", "Binary", "Treatment status for AI-generated content", "1 = Treated (shown AI-generated); 0 = Control (shown human-generated)",
+    "label_treatment", "Binary", "Treatment status for AI-labelled content", "1 = Treated (labelled as AI-generated); 0 = Control (labelled as human-generated)"
+)
+
+# Format the variable names for LaTeX monospace in table cells
+codebook <- codebook %>%
+    mutate(Variable = paste0("\\verb|", Variable, "|"))
+
+# Render the table
+kable(codebook, format = "latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+    kable_styling(latex_options = c("repeat_header"), font_size = 9) %>%
+    column_spec(1, width = "3.2cm") %>%
+    column_spec(3, width = "5cm") %>%
+    column_spec(4, width = "5cm")
+```
 
 ## Data Cleaning
 
+`2,001` respondents were provided with the survey experiment. Respondents who did not give consent to participate in the survey were removed. Respondents were given the option to skip questions. When skipped, a value of `997` was assigned to the question, which was then recoded to `NA`, as were `Not asked` values.
+
+The survey was interested in understanding respondents' views towards their most and least preferred party. When asked who the `mostlikely` and `leastlikely` party was, respondents were given the option to select `None of these`. Respondents who selected `None of these` were removed from the sample as they were unable to answer the follow-up questions.
+
+Categorical variables were recoded to be `factors` in R, these were `profile_gender`, `profile_GOR`, `voted_ge_2024`, `pastvote_ge_2024`, `pastvote_EURef`, `profile_education_level`, `education_recode`, `profile_work_stat`, `xconsent`, `mostlikely`, `leastlikely`, `agreedisagree`, `xtrust`, and `child`.
+
+Each of the thermometer variables were recoded to be `numeric` variables: `MLthermo_KB`, `MLthermo_KS`, `MLthermo_NF`, `MLthermo_ED`, `MLthermo_CD`, `MLthermo_AR`, `LLthermo_KB`, `LLthermo_KS`, `LLthermo_NF`, `LLthermo_ED`, `LLthermo_CD`, and `LLthermo_AR`. As the Green Party has two co-leaders, a mean thermometer score is calculated and used for most and least likely party thermometer scores, coded as `MLthermoMean` and `LLthermoMean`.
+
+For treatment effect analysis, respondents were classified into two treatment groups: those shown AI-generated content (`ai_treatment`), identified where the split variable equalled `1` or `2`; and those shown AI-labelled content (`label_treatment`), identified where the split variable equalled `2` or `3`. Participants in the other split groups were coded as receiving human-generated or unlabelled content. These variables were coded as binary variables, where `1` indicated the treatment group and `0` indicated the control group.
 
 
 ## Balance Check
+
+To ensure that the randomisation process of the treatment allocation was successful, a balance check is conducted to ensure that the treatment and control groups are comparable in every way other than their treatment assignment status. The tables below report the balance of the covariates across the treatment groups. The continuous variables of `age` and `political_attention` are reported as means with the standard deviations in parentheses. The remaining categorical variables are reported as a count from the sample, with the proportions in parentheses. If there was a significant difference between the treatment and control groups, this is indicated with a `*` for p < 0.05, `**` for p < 0.01, and `***` for p < 0.001. The balance check shows that randomisation was successful across all covariates for both treatment groups as no covariates were significantly different between the treatment and control groups.
+
+```{r Balance Analysis, echo=FALSE, message=FALSE, results ='hide'}
+# === Balance Check ===
+# Check the balance of covariates across treatment groups
+# to see if the randomisation was successful
+
+# Define a reusable function for covariate balance checking
+balance_table <- function(data, strata_var, covariates) {
+    table <- tableone::CreateTableOne(
+        vars = unlist(covariates),
+        strata = strata_var,
+        data = data,
+        factorVars = covariates$categorical
+    )
+}
+
+# Define the treatment and control groups to test balance across
+treatment_vars <- c("ai_treatment", "label_treatment")
+
+# Define the covariates for balance checking
+covariates <- list(
+    continuous = c("age", "political_attention"),
+    categorical = c(
+        "profile_gender",
+        "profile_education_level_recode",
+        "profile_work_stat",
+        "voted_ge_2024",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)
+# Run the balance table function for each treatment variable
+for (strata_var in treatment_vars) {
+    balance_table(yougov_data, strata_var, covariates)
+}
+
+# The balance check shows that randomisation was successful across
+# all covariates for both treatment groups
+```
+
+```{r Balance Table Results, echo=FALSE, message=FALSE, results='asis'}
+# === Balance Table Results ===
+
+# Create a function to generate and render balance tables
+create_balance_table <- function(data,
+                                 treatment_var,
+                                 covariates,
+                                 caption_text,
+                                 treatment_levels = c("Control", "Treatment")) {
+    actual_levels <- levels(factor(data[[treatment_var]]))
+
+    clean_names <- c(
+        "age..mean..SD.." = "Age",
+        "political_attention..mean..SD.." = "Political attention",
+        "profile_gender...." = "Gender (male)",
+        "X" = "Female",
+        "profile_education_level_recode...." = "Education level (High)",
+        "X.1" = "Low",
+        "X.2" = "Medium",
+        "profile_work_stat...." = "Employment status (Full time student)",
+        "X.3" = "Not working",
+        "X.4" = "Other",
+        "X.5" = "Retired",
+        "X.6" = "Unemployed",
+        "X.7" = "Working full time (30 or more hours per week)",
+        "X.8" = "Working part time (8-29 hours a week)",
+        "X.9" = "Working part time (Less than 8 hours a week)",
+        "voted_ge_2024...." = "Voted in 2024 General Election (Don't know)",
+        "X.10" = "No, did not vote",
+        "X.11" = "Yes, voted",
+        "pastvote_ge_2024...." = "Vote in 2024 General Election (Conservative)",
+        "X.12" = "Don't know",
+        "X.13" = "Green",
+        "X.14" = "Labour",
+        "X.15" = "Liberal Democrat",
+        "X.16" = "Other",
+        "X.17" = "Plaid Cymru",
+        "X.18" = "Reform UK",
+        "X.19" = "Scottish National Party (SNP)",
+        "X.20" = "Skipped",
+        "pastvote_EURef...." = "Vote in EU Referendum (Can’t remember)",
+        "X.21" = "I did not vote",
+        "X.22" = "I voted to Leave",
+        "X.23" = "I voted to Remain",
+        "profile_GOR...." = "Region (East Midlands)",
+        "X.24" = "East of England",
+        "X.25" = "London",
+        "X.26" = "North East",
+        "X.27" = "North West",
+        "X.28" = "Scotland",
+        "X.29" = "South East",
+        "X.30" = "South West",
+        "X.31" = "Wales",
+        "X.32" = "West Midlands",
+        "X.33" = "Yorkshire and the Humber"
+    )
+
+    # Create balance table object
+    balance_tbl_object <- tableone::CreateTableOne(
+        vars = unlist(covariates),
+        strata = treatment_var,
+        data = data,
+        factorVars = covariates$categorical,
+        test = TRUE
+    )
+
+    # Extract and format results
+    balance_df <- print(balance_tbl_object,
+        noSpaces = TRUE,
+        showAllLevels = TRUE,
+        printToggle = FALSE,
+        test = TRUE
+    ) %>%
+        as.data.frame.matrix() %>%
+        dplyr::select(actual_levels[1], actual_levels[2], "p") %>%
+        setNames(c(treatment_levels[1], treatment_levels[2], "p-value")) %>%
+        tibble::rownames_to_column("Variable") %>%
+        dplyr::filter(Variable != "n") %>%
+        dplyr::mutate(
+            Variable = Variable %>%
+                stringr::str_remove(fixed(" (mean (SD))")) %>%
+                stringr::str_replace("=", " ") %>%
+                stringr::str_remove("\\s\\(%\\)$") %>%
+                dplyr::recode(!!!clean_names),
+            `p-value` = as.numeric(`p-value`),
+            Signif. = dplyr::case_when(
+                `p-value` < 0.001 ~ "***",
+                `p-value` < 0.01 ~ "**",
+                `p-value` < 0.05 ~ "*",
+                `p-value` > 0.05 ~ "-",
+                TRUE ~ ""
+            ),
+            `p-value` = format.pval(`p-value`, digits = 3, eps = 0.001)
+        )
+
+    # Render table using kableExtra
+    kable(balance_df,
+        format = "latex",
+        booktabs = TRUE,
+        caption = caption_text,
+        align = c("l", "c", "c", "c", "c"),
+        col.names = c("Variable", treatment_levels[1], treatment_levels[2], "p-value", "Signif.")
+    ) %>%
+        kableExtra::kable_styling(
+            font_size = 10
+        ) %>%
+        kableExtra::footnote(
+            general = "P-values are from t-tests (continuous) or chi-squared tests (categorical) comparing groups. \\\\ Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001.",
+            threeparttable = TRUE,
+            escape = FALSE
+        )
+}
+```
+
+```{r render-balance-tables, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Render Balance Tables ===
+# Create and render balance tables for each treatment variable
+treatment_names <- list(
+    ai_treatment = "AI Treatment Group",
+    label_treatment = "Label Treatment Group"
+)
+
+for (i in seq_along(treatment_vars)) {
+    var_name <- treatment_vars[i]
+    pretty_name <- treatment_names[[var_name]]
+
+    caption <- paste0("Balance Table of Covariates by ", pretty_name)
+
+    # Define the desired output names for the columns for this specific table
+    level_names_output <- c("Control", "Treatment")
+
+    cat(create_balance_table(
+        data = yougov_data,
+        treatment_var = var_name,
+        covariates = covariates,
+        caption_text = caption,
+        treatment_levels = level_names_output
+    ))
+}
+```
