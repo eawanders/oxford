@@ -237,7 +237,7 @@ balance_table <- function(data, strata_var, covariates) {
 }
 
 # Define the treatment and control groups to test balance across
-treatment_vars <- c("ai_treatment", "label_treatment") 
+treatment_vars <- c("ai_treatment", "label_treatment")
 
 # Define the covariates for balance checking
 covariates <- list(
