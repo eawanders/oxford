@@ -10,6 +10,8 @@ output:
         toc: true
         toc_depth: 2
         number_sections: true
+    includes:
+        in_header: header.tex
 documentclass: article
 zotero: true
 link-citations: true
@@ -20,6 +22,8 @@ header-includes:
   - \setstretch{1.5}
   - \usepackage[para]{threeparttable}
   - \usepackage[margin=1in]{geometry}
+  - \setlength{\footnotesep}{1em}
+  - \setlength{\skip\footins}{2em}
 ---
 
 ```{r Data Setup, include=FALSE}
@@ -223,6 +227,10 @@ yougov_data <- yougov_data %>%
 yougov_data$mostlikely <- droplevels(
     yougov_data$mostlikely
 )
+
+# Create a new `thermo_gap` variable for the difference between MLthermo and LLthermo
+yougov_data <- yougov_data %>%
+    mutate(thermo_gap = MLthermoMean - LLthermoMean)
 ```
 
 \newpage
@@ -248,17 +256,103 @@ yougov_data$mostlikely <- droplevels(
     - What is the agentic modelling?
     - How will I use agentic modelling?
 
+- Note the use of a between-subjects survey experiment
+    - Deliberately chosen to avoid sensitivity issues noted by @levendusky2021
+
 # Data analysis
 
-The survey experiment was facilitated by YouGov across a representative sample of `2,001` UK adults. The sample of participants was drawn from YouGov's panel and weighted to be representative of the UK population.
+The following data analyses focus on all outcome measures of affective polarisation to give a holistic understading of both general and tangible prejudices and discriminatory behaviours towards the opposing out-group to that of the respondent's identified in-group. The analysis covers all outcome measures across of the causal effects of both the aforementioned treatment groups of AI-generated and AI-labelled content.
+
+## Outcome Measures
+
+The measures required to understand AI's affect on affective polarisation are multi-faceted. Different measures can be used to understand the primary outcome of affective polarisation; however, the implication of each measure differs. @druckman2019 clearly outline the best practices for these affective polarisation measures, and how the measures interact. Therefore, this research chooses to follow these measurement recommendations for use in survey self-reporting [@iyengar2019].
+
+The most common measure of someone's identifiction with a political party is through a feeling thermometer score. This aims to understand how warmly or coldly someone feels towards the political parties they most and leat prefer. The thermometer scores are measured on a scale of `0` to `100`, where `0` is the coldest and `100` is the warmest.[^1] This survey experiment firstly asks respondents to identify their most and least preferred party (`mostlikely` and `leastlikely`), allowing for in- and out-party identities to be exposed. We then ask respondents to firstly rate how warmly they feel towards each of these party's leaders, `MLthermo_XY` and `LLthermo_XY`, where `XY` is replaced by each party leader's initials. The use of party-leader thermometers is a common measure, leaning on valence theory's emphasis on the importance of party leaders in shaping party identification and voting behaviour [@garzia2023].[^2] Moreover, Druckman and Levendusky's (2019: 119) findings show that respondents are more  negative towards party elites rather than party voters; thus, the focus on party leaders here helps elicit the more visceral feelings. Alongside these in- and out-group measures, a net-difference score (`thermo_gap`) is also calculated as the difference between the thermometer scores (`MLthermoMean - LLthermoMean`) [@iyengar2012].
+
+The next indicator of affective polarisation is a trait-based rating. This measure identifies the traits that respondents associate with opposing parties [@garrett2014]. The limited scope of the survey experiment meant we focussed on the trait of positive trait of *respect*, and whether respondents associated this trait with oppossing parties. Respondents were asked: "To what extent do you agree or disagree with the following statement: `[leastlikely]` party voters respect my political beliefs and opinions." This question — coded as `agreedisagree` — was asked in a Likert scale format of levels of agreement.[^3]
+
+Additionally, a similar trait-based measure focussed on *trust* was used [@levendusky2013]. Here, we ask "And how much of the time do you think you can trust `[leastlikely]` party to do what is right for the country?". This question was also asked in a Likert scale format, with the options of `Almost never`, `Once in a while`, `About half of the time`, `Most of the time`, and `Always`. This measure is coded as `xtrust`. Along with the themometer score, the trait-based views of respect, and trust in opposing parties, Druckman and Levendusky (2019: 119) argue that these measures are good, general measures of prejudices held towards opposing parties.
+
+On the other hand, affective polarisation should also be interested in actual tangible discriminatory behaviour. Therefore a social-distance-based question is included to understand how comfortable respondents are with having opposing partisans in their lives. For example, @iyengar2012 popularised the use of the @almond1963 five-nation survey question "Suppose you had a child who was getting married. How would you feel if they married a `[leastlikely]` party voter?". Coded as `child`, respondents were given options of `Extremely upset`, `Somewhat upset`, `Neither happy nor upset`, `Somewhat happy`, and `Extremely happy`.
+
+[^1]: The wording for the theremoeter score questions is as follows: "We’d like to get your feelings toward some of our political leaders and other groups who are in the news these days. On the next page, we’ll ask you to do that using a 0 to 100 scale that we call a feeling thermometer. Ratings between 50 degrees and 100 degrees mean that you feel favourable and warm toward the person. Ratings between 0 degrees and 50 degrees mean that you don't feel favourable toward the person and that you don't care too much for that person. You would rate the person at the 50-degree mark if you don't feel particularly warm or cold toward the person."
+[^2]: The Green Party has two co-leaders, Carla Denyer and Adrian Ramsay. Therefore, ratings of both leaders are asked, and the thermometer scores for the Green Party are averaged to create a single score for the party. The variables `MLthermoMean` and `LLthermoMean` are used as the final thermometer measures for in- and out-group thermometer scores.
+[^3]: A full breakdown of the survey experiment variables and values can be found in the codebook in the appendix.
 
 ## Thermometer Analysis
+
+The thermometer scores are continuous measures. We present results from the survey experiment for in- and out-group scores, as well as the net-difference score. A brief summary of the average `thermo_gap` measures across treatments is prsented below. This indicates an initial view of how minimal the treatment effects are.
+
+```{r Descriptive Thermometer Graph, echo=FALSE, message=FALSE, results='asis', fig.width=5, fig.height=3, fig.align='center', fig.cap = "Average in- and out-party thermometer net-difference scores"}
+# === Descriptive Thermometer Graph ===
+
+
+# Reshaped data to long format
+thermo_data <- yougov_data %>%
+    dplyr::select(thermo_gap, ai_treatment, label_treatment) %>%
+    pivot_longer(
+        cols = c(ai_treatment, label_treatment),
+        names_to = "treatment_type",
+        values_to = "treated"
+    ) %>%
+    filter(!is.na(treated), !is.na(thermo_gap)) %>%
+    mutate(
+        treatment_type = recode(treatment_type,
+            "ai_treatment" = "AI treatment",
+            "label_treatment" = "Label Treatment"
+        ),
+        treated = factor(treated, levels = c(0, 1), labels = c("Control", "Treatment"))
+    )
+
+# Group means
+summary_stats <- thermo_data %>%
+    group_by(treatment_type, treated) %>%
+    summarise(
+        mean_gap = mean(thermo_gap, na.rm = TRUE),
+        .groups = "drop"
+    )
+
+# Ggplot of results
+ggplot(summary_stats, aes(x = treatment_type, y = mean_gap, fill = treated)) +
+    geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+    labs(
+        x = NULL,
+        y = "Average Thermometer Gap",
+        fill = "Group"
+    ) +
+    scale_fill_manual(
+        labels = c("Control", "Treatment"),
+        values = c("#bdbdbd", "#4b4b4b")
+    ) +
+    ylim(0, NA) +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+        axis.text = element_text(size = 9),
+        legend.title = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+To understand the treatment effects on the thermometer scores, we run a series of linear regression models. The models are run with the following specifications:
 
 ### Moderator Heterogeneity Analysis
 
 ## Outcome Variable Analysis
 
 ### Moderator Heterogeneity Analysis
+
+## Additional Analysis
+
+### Causal Acyclic Testing
+
+(see exeprimental analysis week 6 notes for details)
+
+### Agentic-based Modelling
+- What is agentic-based modelling?
+- Why is agentic-based modelling important?
+- How will I use agentic-based modelling?
 
 
 \newpage
@@ -267,6 +361,8 @@ The survey experiment was facilitated by YouGov across a representative sample o
 # Appendix
 
 ## Codebook
+
+The codebook below provides a summary of the variables used in the YouGov UniOM analysis. The variable names are provided in the first column, followed by the type of variable (e.g., categorical, continuous), a description of the variable, and the values that the variable can take. Note that the outcome variables of `agreedisagree`, `xtrust`, and `child` are ordinal variables on an ordered Likert scale.
 
 ```{r Codebook Table, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 # === Codebook ===
@@ -301,11 +397,12 @@ codebook <- tribble(
     "LLthermo_ED", "Continuous", "Thermometer rating for Ed Davey", "0–100",
     "LLthermo_CD", "Continuous", "Thermometer rating for Carla Denyer", "0–100",
     "LLthermo_AR", "Continuous", "Thermometer rating for Adrian Ramsay", "0–100",
-    "agreedisagree", "Ordinal", "Agreement with statement shown in the survey", "Strongly disagree; Tend to disagree; Neither agree nor disagree; Tend to agree; Strongly agree",
-    "xtrust", "Ordinal", "Level of trust in the content shown", "Almost never; Once in a while; About half of the time; Most of the time; Always",
-    "child", "Ordinal", "Respondent's emotional reaction to child-focused content", "Extremely upset; Somewhat upset; Neither happy nor upset; Somewhat happy; Extremely happy",
+    "agreedisagree", "Ordinal", "Trait-based measure of whether out-groups respect in-group beliefs ", "Strongly disagree; Tend to disagree; Neither agree nor disagree; Tend to agree; Strongly agree",
+    "xtrust", "Ordinal", "Level of trust in out-group to do what is right", "Almost never; Once in a while; About half of the time; Most of the time; Always",
+    "child", "Ordinal", "Social-disance measure of a child marry an out-group voter", "Extremely upset; Somewhat upset; Neither happy nor upset; Somewhat happy; Extremely happy",
     "MLthermoMean", "Continuous", "Average thermometer score for most likely party", "0–100 (row mean of MLthermo scores)",
     "LLthermoMean", "Continuous", "Average thermometer score for least likely party", "0–100 (row mean of LLthermo scores)",
+    "thermo_gap", "Continuous", "Difference between MLthermoMean and LLthermoMean", "0–100 (MLthermoMean - LLthermoMean)",
     "ai_treatment", "Binary", "Treatment status for AI-generated content", "1 = Treated (shown AI-generated); 0 = Control (shown human-generated)",
     "label_treatment", "Binary", "Treatment status for AI-labelled content", "1 = Treated (labelled as AI-generated); 0 = Control (labelled as human-generated)"
 )
@@ -315,12 +412,17 @@ codebook <- codebook %>%
     mutate(Variable = paste0("\\verb|", Variable, "|"))
 
 # Render the table
-kable(codebook, format = "latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
-    kable_styling(latex_options = c("repeat_header"), font_size = 9) %>%
+kable(codebook, format = "latex", booktabs = TRUE, longtable = TRUE, escape = FALSE, caption = "YouGov UniOM Survey Codebook") %>%
+    kable_styling(
+        latex_options = c("repeat_header"),
+        font_size = 9
+    ) %>%
     column_spec(1, width = "3.2cm") %>%
     column_spec(3, width = "5cm") %>%
     column_spec(4, width = "5cm")
 ```
+
+\newpage
 
 ## Data Cleaning
 
@@ -338,6 +440,10 @@ For treatment effect analysis, respondents were classified into two treatment gr
 ## Balance Check
 
 To ensure that the randomisation process of the treatment allocation was successful, a balance check is conducted to ensure that the treatment and control groups are comparable in every way other than their treatment assignment status. The tables below report the balance of the covariates across the treatment groups. The continuous variables of `age` and `political_attention` are reported as means with the standard deviations in parentheses. The remaining categorical variables are reported as a count from the sample, with the proportions in parentheses. If there was a significant difference between the treatment and control groups, this is indicated with a `*` for p < 0.05, `**` for p < 0.01, and `***` for p < 0.001. The balance check shows that randomisation was successful across all covariates for both treatment groups as no covariates were significantly different between the treatment and control groups.
+
+Note that the p-values are reported at the variable level, not for each individual category within a categorical variable. For categorical variables (e.g., gender, vote choice), a single p-value is generated using a chi-squared test, which assesses whether the overall distribution of categories differs between treatment and control groups. The individual category rows are displayed for reference, but since the test is run at the variable level, no p-value is reported for each specific level, giving the `NA` values in the table.
+
+For each of the categorical variables, there is a base reference category. For example, `profile_gender` uses the base reference category `Male` (reported as `Gender (Male` in the balance tables). This base acts as the comparison group for the other categories, the p-value compares whether the distribution of the other categories is significantly different from the base category.
 
 ```{r Balance Analysis, echo=FALSE, message=FALSE, results ='hide'}
 # === Balance Check ===
@@ -493,12 +599,11 @@ create_balance_table <- function(data,
 }
 ```
 
-```{r balance-ai-treatment, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+```{r AI Balance Table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 # === Render Balance Table for AI Treatment ===
 var_name <- "ai_treatment"
 pretty_name <- "AI Treatment Group"
 caption <- paste0("Balance Table of Covariates by ", pretty_name)
-# You can customize these level names if you prefer, e.g., c("Human-generated", "AI-generated")
 level_names_output <- c("Control", "Treatment")
 
 cat(create_balance_table(
@@ -510,12 +615,11 @@ cat(create_balance_table(
 ))
 ```
 
-```{r balance-label-treatment, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+```{r Label Balance Table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 # === Render Balance Table for Label Treatment ===
 var_name <- "label_treatment"
 pretty_name <- "Label Treatment Group"
 caption <- paste0("Balance Table of Covariates by ", pretty_name)
-# You can customize these level names if you prefer, e.g., c("Unlabelled", "AI-labelled")
 level_names_output <- c("Control", "Treatment")
 
 cat(create_balance_table(
@@ -526,3 +630,15 @@ cat(create_balance_table(
     treatment_levels = level_names_output
 ))
 ```
+
+## Sensitivity Analysis
+
+Given the nature of the results often being reported as null effects, a sensitivity analysis to determine what the smallest true effect that could have detected 80% of the time is calculated.
+
+```{r Sensitivity Analysis, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Sensitivity Analysis ===
+```
+
+\newpage
+
+# Bibliography
