@@ -192,6 +192,23 @@ yougov_data$mostlikely <- droplevels(
     yougov_data$mostlikely
 )
 
+# Refactor pastvote_EURef variable
+yougov_data <- yougov_data %>%
+    mutate(
+        pastvote_EURef = na_if(pastvote_EURef, "Can’t remember"),
+        pastvote_EURef = droplevels(pastvote_EURef),
+        pastvote_EURef = relevel(pastvote_EURef, ref = "I did not vote")
+    )
+
+# Refactor pastvote_ge_2024 variable
+yougov_data <- yougov_data %>%
+    mutate(
+        pastvote_ge_2024 = na_if(pastvote_ge_2024, "Don't know"),
+        pastvote_ge_2024 = na_if(pastvote_ge_2024, "Skipped"),
+        pastvote_ge_2024 = droplevels(pastvote_ge_2024),
+        pastvote_ge_2024 = relevel(pastvote_ge_2024, ref = "Conservative")
+    )
+
 # Rename profile_education_level_recode
 yougov_data <- yougov_data %>%
     rename(
@@ -327,6 +344,7 @@ thermo_models <- function(data,
 
 
 # Specify the function call that I want to make
+
 thermo_models(
     data = yougov_data,
     design = yougov_design,
@@ -399,8 +417,17 @@ ordinal_models <- function(data,
 ordinal_models(
     data = yougov_data,
     design = yougov_design,
-    treatment = "label_treatment",
+    treatment = "ai_treatment",
     outcome = "child",
-    covariates = c("political_attention", "education_recode", "mostlikely", "pastvote_EURef"),
-    moderators = c("pastvote_EURef", "political_attention", "mostlikely", "education_recode")
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    ),
+    moderators = c("education_recode", "profile_GOR", "mostlikely")
 )
