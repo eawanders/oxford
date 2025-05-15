@@ -1,0 +1,1876 @@
+---
+title: "MPhil Politics, Comparative Government"
+author: "Edward Anders"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+    bookdown::pdf_document2:
+        fig_width: 6
+        fig_height: 4
+        fig_caption: true
+        toc: false
+        toc_depth: 2
+        number_sections: true
+        includes:
+            keep_tex: false
+            in_header:
+                header.tex
+documentclass: article
+zotero: true
+link-citations: true
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.5}
+  - \usepackage[para]{threeparttable}
+  - \usepackage[margin=1in]{geometry}
+  - \setlength{\footnotesep}{1em}
+  - \setlength{\skip\footins}{2em}
+urlcolor: blue
+linkcolor: blue
+---
+
+```{r Data Setup, include=FALSE}
+# The data is from a survey conducted by YouGov  
+# === R Script Setup ===
+
+# Load necessary packages using pacman
+if (!requireNamespace("pacman", quietly = TRUE)) {
+    install.packages("pacman")
+}
+
+pacman::p_load(
+    tidyverse,
+    haven,
+    MASS,
+    dplyr,
+    emmeans,
+    ggplot2,
+    tableone,
+    survey,
+    kableExtra,
+    stringr,
+    purrr,
+    tibble,
+    modelsummary,
+    equatiomatic,
+    knitr,
+    ggeffects,
+    patchwork
+)
+
+# === Data Import and Review ===
+
+# Load .csv file into R
+yougov_data <- read_csv(
+    "/Users/edwardanders/Documents/GitHub/oxford/thesis/data/yougov/uniom_results.csv"
+)
+
+# View summary of the data
+summary(yougov_data)
+str(yougov_data)
+glimpse(yougov_data)
+
+
+# === Data Cleaning and Transformation ===
+
+# Check for missing values
+## The only missing values are found in pastvote_ge_2024
+## But these are as a result of voted_ge_2024 being
+## 'No, did not vote' or 'Don't know'
+missing_values <- sapply(yougov_data, function(x) sum(is.na(x)))
+
+# Remove columns that are not needed
+yougov_data <- yougov_data %>%
+    dplyr::select(-c(
+        randMOSTLEAST,
+        MLthermo,
+        LLthermo
+    ))
+
+# Convert any values == 'Not asked' to NA
+yougov_data <- yougov_data %>%
+    mutate(across(where(is.character), ~ na_if(., "Not asked")))
+
+# Convert any values == '997' to NA
+yougov_data <- yougov_data %>%
+    mutate(across(where(is.character), ~ na_if(., "997")))
+
+# Convert character columns to factors
+yougov_data <- yougov_data %>%
+    mutate(across(c(
+        profile_gender,
+        profile_GOR,
+        voted_ge_2024,
+        pastvote_ge_2024,
+        pastvote_EURef,
+        profile_education_level,
+        profile_education_level_recode,
+        profile_work_stat,
+        xconsent,
+        mostlikely,
+        leastlikely,
+        agreedisagree,
+        xtrust,
+        child,
+    ), as.factor))
+
+# Convert relevant columns to numeric
+yougov_data <- yougov_data %>%
+    mutate(across(c(
+        MLthermo_KB,
+        MLthermo_KS,
+        MLthermo_NF,
+        MLthermo_ED,
+        MLthermo_CD,
+        MLthermo_AR,
+        LLthermo_KB,
+        LLthermo_KS,
+        LLthermo_NF,
+        LLthermo_ED,
+        LLthermo_CD,
+        LLthermo_AR
+    ), ~ as.numeric(as.character(.))))
+
+# Remove rows where 'xconsent == I do not with to continue with this study'
+yougov_data <- yougov_data %>%
+    filter(xconsent != "I do not wish to continue with this study")
+
+
+# Create new MLthermo and LLthermo mean variables
+# Variable is mean of values in MLthermo/LLthermo columns
+yougov_data <- yougov_data %>%
+    mutate(
+        MLthermoMean = rowMeans(pick(starts_with("MLthermo_")), na.rm = TRUE),
+        LLthermoMean = rowMeans(pick(starts_with("LLthermo_")), na.rm = TRUE)
+    )
+
+# Remove rows where 'mostlikely == None of these'
+# and 'leastlikely == None of these'
+yougov_data <- yougov_data %>%
+    filter(mostlikely != "None of these" & leastlikely != "None of these")
+
+
+# Create a new treatment status variable for AI-generated content
+## Where treatment == 1, the respondent was shown AI-generated content
+## Where treatment == 0, the respondent was shown human-generated content
+## When 'split == 1 or 2', the respondent was shown AI-generated content
+yougov_data <- yougov_data %>%
+    mutate(ai_treatment = case_when(
+        split == 1 ~ 1,
+        split == 2 ~ 1,
+        split == 3 ~ 0,
+        split == 4 ~ 0,
+        TRUE ~ NA_real_
+    ))
+
+# Create a new treatment status variable for AI-labelled content
+## Where treatment == 1, respondents shown content labelled as AI-generated
+## Where treatment == 0, respondents shown content labelled as human-generated
+## When 'split == 2 or 3', the respondent was shown AI-labelled content
+yougov_data <- yougov_data %>%
+    mutate(label_treatment = case_when(
+        split == 2 ~ 1,
+        split == 3 ~ 1,
+        split == 1 ~ 0,
+        split == 4 ~ 0,
+        TRUE ~ NA_real_
+    ))
+
+# Refactor child variable
+yougov_data <- yougov_data %>%
+    mutate(child = na_if(child, "Don't know")) %>%
+    mutate(child = na_if(child, "Not Asked"))
+
+yougov_data <- yougov_data %>%
+    mutate(child = factor(child,
+        levels = c(
+            "Extremely upset",
+            "Somewhat upset",
+            "Neither happy nor upset",
+            "Somewhat happy",
+            "Extremely happy"
+        ),
+        ordered = TRUE
+    ))
+
+# Refactor xtrust variable
+yougov_data <- yougov_data %>%
+    mutate(xtrust = na_if(xtrust, "Don't know"))
+
+yougov_data <- yougov_data %>%
+    mutate(xtrust = factor(xtrust,
+        levels = c(
+            "Almost never",
+            "Once in a while",
+            "About half of the time",
+            "Always",
+            "Most of the time"
+        ),
+        ordered = TRUE
+    ))
+
+# Refactor agreedisagree variable
+yougov_data <- yougov_data %>%
+    mutate(agreedisagree = na_if(agreedisagree, "Don't know"))
+
+yougov_data <- yougov_data %>%
+    mutate(agreedisagree = factor(agreedisagree,
+        levels = c(
+            "Strongly disagree",
+            "Tend to disagree",
+            "Neither agree nor disagree",
+            "Tend to agree",
+            "Strongly agree"
+        ),
+        ordered = TRUE
+    ))
+
+# Refactor pastvote_EURef variable
+yougov_data <- yougov_data %>%
+    mutate(
+        pastvote_EURef = na_if(pastvote_EURef, "Can’t remember"),
+        pastvote_EURef = droplevels(pastvote_EURef),
+        pastvote_EURef = relevel(pastvote_EURef, ref = "I did not vote")
+    )
+
+# Rename profile_education_level_recode
+yougov_data <- yougov_data %>%
+    rename(
+        education_recode = profile_education_level_recode
+    )
+
+# Drop levels from `mostlikely` that have no observations
+yougov_data$mostlikely <- droplevels(
+    yougov_data$mostlikely
+)
+
+# Create a new `thermo_gap` variable for the difference between MLthermo and LLthermo
+yougov_data <- yougov_data %>%
+    mutate(thermo_gap = MLthermoMean - LLthermoMean)
+```
+
+\newpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+# Abstract {-}
+
+\newpage
+\tableofcontents
+
+\newpage
+# List of Tables {-}
+\listoftables
+
+\newpage
+# List of Figures {-}
+\listoffigures
+
+\newpage
+\mainmatter
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+# Introduction {#sec-intro}
+
+# Literature Review {#sec-lit-review}
+
+# Theoretical Framework {#sec-theory}
+
+## Theory and Argumentation
+
+- Develop the initial arguments and theoretical framework of your project.
+- Discuss how your project relates to existing theoretical approaches in the literature and how these are further developed and/or applied in your research.
+- This theoretical framework will most likely only be at the preliminary stage, but it is important to outline the relationships between the key actors or variables in your project.
+- This ‘model’ does not have to be formal and explicit, but you may find it helpful to specify causal relationships in terms of dependent variable(s) (the outcome) and independent variables (the explanatory factors).
+- Formulate some preliminary testable hypotheses derived from this ‘model’.
+- Outline the key assumptions of your argument, as well as the limits to your topic (temporally and spatially).
+
+## Hypotheses
+
+- The hypotheses provided should state the relationship(s) expected to be observed between variables being used
+- The formulation of a hypothesis should make clear whether it involves one- or two-tailed tests (i.e. predict an increase, decrease, or change in the outcome variable)
+- There are two types of hypotheses to consider:
+    - **Confirmatory Hypotheses**
+        - The main focus of the study → what the study is designed to test
+        - There should be well-powered analyses of this hypothesis
+        - Should be backed up by strong theory leading to hypotheses *a priori*
+    - **Exploratory Hypotheses**
+        - Hypotheses wish to test but are not the main focus of the study
+        - Often seen as secondary hypotheses looking at mechanisms, subgroups, heterogeneous effects, or downstream outcomes
+- Should include as many hypotheses as relate to your theory or intervention
+- With more than one hypothesis you will need to specify a procedure for handling multiple hypotheses in the inference criteria section of your PAP
+
+Use the paper Affect, Not Ideology: A Social Identity Perspective on Polarization to look at theory.
+As is The Origins and Consequences of Affective Polarization in the United States.
+    This has a lot of criqtues of the measures of polarization too.
+
+
+# Case Selection and Data Gathering {#sec-case-selection}
+
+## Outcome Measures {#sec-outcome-measures}
+
+The measures required to understand AI's affect on affective polarisation are multi-faceted. Different measures can be used to understand the primary outcome of affective polarisation; however, the implication of each measure differs. @druckman2019 clearly outline the best practices for these affective polarisation measures, and how the measures interact. Therefore, this research chooses to follow these measurement recommendations for use in survey self-reporting [@iyengar2019].
+
+The most common measure of someone's identifiction with a political party is through a feeling thermometer score. This aims to understand how warmly or coldly someone feels towards the political parties they most and leat prefer. The thermometer scores are measured on a scale of `0` to `100`, where `0` is the coldest and `100` is the warmest.[^thermo-scale] This survey experiment firstly asks respondents to identify their most and least preferred party (`mostlikely` and `leastlikely`), allowing for in- and out-party identities to be exposed. We then ask respondents to firstly rate how warmly they feel towards each of these party's leaders, `MLthermo_XY` and `LLthermo_XY`, where `XY` is replaced by each party leader's initials. The use of party-leader thermometers is a common measure, leaning on valence theory's emphasis on the importance of party leaders in shaping party identification and voting behaviour [@garzia2023].[^green-leaders] Moreover, Druckman and Levendusky's (2019: 119) findings show that respondents are more  negative towards party elites rather than party voters; thus, the focus on party leaders here helps elicit the more visceral feelings. Alongside these in- and out-group measures, a net-difference score (`thermo_gap`) is also calculated as the difference between the thermometer scores (`MLthermoMean - LLthermoMean`) [@iyengar2012].
+
+The next indicator of affective polarisation is a trait-based rating. This measure identifies the traits that respondents associate with opposing parties [@garrett2014]. The limited scope of the survey experiment meant we focussed on the trait of positive trait of *respect*, and whether respondents associated this trait with oppossing parties. Respondents were asked: "To what extent do you agree or disagree with the following statement: `[leastlikely]` party voters respect my political beliefs and opinions." This question — coded as `agreedisagree` — was asked in a Likert scale format of levels of agreement.[^codebook]
+
+Additionally, a similar trait-based measure focussed on *trust* was used [@levendusky2013]. Here, we ask "And how much of the time do you think you can trust `[leastlikely]` party to do what is right for the country?". This question was also asked in a Likert scale format, with the options of `Almost never`, `Once in a while`, `About half of the time`, `Most of the time`, and `Always`. This measure is coded as `xtrust`. Along with the themometer score, the trait-based views of respect, and trust in opposing parties, Druckman and Levendusky (2019: 119) argue that these measures are good, general measures of prejudices held towards opposing parties.
+
+On the other hand, affective polarisation should also be interested in actual tangible discriminatory behaviour. Therefore an emotional, social-distance-based question is included to understand how comfortable respondents are with having opposing partisans in their lives. For example, @iyengar2012 popularised the use of the @almond1963 five-nation survey question "Suppose you had a child who was getting married. How would you feel if they married a `[leastlikely]` party voter?". Coded as `child`, respondents were given options of `Extremely upset`, `Somewhat upset`, `Neither happy nor upset`, `Somewhat happy`, and `Extremely happy`.
+
+[^thermo-scale]: The wording for the theremoeter score questions is as follows: "We’d like to get your feelings toward some of our political leaders and other groups who are in the news these days. On the next page, we’ll ask you to do that using a 0 to 100 scale that we call a feeling thermometer. Ratings between 50 degrees and 100 degrees mean that you feel favourable and warm toward the person. Ratings between 0 degrees and 50 degrees mean that you don't feel favourable toward the person and that you don't care too much for that person. You would rate the person at the 50-degree mark if you don't feel particularly warm or cold toward the person."
+[^green-leaders]: The Green Party has two co-leaders, Carla Denyer and Adrian Ramsay. Therefore, ratings of both leaders are asked, and the thermometer scores for the Green Party are averaged to create a single score for the party. The variables `MLthermoMean` and `LLthermoMean` are used as the final thermometer measures for in- and out-group thermometer scores.
+
+[^codebook]: A full breakdown of the survey experiment variables and values can be found in the codebook \hyperref[sec-codebook]{Section \ref*{sec-codebook}} in the appendix.
+
+- See pre-analysis plan for details of what to include in this section
+- Case selection (why focus on the UK?)
+    - I am to have external validity to my research/case?
+    - Can I make inferences to other cases?
+- What is the case?
+    - What is the unit of analysis?
+    - What is the time period?
+    - What is the geographical scope?
+    - What are the key variables?
+- What data is being collected?
+- How is the data being collected?
+    - What is the sampling strategy?
+    - Note the UK weighting
+
+- Plan for using agentic modelling
+    - Why would I use agentic modelling?
+    - What is the agentic modelling?
+    - How will I use agentic modelling?
+
+- Note the use of a between-subjects survey experiment
+    - Deliberately chosen to avoid sensitivity issues noted by @levendusky2021
+
+# Data analysis {#sec-data-analysis}
+
+The following data analyses focus on all outcome measures of affective polarisation to give a holistic understading of both general and tangible prejudices, and discriminatory behaviours towards the opposing out-group to that of the respondent's identified in-group. The analysis is split by the treatments being tested: AI-generated content and AI-labelled content. Each treatment is analysed across the outcome measures of thermometer scores, trait-based measures, and social-distance measures.
+
+## Regression Specification {#sec-reg-spec}
+
+To test the causal Average Treatment Effect (ATE) of respondents being exposed to AI-generated and AI-lebelled content on the set of affective polarisation measures, a series of regression models are estimated. The model specification is given by Equation \@ref(eq:reg-spec):
+
+\begin{equation}
+Y_i = \beta_0 + \beta_1 D_i + \beta_2 \mathbf{X}_i + \beta_3 (D_i \times \mathbf{Z}_i) + \varepsilon_i (\#eq:reg-spec)
+\end{equation}
+
+*where:*
+
+- $Y_i$ takes the outcome variables (`thermo_gap`, `MLthermoMean`, `LLthermoMean`, `agreedisagree`, `xtrust`, and `child`)
+- $D_i$ is the treatment recieved (`ai_treatment` or `label_treatment`)
+- $\mathbf{X}_i$ is a vector of covariates (see Balance Check in \hyperref[sec-balance]{Section \ref*{sec-balance}} for details)
+- $\mathbf{Z}_i$ is a vector of possible interaction terms between the treatment and moderators
+- $\varepsilon_i$ is the error term
+
+In this full specitifcation, $\beta_1$ estimates the average treatment effect when the moderator(s) are at their reference level. Estimates are calculated with survey-weighted least squares and ordinal logistic models so results can be generalised to the UK more broadly. $\beta_2$ measures the effect of a one-unit change of a covariate on the outcome variable. $\beta_3$ captures the treatment effect heterogeneity across different sub-groups of the moderator, where statistically significant non-zero values suggest the ATE is different for different sub-group characteristics.
+
+## AI-Generated Content Treatment {#sec-ai-treatment}
+
+The results show no statistically significant treatment effect of AI-generated content on in- and out-party, nor net-difference thermometer scores. However, it is found that Liberal Democrat voters are significantly susceptible to being polarised from expsure to AI-generated content. Trait-based ratings of opposing parties/voters' respect and trust show...
+
+### Thermometer Analysis {#sec-thermo-analysis}
+
+Thermometer analysis is one of the primary affective polarisation measures. Before determining a causal link between AI content exposure and the affective polarisation measures, a descriptive summary of the `thermo_gap` measures, averaged over all in- and out-party leaders, given for both treatments is presented in \hyperref[fig:thermo-graph]{Figure \ref*{fig:thermo-graph}}. This shows how net-difference thermometer scores are similar across both control and treatment groups, suggesting causal effects are likely to be minimal.
+
+```{r thermo-graph, echo=FALSE, message=FALSE, fig.width=5, fig.height=3, fig.cap = "Average in- and out-party thermometer net-difference scores"}
+# === Descriptive Thermometer Graph ===
+
+
+# Reshaped data to long format
+thermo_data <- yougov_data %>%
+    dplyr::select(thermo_gap, ai_treatment, label_treatment) %>%
+    pivot_longer(
+        cols = c(ai_treatment, label_treatment),
+        names_to = "treatment_type",
+        values_to = "treated"
+    ) %>%
+    filter(!is.na(treated), !is.na(thermo_gap)) %>%
+    mutate(
+        treatment_type = recode(treatment_type,
+            "ai_treatment" = "AI Treatment",
+            "label_treatment" = "Label Treatment"
+        ),
+        treated = factor(treated, levels = c(0, 1), labels = c("Control", "Treatment"))
+    )
+
+# Group means
+summary_stats <- thermo_data %>%
+    group_by(treatment_type, treated) %>%
+    summarise(
+        mean_gap = mean(thermo_gap, na.rm = TRUE),
+        .groups = "drop"
+    )
+
+# Ggplot of results
+ggplot(summary_stats, aes(x = treatment_type, y = mean_gap, fill = treated)) +
+    geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+    labs(
+        x = NULL,
+        y = "Average Thermometer Gap",
+        fill = "Group"
+    ) +
+    scale_fill_manual(
+        labels = c("Control", "Treatment"),
+        values = c("#bdbdbd", "#4b4b4b")
+    ) +
+    ylim(0, NA) +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+        axis.text = element_text(size = 9),
+        legend.title = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+To test whether this descriptive expectation is causally salient, models for the outcome variables for in- and out-party, and net-difference thermometer scores are estimated. The thermometer outcome scores are continuous measures. Therefore, survey-weighted least squares regression models are estimated.
+
+ATE models are presented in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}} for the outcome `thermo_gap`.[^thermo-outcomes] A first model (1) sets the benchmark without control for covariates and moderators. A full balanace check (\hyperref[sec-balance]{Section \ref*{sec-balance}}) shows that the treatment and control groups were balanced across all convariates. Despite this, model (2) still includes a full set of pre-treatment covariates as each has theoretical justification for affecting the outcome independently of the treatment, and also to ensure the ATE estimates are efficient. To avoid multicollinearity, individual moderators were sequentially tested within the models; however, few showed any moderation effects. The moderators of party affiliation/warmth (`mostlikely`) and attentivness to politics (`political_attention`) showed the greatest moderation effects, thus are included in the final model (3) as interaction terms to test these groups for heterogeneity.
+
+[^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}.
+
+```{r thermo-models, echo=FALSE, message=FALSE, results='hide'}
+# === Thermometer Analysis ===
+# Analysis of the thermometer outcome variables on a continuous scale
+# Analysis done using weighted least squares regression inc. robust standard errors
+
+# Define the survey design
+yougov_design <- svydesign(
+    ids = ~1,
+    data = yougov_data,
+    weights = ~weight
+)
+
+# Flexible function to run linear models for thermometer outcomes
+thermo_models <- function(data,
+                          design,
+                          outcome = c("thermo_gap", "MLthermoMean", "LLthermoMean"),
+                          treatment = c("ai_treatment", "label_treatment"),
+                          covariates = NULL,
+                          moderators = NULL) {
+    results_list <- list()
+
+    for (treat in treatment) {
+        for (out in outcome) {
+            rhs <- treat
+
+            if (!is.null(covariates)) {
+                rhs <- c(rhs, covariates)
+            }
+
+            if (!is.null(moderators)) {
+                rhs <- c(rhs, moderators, paste(treat, moderators, sep = ":"))
+            }
+
+            formula_spec <- reformulate(termlabels = rhs, response = out)
+            model <- svyglm(formula = formula_spec, design = design)
+
+            model_name <- paste0(out, "_", treat)
+            results_list[[model_name]] <- model
+        }
+    }
+
+    return(results_list)
+}
+```
+
+```{r thermo-gap-models-results, echo=FALSE, message=FALSE, results='hide'}
+# thermo_gap model with treatment only
+thermo_gap_treat <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "thermo_gap"
+)[[1]]
+
+# thermo_gap model with treatment and covariates
+thermo_gap_treat_cov <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "thermo_gap",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)[[1]]
+
+# thermo_gap model with covariates and moderators
+full_thermo_gap_model <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "thermo_gap",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    ), moderators = c("mostlikely", "political_attention", "education_recode")
+)[[1]]
+```
+
+```{r thermo-gap-results-table, echo=FALSE, message=FALSE, warning=FALSE, results='hid'}
+# === Thermometer Models Results ===
+modelsummary(
+    list(
+        "Treatment Only" = thermo_gap_treat,
+        "Treatment + Covariates" = thermo_gap_treat_cov,
+        "Full Model" = full_thermo_gap_model
+    ),
+    output = "latex",
+    statistic = "({std.error})",
+    stars = TRUE,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
+    gof_omit = "IC|Log|Adj",
+    coef_rename = c(
+        "ai_treatment" = "AI Treatment",
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education"
+    ),
+    escape = FALSE,
+    title = "AI-Generated Content: Thermometer Gap Results \\label{tab:thermo-results}",
+    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+```
+
+```{r thermo-results-graph, echo=FALSE, message=FALSE, results='hide'}
+equatiomatic::extract_eq(thermo_gap_treat_cov)
+```
+
+The primary takeaway from model (3) in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}} is that there is no significant treatment effect seen for the exposure to AI-generated content on the reported net-difference thermometer scores. The treatment group shows a slight decrease of **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " points")``** in the thermometer gap, but this is not statistically significant. However, reposndents who were most likely to vote for the Liberal Democrats showed a significant increase of **``r paste0(round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``** at the 95% confidence level in their net-difference thermometer gap, compared to those who were most likely to vote for the Conservative Party. This implies that Liberal Democrat voters are more susceptible to being polarised against their opposing partisans when exposed to AI-generated content. The effect size is notable too. The total treatment effect of AI exposure for Liberal Democrat voters on their affective polarisation is **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " + ", round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " = ", round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"] + coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``**. This is a significant effect size, and suggests that AI-generated content can have a polarising effect. Other than Liberal Democrat voters, the full model suggests that the treatment of exposure to AI-generated content does not have a significant differential effect on the thermometer gap for different sub-groups of respondents.
+
+```{r thermo-ml-models-results, echo=FALSE, message=FALSE, results='hide'}
+# MLthermoMean model with treatment only
+thermo_ml_treat <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "MLthermoMean"
+)[[1]]
+
+# MLthermoMean model with treatment and covariates
+thermo_ml_treat_cov <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "MLthermoMean",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)[[1]]
+
+# MLthermoMean model with covariates and moderators
+full_thermo_ml_model <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "MLthermoMean",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    ), moderators = c("age", "education_recode", "mostlikely")
+)[[1]]
+```
+
+```{r thermo-ll-models-results, echo=FALSE, message=FALSE, results='hide'}
+# LLthermoMean model with treatment only
+thermo_ll_treat <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "LLthermoMean"
+)[[1]]
+
+# LLthermoMean model with treatment and covariates
+thermo_ll_treat_cov <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "LLthermoMean",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)[[1]]
+
+# LLthermoMean model with covariates and moderators
+full_thermo_ll_model <- thermo_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "LLthermoMean",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    ), moderators = c("pastvote_EURef", "education_recode", "mostlikely")
+)[[1]]
+```
+
+To test what drives this affective polarisation, the models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated. These models are presented in the Appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}. Thermometer scores for both in- and out-party leaders show positive increases of **``r paste0(round(coef(summary(full_thermo_ml_model))["ai_treatment", "Estimate"], 3), " points")``** and **``r paste0(round(coef(summary(full_thermo_ll_model))["ai_treatment", "Estimate"], 3), " points")``** respectively to the treatment but the scores are not statistically significant. These models do not show any sub-group differences from moderator variables.
+
+```{r thermo-plot-overall, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+## Helper function to extract control mean and treatment effect
+get_means <- function(model, treatment_var = "ai_treatment") {
+    coefs <- coef(model)
+    intercept <- coefs["(Intercept)"]
+    treatment_effect <- coefs[treatment_var]
+    tibble(
+        Group = c("Control", "Treatment"),
+        Mean = c(intercept, intercept + treatment_effect)
+    )
+}
+
+ml_df_overall <- get_means(full_thermo_ml_model) %>% mutate(Outcome = "MLthermoMean")
+ll_df_overall <- get_means(full_thermo_ll_model) %>% mutate(Outcome = "LLthermoMean")
+gap_df_overall <- get_means(full_thermo_gap_model) %>% mutate(Outcome = "thermo_gap")
+
+thermo_plot_data_overall <- bind_rows(ml_df_overall, ll_df_overall, gap_df_overall) %>%
+    mutate(Outcome = factor(Outcome, levels = c("MLthermoMean", "LLthermoMean", "thermo_gap")))
+
+plot_overall <- ggplot(thermo_plot_data_overall, aes(x = Group, y = Mean, group = Outcome, colour = Outcome)) +
+    geom_line(size = 0.75) +
+    geom_point(size = 2) +
+    scale_colour_manual(
+        values = c("MLthermoMean" = "#4b4b4b", "LLthermoMean" = "#bdbdbd", "thermo_gap" = "black"),
+        labels = c("Most Likely", "Least Likely", "Thermometer Gap")
+    ) +
+    labs(
+        x = NULL,
+        y = "Feeling Thermometer",
+        colour = NULL
+    ) +
+    theme_classic(base_family = "serif") +
+    ylim(0, 100) +
+    theme(
+        axis.title.y = element_text(size = 10),
+        axis.text = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r thermo-plot-ld, echo=FALSE, message=FALSE, results='hide'}
+# === Thermometer Models Results Graphs for Liberal Democrat subgroup ===
+
+# Updated function to extract means for the Lib Dem subgroup
+get_libdem_means <- function(model, treatment_var = "ai_treatment", interaction_term = "ai_treatment:mostlikelyLiberal Democrats") {
+    coefs <- coef(model)
+    intercept <- coefs["(Intercept)"]
+    treatment_effect <- coefs[treatment_var]
+    interaction_effect <- ifelse(interaction_term %in% names(coefs), coefs[interaction_term], 0)
+    tibble(
+        Group = c("Control", "Treatment"),
+        Mean = c(intercept, intercept + treatment_effect + interaction_effect)
+    )
+}
+
+ml_df_libdem <- get_libdem_means(full_thermo_ml_model) %>% mutate(Outcome = "MLthermoMean")
+ll_df_libdem <- get_libdem_means(full_thermo_ll_model) %>% mutate(Outcome = "LLthermoMean")
+gap_df_libdem <- get_libdem_means(full_thermo_gap_model) %>% mutate(Outcome = "thermo_gap")
+
+thermo_plot_data_libdem <- bind_rows(ml_df_libdem, ll_df_libdem, gap_df_libdem) %>%
+    mutate(Outcome = factor(Outcome, levels = c("MLthermoMean", "LLthermoMean", "thermo_gap")))
+
+plot_libdem <- ggplot(thermo_plot_data_libdem, aes(x = Group, y = Mean, group = Outcome, colour = Outcome)) +
+    geom_line(size = 0.75) +
+    geom_point(size = 2) +
+    scale_colour_manual(
+        values = c("MLthermoMean" = "#4b4b4b", "LLthermoMean" = "#bdbdbd", "thermo_gap" = "black"),
+        labels = c("Most Likely", "Least Likely", "Thermometer Gap")
+    ) +
+    labs(
+        x = NULL,
+        y = "Feeling Thermometer (Liberal Democrat Subgroup)",
+        colour = NULL
+    ) +
+    theme_classic(base_family = "serif") +
+    ylim(0, 100) +
+    theme(
+        axis.title.y = element_text(size = 10),
+        axis.text = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r thermo-plots-green, echo=FALSE, message=FALSE, results='hide'}
+# === Thermometer Models Results Graphs for Green Party subgroup ===
+
+# Updated function to extract means for the Green Party subgroup
+get_green_means <- function(model, treatment_var = "ai_treatment", interaction_term = "ai_treatment:mostlikelyGreen Party") {
+    coefs <- coef(model)
+    intercept <- coefs["(Intercept)"]
+    treatment_effect <- coefs[treatment_var]
+    interaction_effect <- ifelse(interaction_term %in% names(coefs), coefs[interaction_term], 0)
+    tibble(
+        Group = c("Control", "Treatment"),
+        Mean = c(intercept, intercept + treatment_effect + interaction_effect)
+    )
+}
+
+ml_df_green <- get_green_means(full_thermo_ml_model) %>% mutate(Outcome = "MLthermoMean")
+ll_df_green <- get_green_means(full_thermo_ll_model) %>% mutate(Outcome = "LLthermoMean")
+gap_df_green <- get_green_means(full_thermo_gap_model) %>% mutate(Outcome = "thermo_gap")
+
+thermo_plot_data_green <- bind_rows(ml_df_green, ll_df_green, gap_df_green) %>%
+    mutate(Outcome = factor(Outcome, levels = c("MLthermoMean", "LLthermoMean", "thermo_gap")))
+
+plot_green <- ggplot(thermo_plot_data_green, aes(x = Group, y = Mean, group = Outcome, colour = Outcome)) +
+    geom_line(size = 0.75) +
+    geom_point(size = 2) +
+    scale_colour_manual(
+        values = c("MLthermoMean" = "#4b4b4b", "LLthermoMean" = "#bdbdbd", "thermo_gap" = "black"),
+        labels = c("Most Likely", "Least Likely", "Thermometer Gap")
+    ) +
+    labs(
+        x = NULL,
+        y = "Feeling Thermometer (Green Party Subgroup)",
+        colour = NULL
+    ) +
+    theme_classic(base_family = "serif") +
+    ylim(0, 100) +
+    theme(
+        axis.title.y = element_text(size = 10),
+        axis.text = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r thermo-plot-educ, echo=FALSE, message=FALSE, results='hide'}
+# === Thermometer Models Results Graphs for Low Education subgroup ===
+
+# Function to extract means for Low Education subgroup
+get_lowedu_means <- function(model, treatment_var = "ai_treatment", interaction_term = "ai_treatment:education_recodeLow") {
+    coefs <- coef(model)
+    intercept <- coefs["(Intercept)"]
+    treatment_effect <- coefs[treatment_var]
+    interaction_effect <- ifelse(interaction_term %in% names(coefs), coefs[interaction_term], 0)
+    tibble(
+        Group = c("Control", "Treatment"),
+        Mean = c(intercept, intercept + treatment_effect + interaction_effect)
+    )
+}
+
+ml_df_lowedu <- get_lowedu_means(full_thermo_ml_model) %>% mutate(Outcome = "MLthermoMean")
+ll_df_lowedu <- get_lowedu_means(full_thermo_ll_model) %>% mutate(Outcome = "LLthermoMean")
+gap_df_lowedu <- get_lowedu_means(full_thermo_gap_model) %>% mutate(Outcome = "thermo_gap")
+
+thermo_plot_data_lowedu <- bind_rows(ml_df_lowedu, ll_df_lowedu, gap_df_lowedu) %>%
+    mutate(Outcome = factor(Outcome, levels = c("MLthermoMean", "LLthermoMean", "thermo_gap")))
+
+plot_lowedu <- ggplot(thermo_plot_data_lowedu, aes(x = Group, y = Mean, group = Outcome, colour = Outcome)) +
+    geom_line(size = 0.75) +
+    geom_point(size = 2) +
+    scale_colour_manual(
+        values = c("MLthermoMean" = "#4b4b4b", "LLthermoMean" = "#bdbdbd", "thermo_gap" = "black"),
+        labels = c("Most Likely", "Least Likely", "Thermometer Gap")
+    ) +
+    labs(
+        x = NULL,
+        y = "Feeling Thermometer (Low Education Subgroup)",
+        colour = NULL
+    ) +
+    theme_classic(base_family = "serif") +
+    ylim(0, 100) +
+    theme(
+        axis.title.y = element_text(size = 10),
+        axis.text = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r themo-plots-combined, echo=FALSE, message=FALSE, results='hide', fig.cap="\\label{fig:thermo-patchwork} Thermometer Scores by Subgroup"}
+library(patchwork)
+
+# 1. Standardise each plot
+standardise_plot <- function(p, ylab = "Thermometer Score") {
+    p +
+        labs(y = ylab, x = NULL, colour = NULL) +
+        theme(
+            axis.title.y = element_text(size = 9, family = "serif"),
+            axis.text.x = element_text(angle = 0, hjust = 0.5, family = "serif"),
+            axis.text = element_text(size = 9, family = "serif"),
+            legend.text = element_text(size = 9, family = "serif"),
+            plot.title = element_text(size = 9, family = "serif", hjust = 0.5),
+            legend.title = element_blank()
+        )
+}
+
+plot_overall <- standardise_plot(plot_overall) + ggtitle("Average Treatment Effect")
+plot_libdem <- standardise_plot(plot_libdem) + ggtitle("Liberal Democrat Subgroup")
+plot_green <- standardise_plot(plot_green) + ggtitle("Green Party Subgroup")
+plot_lowedu <- standardise_plot(plot_lowedu) + ggtitle("Low Education Subgroup")
+
+# 2. Combine with patchwork, add label
+combined_thermo_plot <- (
+    (plot_overall + plot_libdem) /
+        (plot_green + plot_lowedu)
+) +
+    plot_layout(guides = "collect") &
+    theme(legend.position = "bottom")
+
+# 3. Print the final patchwork figure
+print(combined_thermo_plot)
+```
+
+### Ordinal Affective Polarisation Analysis {#sec-ordinal-analysis}
+
+To further disect the affective polarisation caused by treatment to AI-generated content, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are next estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of respect, trust, and social-distance to opposing partisans are presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} respectively.
+
+```{r ordinal-models, echo=FALSE, message=FALSE, results='hide'}
+# === Additional Ordinal Outcome Models ===
+
+# Function to run ordinal logistic regression models
+# for the collapsed outcome variables and treatment groups
+ordinal_models <- function(data,
+                           design,
+                           outcome = c("agreedisagree", "xtrust", "child"),
+                           treatment = c("ai_treatment", "label_treatment"),
+                           moderators = NULL,
+                           covariates = NULL) {
+    results_list <- list()
+    for (treat in treatment) {
+        for (out in outcome) {
+            # Start with treatment as predictor
+            rhs <- treat
+
+            # Add covariates (if specified)
+            if (!is.null(covariates)) {
+                rhs <- c(rhs, covariates)
+            }
+
+            # Add moderators and interactions with treatment
+            if (!is.null(moderators)) {
+                rhs <- c(
+                    rhs, moderators,
+                    paste(treat, moderators, sep = ":")
+                )
+            }
+
+            formula_spec <- reformulate(termlabels = rhs, response = out)
+
+            model <- svyolr(formula = formula_spec, design = design)
+
+            model_name <- paste0(out, "_", treat)
+            results_list[[model_name]] <- model
+        }
+    }
+
+    return(results_list)
+}
+```
+
+```{r ordinal-models-results, echo=FALSE, message=FALSE, results='hide'}
+# === Ordinal models for the outcome variables ===
+
+# agreedisagree model with treatment only
+agreedisagree_treat <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "agreedisagree"
+)[[1]]
+
+# agreedisagree model with treatment and covariates
+agreedisagree_cov <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "agreedisagree",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat"
+    )
+)[[1]]
+
+# agreedisagree model with covariates and moderators
+agreedisagree_full <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "agreedisagree",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat"
+    ),
+    moderators = c("education_recode", "profile_work_stat")
+)[[1]]
+
+# xtrust model with treatment only
+xtrust_treat <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "xtrust"
+)[[1]]
+
+# xtrust model with treatment and covariates
+xtrust_cov <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "xtrust",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)[[1]]
+
+# xtrust model with covariates and moderators
+xtrust_full <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "xtrust",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    ),
+    moderators = c("mostlikely", "education_recode")
+)[[1]]
+
+# child model with treatment only
+child_treat <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "child"
+)[[1]]
+
+# child model with treatment and covariates
+child_cov <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "child",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)[[1]]
+
+# child model with covariates and moderators
+child_full <- ordinal_models(
+    data = yougov_data,
+    design = yougov_design,
+    treatment = "ai_treatment",
+    outcome = "child",
+    covariates = c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    ),
+    moderators = c("education_recode", "profile_GOR", "mostlikely")
+)[[1]]
+```
+
+```{r agreedisagree-probability-plot, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Predicted Probability of Disagreement that Out-Parties respect In-Party Beliefs by Moderator"}
+# 1. Estimate polr model with interactions
+polr_model <- polr(
+    agreedisagree ~ ai_treatment * education_recode + ai_treatment * profile_work_stat,
+    data = yougov_data,
+    method = "logistic",
+    Hess = TRUE
+)
+
+# === Individual collapsed predictions ===
+
+# Helper to extract and collapse predictions for a single subgroup
+collapse_preds <- function(term_list, subgroup_label) {
+    preds_filtered <- ggpredict(polr_model, terms = term_list) %>%
+        filter(response.level %in% c("Strongly disagree", "Tend to disagree"))
+
+    preds_collapsed <- preds_filtered %>%
+        group_by(x) %>%
+        summarise(
+            predicted = sum(predicted),
+            conf.low = sum(predicted) - sqrt(sum((predicted - conf.low)^2)),
+            conf.high = sum(predicted) + sqrt(sum((conf.high - predicted)^2)),
+            .groups = "drop"
+        )
+
+    preds_collapsed %>%
+        mutate(
+            treatment = ifelse(x == 0, "Control", "Treatment"),
+            mod_group = subgroup_label
+        )
+}
+
+# Low Education
+preds_edu <- collapse_preds(
+    term_list = c("ai_treatment", "education_recode[Low]"),
+    subgroup_label = "Low Education"
+)
+
+# Working PT (8–29h)
+preds_work1 <- collapse_preds(
+    term_list = c("ai_treatment", "profile_work_stat[Working part time (8-29 hours a week)]"),
+    subgroup_label = "Working PT (8–29h)"
+)
+
+# Working PT (<8h)
+preds_work2 <- collapse_preds(
+    term_list = c("ai_treatment", "profile_work_stat[Working part time (Less than 8 hours a week)]"),
+    subgroup_label = "Working PT (<8h)"
+)
+
+# Overall
+preds_overall <- ggpredict(polr_model, terms = "ai_treatment") %>%
+    filter(response.level %in% c("Strongly disagree", "Tend to disagree")) %>%
+    group_by(x) %>%
+    summarise(
+        predicted = sum(predicted),
+        conf.low = sum(conf.low),
+        conf.high = sum(conf.high),
+        .groups = "drop"
+    ) %>%
+    mutate(
+        treatment = ifelse(x == 0, "Control", "Treatment"),
+        mod_group = "Overall"
+    )
+
+# === Combine all results ===
+final_preds <- bind_rows(preds_edu, preds_work1, preds_work2, preds_overall)
+
+final_preds <- final_preds %>%
+    mutate(mod_group = factor(mod_group, levels = c(
+        "Overall",
+        "Low Education",
+        "Working PT (<8h)",
+        "Working PT (8–29h)"
+    )))
+
+# === Final predictions ===
+overall_treatment_value <- final_preds %>%
+    filter(mod_group == "Overall", treatment == "Treatment") %>%
+    pull(predicted)
+
+# === Plot ===
+position <- position_dodge(width = 0.5)
+
+plot_disagreement <- ggplot(final_preds, aes(x = mod_group, y = predicted, group = treatment, shape = treatment)) +
+    geom_point(size = 3, position = position) +
+    geom_hline(yintercept = overall_treatment_value, linetype = "dashed", colour = "black") +
+    labs(
+        x = "Moderator Subgroup",
+        y = "Predicted Probability of Disagreement",
+        shape = "Treatment"
+    ) +
+    scale_shape_manual(values = c(1, 19)) +
+    ylim(0, 1) +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+        axis.text = element_text(size = 9),
+        legend.title = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r xtrust-probability-plot, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Predicted Probability of Low Trust in Out-Parties by Moderator"}
+# Estimate polr model with interactions
+polr_model <- polr(
+    xtrust ~ ai_treatment * mostlikely + ai_treatment * education_recode,
+    data = yougov_data,
+    method = "logistic",
+    Hess = TRUE
+)
+
+# Helper to extract and collapse predictions
+collapse_preds <- function(term_list, subgroup_label) {
+    preds_filtered <- ggpredict(polr_model, terms = term_list) %>%
+        filter(response.level %in% c("Almost never", "Once in a while"))
+
+    preds_filtered %>%
+        group_by(x) %>%
+        summarise(
+            predicted = sum(predicted),
+            conf.low = sum(predicted) - sqrt(sum((predicted - conf.low)^2)),
+            conf.high = sum(predicted) + sqrt(sum((conf.high - predicted)^2)),
+            .groups = "drop"
+        ) %>%
+        mutate(
+            treatment = ifelse(x == 0, "Control", "Treatment"),
+            mod_group = subgroup_label
+        )
+}
+
+# Labour Voters
+preds_lab <- collapse_preds(
+    term_list = c("ai_treatment", "mostlikely[Labour Party]"),
+    subgroup_label = "Labour"
+)
+
+# Lib Dem Voters
+preds_ld <- collapse_preds(
+    term_list = c("ai_treatment", "mostlikely[Liberal Democrats]"),
+    subgroup_label = "Liberal Democrats"
+)
+
+# Low Education
+preds_edu <- collapse_preds(
+    term_list = c("ai_treatment", "education_recode[Low]"),
+    subgroup_label = "Low Education"
+)
+
+# Overall
+preds_overall <- ggpredict(polr_model, terms = "ai_treatment") %>%
+    filter(response.level %in% c("Almost never", "Once in a while")) %>%
+    group_by(x) %>%
+    summarise(
+        predicted = sum(predicted),
+        conf.low = sum(conf.low),
+        conf.high = sum(conf.high),
+        .groups = "drop"
+    ) %>%
+    mutate(
+        treatment = ifelse(x == 0, "Control", "Treatment"),
+        mod_group = "Overall"
+    )
+
+# Combine
+final_preds <- bind_rows(preds_lab, preds_ld, preds_edu, preds_overall) %>%
+    mutate(
+        mod_group = factor(mod_group, levels = c("Overall", "Labour", "Liberal Democrats", "Low Education"))
+    )
+
+# Horizontal reference line
+overall_treatment_value <- final_preds %>%
+    filter(mod_group == "Overall", treatment == "Treatment") %>%
+    pull(predicted)
+
+# Plot
+position <- position_dodge(width = 0.5)
+
+plot_trust <- ggplot(final_preds, aes(x = mod_group, y = predicted, group = treatment, shape = treatment)) +
+    geom_point(size = 3, position = position) +
+    geom_hline(yintercept = overall_treatment_value, linetype = "dashed", colour = "black") +
+    labs(
+        x = "Moderator Subgroup",
+        y = "Predicted Probability of Low Trust",
+        shape = "Treatment"
+    ) +
+    scale_shape_manual(values = c(1, 19)) +
+    ylim(0, 1) +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+        axis.text = element_text(size = 9),
+        legend.title = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r child-probability-plot, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Predicted Probability of Discomfort with Child Marrying Opposing Partisan by Moderator"}
+# 1. Estimate polr model with interactions
+polr_model <- polr(
+    child ~ ai_treatment * education_recode + ai_treatment * profile_GOR,
+    data = yougov_data,
+    method = "logistic",
+    Hess = TRUE
+)
+
+# === Helper to extract and collapse predicted disagreement ===
+collapse_preds <- function(term_list, subgroup_label) {
+    preds_filtered <- ggpredict(polr_model, terms = term_list) %>%
+        filter(response.level %in% c("Extremely upset", "Somewhat upset"))
+
+    preds_filtered %>%
+        group_by(x) %>%
+        summarise(
+            predicted = sum(predicted),
+            conf.low = sum(predicted) - sqrt(sum((predicted - conf.low)^2)),
+            conf.high = sum(predicted) + sqrt(sum((conf.high - predicted)^2)),
+            .groups = "drop"
+        ) %>%
+        mutate(
+            treatment = ifelse(x == 0, "Control", "Treatment"),
+            mod_group = subgroup_label
+        )
+}
+
+# Low Education
+preds_edu <- collapse_preds(
+    term_list = c("ai_treatment", "education_recode[Low]"),
+    subgroup_label = "Low Education"
+)
+
+# North East
+preds_ne <- collapse_preds(
+    term_list = c("ai_treatment", "profile_GOR[North East]"),
+    subgroup_label = "North East"
+)
+
+# South East
+preds_se <- collapse_preds(
+    term_list = c("ai_treatment", "profile_GOR[South East]"),
+    subgroup_label = "South East"
+)
+
+# Overall (no moderator)
+preds_overall <- ggpredict(polr_model, terms = "ai_treatment") %>%
+    filter(response.level %in% c("Extremely upset", "Somewhat upset")) %>%
+    group_by(x) %>%
+    summarise(
+        predicted = sum(predicted),
+        conf.low = sum(conf.low),
+        conf.high = sum(conf.high),
+        .groups = "drop"
+    ) %>%
+    mutate(
+        treatment = ifelse(x == 0, "Control", "Treatment"),
+        mod_group = "Overall"
+    )
+
+# Combine
+final_preds <- bind_rows(preds_edu, preds_ne, preds_se, preds_overall) %>%
+    mutate(
+        mod_group = factor(mod_group, levels = c("Overall", "Low Education", "North East", "South East"))
+    )
+
+# Horizontal reference line
+overall_treatment_value <- final_preds %>%
+    filter(mod_group == "Overall", treatment == "Treatment") %>%
+    pull(predicted)
+
+# Plot
+position <- position_dodge(width = 0.5)
+
+plot_discomfort <- ggplot(final_preds, aes(x = mod_group, y = predicted, group = treatment, shape = treatment)) +
+    geom_point(size = 3, position = position) +
+    geom_hline(yintercept = overall_treatment_value, linetype = "dashed", colour = "black") +
+    labs(
+        x = "Moderator Subgroup",
+        y = "Predicted Probability of Discomfort",
+        shape = "Treatment"
+    ) +
+    scale_shape_manual(values = c(1, 19)) +
+    ylim(0, 1) +
+    theme_classic(base_family = "serif") +
+    theme(
+        axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+        axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+        axis.text = element_text(size = 9),
+        legend.title = element_text(size = 9),
+        legend.text = element_text(size = 9)
+    )
+```
+
+```{r combined-ordinal-plots, echo=FALSE, message=FALSE, results='asis', fig.cap="Predicted Probabilities of Affective Polarisation Measures of Respect, Trust, and Discomfort"}
+# Apply individual titles and adjustments to each plot
+plot_disagreement <- plot_disagreement +
+    ggtitle("Respect Beliefs") +
+    theme(
+        plot.title = element_text(
+            size = 9,
+            family = "serif",
+            hjust = 0.5
+        ),
+        axis.title.x = element_blank(),
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 1)
+    )
+
+plot_trust <- plot_trust +
+    ggtitle("Trust to do Right") +
+    theme(
+        plot.title = element_text(
+            size = 9,
+            family = "serif",
+            hjust = 0.5
+        ),
+        axis.title.x = element_blank(),
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 1)
+    )
+
+plot_discomfort <- plot_discomfort +
+    ggtitle("Discomfort with Marriage") +
+    theme(
+        plot.title = element_text(
+            size = 9,
+            family = "serif",
+            hjust = 0.5
+        ),
+        axis.title.x = element_blank(),
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 1)
+    )
+
+# Combine them horizontally with shared legend at bottom
+combined_plot <- plot_disagreement + plot_trust + plot_discomfort +
+    plot_layout(ncol = 3, guides = "collect") &
+    theme(legend.position = "bottom")
+
+# Print the combined plot
+print(combined_plot)
+```
+
+
+
+## AI-Labelled Content Treatment {#sec-label-treatment}
+
+### Thermometer Analysis {#sec-label-thermo-analysis}
+
+### Ordinal Affective Polarisation Analysis {#sec-label-ordinal-analysis}
+
+## Additional Analysis
+
+### Causal Acyclic Testing
+
+(see exeprimental analysis week 6 notes for details)
+
+### Agentic-based Modelling
+- What is agentic-based modelling?
+- Why is agentic-based modelling important?
+- How will I use agentic-based modelling?
+
+
+\newpage
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+
+# Appendix {-}
+
+## Codebook {#sec-codebook}
+
+The codebook in \hyperref[tab:codebook-table]{Table \ref*{tab:codebook-table}} below provides a summary of the variables used in the YouGov UniOM analysis. The variable names are provided in the first column, followed by the type of variable (e.g., categorical, continuous), a description of the variable, and the values that the variable can take. Note that the outcome variables of `agreedisagree`, `xtrust`, and `child` are ordinal variables on an ordered Likert scale.
+
+```{r codebook-table, echo=FALSE, message=FALSE, warning=FALSE}
+# === Codebook ===
+# Input variable names as plain text (no LaTeX yet)
+
+codebook <- tribble(
+    ~Variable, ~Type, ~Description, ~Values,
+    "identity_client", "Identifier", "Unique identifier for the respondent", "Alphanumeric string",
+    "weight", "Continuous", "Survey weight to ensure national representativeness", "Continuous float (e.g., 0.982, 1.034)",
+    "age", "Continuous", "Age of the respondent", "Integer values, typically 18–90",
+    "profile_gender", "Categorical", "Gender of the respondent", "Female; Male",
+    "profile_GOR", "Categorical", "Government Office Region (region of residence)", "East Midlands; East of England; London; North East; North West; Scotland; South East; South West; Wales; West Midlands; Yorkshire and the Humber",
+    "voted_ge_2024", "Categorical", "Did the respondent vote in the 2024 General Election?", "Don’t know; No, did not vote; Yes, voted",
+    "pastvote_ge_2024", "Categorical", "How the respondent voted in the 2024 General Election", "Conservative; Don't know; Green; Labour; Liberal Democrat; Other; Plaid Cymru; Reform UK; Scottish National Party (SNP); Skipped",
+    "pastvote_EURef", "Categorical", "How the respondent voted in the 2016 EU Referendum", "Can’t remember; I did not vote; I voted to Leave; I voted to Remain",
+    "education_recode", "Categorical", "Re-coded education level (grouped)", "High; Medium; Low",
+    "profile_work_stat", "Categorical", "Employment status", "Full time student; Not working; Other; Retired; Unemployed; Working full time (30+ hrs); Working part time (8–29 hrs); Working part time (<8 hrs)",
+    "political_attention", "Continuous", "How much attention the respondent pays to politics", "Scale (e.g., 0–10 or continuous values)",
+    "split", "Categorical", "Randomly assigned treatment group (1–4)", "1 = AI-generated, not labelled as AI-generated; 2 = AI-generated and labelled as AI-generated; 3 = Human-generated but labelled as AI-generated; 4 = Human-generated, not labelled as AI-generated",
+    "xconsent", "Categorical", "Consent to participate in the survey", "I consent to taking part in this study; I do not wish to continue with this study",
+    "mostlikely", "Categorical", "Which of these parties would you be most likley to vote for?", "Conservative Party; Green Party; Labour Party; Liberal Democrats; Reform UK",
+    "leastlikely", "Categorical", "Which of these parties would you be least likley to vote for?", "Conservative Party; Green Party; Labour Party; Liberal Democrats; Reform UK; None of these; Not Asked",
+    "MLthermo_KB", "Continuous", "Thermometer rating for Kemi Badenoch (most likely party)", "0–100",
+    "MLthermo_KS", "Continuous", "Thermometer rating for Keir Starmer", "0–100",
+    "MLthermo_NF", "Continuous", "Thermometer rating for Nigel Farage", "0–100",
+    "MLthermo_ED", "Continuous", "Thermometer rating for Ed Davey", "0–100",
+    "MLthermo_CD", "Continuous", "Thermometer rating for Carla Denyer", "0–100",
+    "MLthermo_AR", "Continuous", "Thermometer rating for Adrian Ramsay", "0–100",
+    "LLthermo_KB", "Continuous", "Thermometer rating for Kemi Badenoch (least likely party)", "0–100",
+    "LLthermo_KS", "Continuous", "Thermometer rating for Keir Starmer", "0–100",
+    "LLthermo_NF", "Continuous", "Thermometer rating for Nigel Farage", "0–100",
+    "LLthermo_ED", "Continuous", "Thermometer rating for Ed Davey", "0–100",
+    "LLthermo_CD", "Continuous", "Thermometer rating for Carla Denyer", "0–100",
+    "LLthermo_AR", "Continuous", "Thermometer rating for Adrian Ramsay", "0–100",
+    "agreedisagree", "Ordinal", "Trait-based measure of whether out-groups respect in-group beliefs ", "Strongly disagree; Tend to disagree; Neither agree nor disagree; Tend to agree; Strongly agree",
+    "xtrust", "Ordinal", "Level of trust in out-group to do what is right", "Almost never; Once in a while; About half of the time; Most of the time; Always",
+    "child", "Ordinal", "Social-disance measure of a child marry an out-group voter", "Extremely upset; Somewhat upset; Neither happy nor upset; Somewhat happy; Extremely happy",
+    "MLthermoMean", "Continuous", "Average thermometer score for most likely party", "0–100 (row mean of MLthermo scores)",
+    "LLthermoMean", "Continuous", "Average thermometer score for least likely party", "0–100 (row mean of LLthermo scores)",
+    "thermo_gap", "Continuous", "Difference between MLthermoMean and LLthermoMean", "0–100 (MLthermoMean - LLthermoMean)",
+    "ai_treatment", "Binary", "Treatment status for AI-generated content", "1 = Treated (shown AI-generated); 0 = Control (shown human-generated)",
+    "label_treatment", "Binary", "Treatment status for AI-labelled content", "1 = Treated (labelled as AI-generated); 0 = Control (labelled as human-generated)"
+)
+
+# Format the variable names for LaTeX monospace in table cells
+codebook <- codebook %>%
+    mutate(Variable = paste0("\\verb|", Variable, "|"))
+
+# Render the table
+kable(
+    codebook,
+    format = "latex",
+    booktabs = TRUE,
+    longtable = TRUE,
+    escape = FALSE,
+    caption = "YouGov UniOM Survey Codebook"
+) %>%
+    kable_styling(
+        latex_options = c("repeat_header"),
+        font_size = 9
+    ) %>%
+    column_spec(1, width = "3.2cm") %>%
+    column_spec(3, width = "5cm") %>%
+    column_spec(4, width = "5cm")
+```
+
+\newpage
+
+## Data Cleaning
+
+`2,001` respondents were provided with the survey experiment. Respondents who did not give consent to participate in the survey were removed. Respondents were given the option to skip questions. When skipped, a value of `997` was assigned to the question, which was then recoded to `NA`, as were `Not asked` values.
+
+The survey was interested in understanding respondents' views towards their most and least preferred party. When asked who the `mostlikely` and `leastlikely` party was, respondents were given the option to select `None of these`. Respondents who selected `None of these` were removed from the sample as they were unable to answer the follow-up questions.
+
+Categorical variables were recoded to be `factors` in R, these were `profile_gender`, `profile_GOR`, `voted_ge_2024`, `pastvote_ge_2024`, `pastvote_EURef`, `profile_education_level`, `education_recode`, `profile_work_stat`, `xconsent`, `mostlikely`, `leastlikely`, `agreedisagree`, `xtrust`, and `child`.
+
+Each of the thermometer variables were recoded to be `numeric` variables: `MLthermo_KB`, `MLthermo_KS`, `MLthermo_NF`, `MLthermo_ED`, `MLthermo_CD`, `MLthermo_AR`, `LLthermo_KB`, `LLthermo_KS`, `LLthermo_NF`, `LLthermo_ED`, `LLthermo_CD`, and `LLthermo_AR`. As the Green Party has two co-leaders, a mean thermometer score is calculated and used for most and least likely party thermometer scores, coded as `MLthermoMean` and `LLthermoMean`.
+
+For treatment effect analysis, respondents were classified into two treatment groups: those shown AI-generated content (`ai_treatment`), identified where the split variable equalled `1` or `2`; and those shown AI-labelled content (`label_treatment`), identified where the split variable equalled `2` or `3`. Participants in the other split groups were coded as receiving human-generated or unlabelled content. These variables were coded as binary variables, where `1` indicated the treatment group and `0` indicated the control group.
+
+
+## Balance Check {#sec-balance}
+
+To ensure that the randomisation process of the treatment allocation was successful, a balance check is conducted to ensure that the treatment and control groups are comparable in every way other than their treatment assignment status. \hyperref[tab:ai-balance]{Table \ref*{tab:ai-balance}} and \hyperref[tab:label-balance]{Table \ref*{tab:label-balance}} below report the balance of the covariates across the treatment groups. The continuous variables of `age` and `political_attention` are reported as means with the standard deviations in parentheses. The remaining categorical variables are reported as a count from the sample, with the proportions in parentheses. If there was a significant difference between the treatment and control groups, this is indicated with a `*` for p < 0.05, `**` for p < 0.01, and `***` for p < 0.001. The balance check shows that randomisation was successful across all covariates for both treatment groups as no covariates were significantly different between the treatment and control groups.
+
+Note that the p-values are reported at the variable level, not for each individual category within a categorical variable. For categorical variables (e.g., gender, vote choice), a single p-value is generated using a chi-squared test, which assesses whether the overall distribution of categories differs between treatment and control groups. The individual category rows are displayed for reference, but since the test is run at the variable level, no p-value is reported for each specific level, giving the `NA` values in the tables.
+
+For each of the categorical variables, there is a base reference category. For example, `profile_gender` uses the base reference category `Male` (reported as `Gender (Male)` in the balance tables). This base acts as the comparison group for the other categories, the p-value compares whether the distribution of the other categories is significantly different from the base category.
+
+```{r Balance Analysis, echo=FALSE, message=FALSE, results ='hide'}
+# === Balance Check ===
+# Check the balance of covariates across treatment groups
+# to see if the randomisation was successful
+
+# Define a reusable function for covariate balance checking
+balance_table <- function(data, strata_var, covariates) {
+    table <- tableone::CreateTableOne(
+        vars = unlist(covariates),
+        strata = strata_var,
+        data = data,
+        factorVars = covariates$categorical
+    )
+}
+
+# Define the treatment and control groups to test balance across
+treatment_vars <- c("ai_treatment", "label_treatment")
+
+# Define the covariates for balance checking
+covariates <- list(
+    continuous = c("age", "political_attention"),
+    categorical = c(
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "voted_ge_2024",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+)
+# Run the balance table function for each treatment variable
+for (strata_var in treatment_vars) {
+    balance_table(yougov_data, strata_var, covariates)
+}
+
+# The balance check shows that randomisation was successful across
+# all covariates for both treatment groups
+```
+
+```{r Balance Table Results, echo=FALSE, message=FALSE, results='asis'}
+# === Balance Table Results ===
+
+# Create a function to generate and render balance tables
+create_balance_table <- function(data,
+                                 treatment_var,
+                                 covariates,
+                                 caption_text,
+                                 treatment_levels = c("Control", "Treatment")) {
+    actual_levels <- levels(factor(data[[treatment_var]]))
+
+    clean_names <- c(
+        "age..mean..SD.." = "Age",
+        "political_attention..mean..SD.." = "Political attention",
+        "profile_gender...." = "Gender (male)",
+        "X" = "Female",
+        "education_recode...." = "Education level (High)",
+        "X.1" = "Low",
+        "X.2" = "Medium",
+        "profile_work_stat...." = "Employment status (Full time student)",
+        "X.3" = "Not working",
+        "X.4" = "Other",
+        "X.5" = "Retired",
+        "X.6" = "Unemployed",
+        "X.7" = "Working full time (30 or more hours per week)",
+        "X.8" = "Working part time (8-29 hours a week)",
+        "X.9" = "Working part time (Less than 8 hours a week)",
+        "voted_ge_2024...." = "Voted in 2024 General Election (Don't know)",
+        "X.10" = "No, did not vote",
+        "X.11" = "Yes, voted",
+        "pastvote_ge_2024...." = "Vote in 2024 General Election (Conservative)",
+        "X.12" = "Don't know",
+        "X.13" = "Green",
+        "X.14" = "Labour",
+        "X.15" = "Liberal Democrat",
+        "X.16" = "Other",
+        "X.17" = "Plaid Cymru",
+        "X.18" = "Reform UK",
+        "X.19" = "Scottish National Party (SNP)",
+        "X.20" = "Skipped",
+        "pastvote_EURef...." = "Vote in EU Referendum (Can’t remember)",
+        "X.21" = "I did not vote",
+        "X.22" = "I voted to Leave",
+        "X.23" = "I voted to Remain",
+        "profile_GOR...." = "Region (East Midlands)",
+        "X.24" = "East of England",
+        "X.25" = "London",
+        "X.26" = "North East",
+        "X.27" = "North West",
+        "X.28" = "Scotland",
+        "X.29" = "South East",
+        "X.30" = "South West",
+        "X.31" = "Wales",
+        "X.32" = "West Midlands",
+        "X.33" = "Yorkshire and the Humber"
+    )
+
+    # Create balance table object
+    balance_tbl_object <- tableone::CreateTableOne(
+        vars = unlist(covariates),
+        strata = treatment_var,
+        data = data,
+        factorVars = covariates$categorical,
+        test = TRUE
+    )
+
+    # Extract and format results
+    balance_df <- print(balance_tbl_object,
+        noSpaces = TRUE,
+        showAllLevels = TRUE,
+        printToggle = FALSE,
+        test = TRUE
+    ) %>%
+        as.data.frame.matrix() %>%
+        dplyr::select(actual_levels[1], actual_levels[2], "p") %>%
+        setNames(c(treatment_levels[1], treatment_levels[2], "p-value")) %>%
+        tibble::rownames_to_column("Variable") %>%
+        dplyr::filter(Variable != "n") %>%
+        dplyr::mutate(
+            Variable = Variable %>%
+                stringr::str_remove(fixed(" (mean (SD))")) %>%
+                stringr::str_replace("=", " ") %>%
+                stringr::str_remove("\\s\\(%\\)$") %>%
+                dplyr::recode(!!!clean_names),
+            `p-value` = as.numeric(`p-value`),
+            Signif. = dplyr::case_when(
+                `p-value` < 0.001 ~ "***",
+                `p-value` < 0.01 ~ "**",
+                `p-value` < 0.05 ~ "*",
+                `p-value` > 0.05 ~ "-",
+                TRUE ~ ""
+            ),
+            `p-value` = format.pval(`p-value`, digits = 3, eps = 0.001)
+        )
+
+    # Render table using kableExtra
+    kable(balance_df,
+        format = "latex",
+        booktabs = TRUE,
+        caption = caption_text,
+        align = c("l", "c", "c", "c", "c"),
+        col.names = c("Variable", treatment_levels[1], treatment_levels[2], "p-value", "Signif.")
+    ) %>%
+        kableExtra::kable_styling(
+            font_size = 10
+        ) %>%
+        kableExtra::footnote(
+            general = "P-values are from t-tests (continuous) or chi-squared tests (categorical) comparing groups. \\\\ Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001.",
+            threeparttable = TRUE,
+            escape = FALSE
+        )
+}
+```
+
+```{r ai-balance, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Render Balance Table for AI Treatment ===
+var_name <- "ai_treatment"
+pretty_name <- "AI Treatment Group"
+caption <- paste0("Balance Table of Covariates by ", pretty_name)
+level_names_output <- c("Control", "Treatment")
+
+cat(create_balance_table(
+    data = yougov_data,
+    treatment_var = var_name,
+    covariates = covariates,
+    caption_text = caption,
+    treatment_levels = level_names_output
+))
+```
+
+```{r label-balance, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Render Balance Table for Label Treatment ===
+var_name <- "label_treatment"
+pretty_name <- "Label Treatment Group"
+caption <- paste0("Balance Table of Covariates by ", pretty_name)
+level_names_output <- c("Control", "Treatment")
+
+cat(create_balance_table(
+    data = yougov_data,
+    treatment_var = var_name,
+    covariates = covariates,
+    caption_text = caption,
+    treatment_levels = level_names_output
+))
+```
+
+## Sensitivity Analysis
+
+Given the nature of the results often being reported as null effects, a sensitivity analysis to determine what the smallest true effect that could have detected 80% of the time is calculated.
+
+```{r Sensitivity Analysis, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Sensitivity Analysis ===
+```
+
+## `MLthermoMean` and `LLthermoMean` Analysis {#sec-MLthermo}
+
+The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}}. These models are presented in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}} respectvely.
+
+```{r thermo-ml-results-table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Thermometer Models Results ===
+modelsummary(
+    list(
+        "Treatment Only" = thermo_ml_treat,
+        "Treatment + Covariates" = thermo_ml_treat_cov,
+        "Full Model" = full_thermo_ml_model
+    ),
+    output = "latex",
+    statistic = "({std.error})",
+    stars = TRUE,
+    coef_omit = "^(political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
+    gof_omit = "IC|Log|Adj",
+    escape = FALSE,
+    title = "AI-Generated Content: Thermometer (mostlikely) Results \\label{tab:thermo-ml-results}",
+    coef_rename = c(
+        "ai_treatment" = "AI Treatment",
+        "age" = "Age",
+        "education_recode" = "Education"
+    ),
+    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+```
+
+```{r thermo-ll-results-table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# === Thermometer Models Results ===
+modelsummary(
+    list(
+        "Treatment Only" = thermo_ll_treat,
+        "Treatment + Covariates" = thermo_ll_treat_cov,
+        "Full Model" = full_thermo_ll_model
+    ),
+    output = "latex",
+    statistic = "({std.error})",
+    stars = TRUE,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|profile_GOR|pastvote_EURef)",
+    gof_omit = "IC|Log|Adj",
+    escape = FALSE,
+    title = "AI-Generated Content: Thermometer (leastlikely) Results \\label{tab:thermo-ll-results}",
+    coef_rename = c(
+        "ai_treatment" = "AI Treatment",
+        "pastvote_EURef" = "EURef Vote",
+        "education_recode" = "Education"
+    ),
+    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+```
+
+## Ordinal Affective Polarisation Results {#sec-ordinal-results}
+
+The following results presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} show the log-odds change in the probability of being in a higher level (a higher threshold cut point) of agreement, trust, or comfort respectively.
+```{r agreedisagree-results-table, echo=FALSE, message=FALSE, results='asis'}
+# === Ordinal Models Results ===
+# Model results for the outcome variable of agreedisagree
+modelsummary(
+    list(
+        "Treatment Only" = agreedisagree_treat,
+        "Treatment + Covariates" = agreedisagree_cov,
+        "Full Model" = agreedisagree_full
+    ),
+    output = "latex",
+    statistic = "({std.error})",
+    stars = TRUE,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat)",
+    gof_omit = "IC|Log|Adj",
+    coef_rename = c(
+        "ai_treatment" = "AI Treatment",
+        "education_recodeLow" = "Low Education",
+        "education_recodeMedium" = "Medium Education",
+        "profile_work_statNot working" = "Not Working",
+        "profile_work_statOther" = "Other",
+        "profile_work_statRetired" = "Retired",
+        "profile_work_statUnemployed" = "Unemployed",
+        "profile_work_statWorking full time (30 or more hours per week)" = "Working Full Time",
+        "profile_work_statWorking part time (8-29 hours a week)" = "Working PT (8–29h)",
+        "profile_work_statWorking part time (Less than 8 hours a week)" = "Working PT (<8h)",
+        "ai_treatment:education_recodeLow" = "AI Treatment:Low Education",
+        "ai_treatment:education_recodeMedium" = "AI Treatment:Medium Education",
+        "ai_treatment:profile_work_statNot working" = "AI Treatment:Not Working",
+        "ai_treatment:profile_work_statOther" = "AI Treatment:Other",
+        "ai_treatment:profile_work_statRetired" = "AI Treatment:Retired",
+        "ai_treatment:profile_work_statUnemployed" = "AI Treatment:Unemployed",
+        "ai_treatment:profile_work_statWorking full time (30 or more hours per week)" = "AI Treatment:Working Full Time",
+        "ai_treatment:profile_work_statWorking part time (8-29 hours a week)" = "AI Treatment:Working PT (8–29h)",
+        "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)" = "AI Treatment:Working PT (<8h)"
+    ),
+    escape = FALSE,
+    title = "AI-Generated Content: Agree Out-Party Respect Beliefs \\label{tab:agreedisagree-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are inclucded but have no substantive interpretation.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+```
+
+```{r xtrust-results-table, echo=FALSE, message=FALSE, results='asis'}
+# === Ordinal Models Results ===
+# Model results for the outcome variable of xtrust
+modelsummary(
+    list(
+        "Treatment Only" = xtrust_treat,
+        "Treatment + Covariates" = xtrust_cov,
+        "Full Model" = xtrust_full
+    ),
+    output = "latex",
+    statistic = "({std.error})",
+    stars = TRUE,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
+    gof_omit = "IC|Log|Adj",
+    coef_rename = c(
+        "ai_treatment" = "AI Treatment",
+        "education_recode" = "Education"
+    ),
+    escape = FALSE,
+    title = "AI-Generated Content: Trust in Out-Party to Do What Is Right \\label{tab:xtrust-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are inclucded but have no substantive interpretation.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+```
+
+```{r child-results-table, echo=FALSE, message=FALSE, results='asis'}
+# === Ordinal Models Results ===
+# Model results for the outcome variable of child
+
+modelsummary(
+    list(
+        "Treatment Only" = child_treat,
+        "Treatment + Covariates" = child_cov,
+        "Full Model" = child_full
+    ),
+    output = "latex",
+    statistic = "({std.error})",
+    stars = TRUE,
+    coef_omit = "^(?!(ai_treatment(:|$))).*|\\|",
+    gof_omit = "IC|Log|Adj",
+    coef_rename = c(
+        "ai_treatment" = "AI Treatment",
+        "education_recode" = "Education Level",
+        "profile_GOR" = "Region"
+    ),
+    escape = FALSE,
+    title = "AI-Generated Content: Comfort with Child Marrying Opposing Partisan \\label{tab:child-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are inclucded but have no substantive interpretation.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+```
+
+\newpage
+
+# Bibliography
