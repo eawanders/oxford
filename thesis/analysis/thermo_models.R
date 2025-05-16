@@ -1,0 +1,164 @@
+# Thermometer Model Analysis to allow for flexible modeling of different thermometer outcome models
+
+thermo_models <- function(data,
+                          design,
+                          outcome = c("thermo_gap", "MLthermoMean", "LLthermoMean"),
+                          treatment = c("ai_treatment", "label_treatment"),
+                          covariates = NULL,
+                          moderators = NULL) {
+    results_list <- list()
+
+    for (treat in treatment) {
+        for (out in outcome) {
+            rhs <- treat
+
+            if (!is.null(covariates)) {
+                rhs <- c(rhs, covariates)
+            }
+
+            if (!is.null(moderators)) {
+                rhs <- c(rhs, moderators, paste(treat, moderators, sep = ":"))
+            }
+
+            formula_spec <- reformulate(termlabels = rhs, response = out)
+            model <- svyglm(formula = formula_spec, design = design)
+
+            model_name <- paste0(out, "_", treat)
+            results_list[[model_name]] <- model
+        }
+    }
+
+    return(results_list)
+}
+
+# This function will create a list of models for each combination of outcome and treatment
+
+fit_thermo_models <- function(data, design) {
+    covariates <- c(
+        "age",
+        "political_attention",
+        "profile_gender",
+        "education_recode",
+        "profile_work_stat",
+        "pastvote_ge_2024",
+        "pastvote_EURef",
+        "profile_GOR"
+    )
+    # Explicit list of model specifications with name, outcome, treatment, covariates, and moderators
+    model_specs <- list(
+        # thermo_gap models with ai_treatment
+        list(
+            name = "thermo_gap_ai_treatment_treat",
+            outcome = "thermo_gap",
+            treatment = "ai_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_gap_ai_treatment_cov",
+            outcome = "thermo_gap",
+            treatment = "ai_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_gap_ai_treatment_model",
+            outcome = "thermo_gap",
+            treatment = "ai_treatment",
+            covariates = covariates,
+            moderators = c("mostlikely", "political_attention", "education_recode")
+        ),
+        # MLthermoMean models with ai_treatment
+        list(
+            name = "thermo_ml_ai_treatment_treat",
+            outcome = "MLthermoMean",
+            treatment = "ai_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_ml_ai_treatment_cov",
+            outcome = "MLthermoMean",
+            treatment = "ai_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_ml_ai_treatment_model",
+            outcome = "MLthermoMean",
+            treatment = "ai_treatment",
+            covariates = covariates,
+            moderators = c("age", "education_recode", "mostlikely")
+        ),
+        # LLthermoMean models with ai_treatment
+        list(
+            name = "thermo_ll_ai_treatment_treat",
+            outcome = "LLthermoMean",
+            treatment = "ai_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_ll_ai_treatment_cov",
+            outcome = "LLthermoMean",
+            treatment = "ai_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_ll_ai_treatment_model",
+            outcome = "LLthermoMean",
+            treatment = "ai_treatment",
+            covariates = covariates,
+            moderators = c("pastvote_EURef", "education_recode", "mostlikely")
+        )
+    )
+
+    result <- list()
+    for (spec in model_specs) {
+        mod <- thermo_models(
+            data = data,
+            design = design,
+            treatment = spec$treatment,
+            outcome = spec$outcome,
+            covariates = spec$covariates,
+            moderators = spec$moderators
+        )[[1]]
+        result[[spec$name]] <- mod
+    }
+    return(result)
+}
+
+# Flexible function to export modelsummary tables for thermometer models
+save_thermo_table <- function(
+    file,
+    treat, cov, full,
+    coef_omit,
+    coef_rename,
+    title,
+    notes,
+    add_rows = NULL,
+    statistic = "({std.error})",
+    stars = TRUE,
+    gof_omit = "IC|Log|Adj",
+    escape = FALSE,
+    output = "latex") {
+    model_list <- list(
+        "Treatment Only" = treat,
+        "Treatment + Covariates" = cov,
+        "Full Model" = full
+    )
+    modelsummary::modelsummary(
+        model_list,
+        output = file,
+        statistic = statistic,
+        stars = stars,
+        coef_omit = coef_omit,
+        gof_omit = gof_omit,
+        escape = escape,
+        title = title,
+        coef_rename = coef_rename,
+        notes = notes,
+        add_rows = add_rows
+    )
+}
