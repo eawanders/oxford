@@ -162,3 +162,32 @@ save_thermo_table <- function(
         add_rows = add_rows
     )
 }
+
+# Fit all thermometer models for the AI treatment only (can easily extend to label_treatment later)
+thermo_models_list <- fit_thermo_models(
+    data = yougov_data,
+    design = yougov_design
+)
+
+# Assign objects for easier referencing throughout your document
+thermo_gap_treat <- thermo_models_list[["thermo_gap_ai_treatment_treat"]]
+thermo_gap_treat_cov <- thermo_models_list[["thermo_gap_ai_treatment_cov"]]
+full_thermo_gap_model <- thermo_models_list[["full_thermo_gap_ai_treatment_model"]]
+
+thermo_ml_treat <- thermo_models_list[["thermo_ml_ai_treatment_treat"]]
+thermo_ml_treat_cov <- thermo_models_list[["thermo_ml_ai_treatment_cov"]]
+full_thermo_ml_model <- thermo_models_list[["full_thermo_ml_ai_treatment_model"]]
+
+thermo_ll_treat <- thermo_models_list[["thermo_ll_ai_treatment_treat"]]
+thermo_ll_treat_cov <- thermo_models_list[["thermo_ll_ai_treatment_cov"]]
+full_thermo_ll_model <- thermo_models_list[["full_thermo_ll_ai_treatment_model"]]
+
+models_dir <- "../outputs/models"
+
+# Save each model as an .rds
+for (model_name in names(thermo_models_list)) {
+    saveRDS(
+        thermo_models_list[[model_name]],
+        file = file.path(models_dir, paste0(model_name, ".rds"))
+    )
+}
