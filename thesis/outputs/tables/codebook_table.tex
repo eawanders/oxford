@@ -1,0 +1,60 @@
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{longtable}[t]{>{\raggedright\arraybackslash}p{3.2cm}l>{\raggedright\arraybackslash}p{5cm}>{\raggedright\arraybackslash}p{5cm}}
+\caption{(\#tab:codebook-table)YouGov UniOM Survey Codebook}\\
+\toprule
+Variable & Type & Description & Values\\
+\midrule
+\endfirsthead
+\caption[]{(\#tab:codebook-table)YouGov UniOM Survey Codebook \textit{(continued)}}\\
+\toprule
+Variable & Type & Description & Values\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+\verb|identity_client| & Identifier & Unique identifier for the respondent & Alphanumeric string\\
+\verb|weight| & Continuous & Survey weight to ensure national representativeness & Continuous float (e.g., 0.982, 1.034)\\
+\verb|age| & Continuous & Age of the respondent & Integer values, typically 18–90\\
+\verb|profile_gender| & Categorical & Gender of the respondent & Female; Male\\
+\verb|profile_GOR| & Categorical & Government Office Region (region of residence) & East Midlands; East of England; London; North East; North West; Scotland; South East; South West; Wales; West Midlands; Yorkshire and the Humber\\
+\addlinespace
+\verb|voted_ge_2024| & Categorical & Did the respondent vote in the 2024 General Election? & Don’t know; No, did not vote; Yes, voted\\
+\verb|pastvote_ge_2024| & Categorical & How the respondent voted in the 2024 General Election & Conservative; Don't know; Green; Labour; Liberal Democrat; Other; Plaid Cymru; Reform UK; Scottish National Party (SNP); Skipped\\
+\verb|pastvote_EURef| & Categorical & How the respondent voted in the 2016 EU Referendum & Can’t remember; I did not vote; I voted to Leave; I voted to Remain\\
+\verb|education_recode| & Categorical & Re-coded education level (grouped) & High; Medium; Low\\
+\verb|profile_work_stat| & Categorical & Employment status & Full time student; Not working; Other; Retired; Unemployed; Working full time (30+ hrs); Working part time (8–29 hrs); Working part time (<8 hrs)\\
+\addlinespace
+\verb|political_attention| & Continuous & How much attention the respondent pays to politics & Scale (e.g., 0–10 or continuous values)\\
+\verb|split| & Categorical & Randomly assigned treatment group (1–4) & 1 = AI-generated, not labelled as AI-generated; 2 = AI-generated and labelled as AI-generated; 3 = Human-generated but labelled as AI-generated; 4 = Human-generated, not labelled as AI-generated\\
+\verb|xconsent| & Categorical & Consent to participate in the survey & I consent to taking part in this study; I do not wish to continue with this study\\
+\verb|mostlikely| & Categorical & Which of these parties would you be most likley to vote for? & Conservative Party; Green Party; Labour Party; Liberal Democrats; Reform UK\\
+\verb|leastlikely| & Categorical & Which of these parties would you be least likley to vote for? & Conservative Party; Green Party; Labour Party; Liberal Democrats; Reform UK; None of these; Not Asked\\
+\addlinespace
+\verb|MLthermo_KB| & Continuous & Thermometer rating for Kemi Badenoch (most likely party) & 0–100\\
+\verb|MLthermo_KS| & Continuous & Thermometer rating for Keir Starmer & 0–100\\
+\verb|MLthermo_NF| & Continuous & Thermometer rating for Nigel Farage & 0–100\\
+\verb|MLthermo_ED| & Continuous & Thermometer rating for Ed Davey & 0–100\\
+\verb|MLthermo_CD| & Continuous & Thermometer rating for Carla Denyer & 0–100\\
+\addlinespace
+\verb|MLthermo_AR| & Continuous & Thermometer rating for Adrian Ramsay & 0–100\\
+\verb|LLthermo_KB| & Continuous & Thermometer rating for Kemi Badenoch (least likely party) & 0–100\\
+\verb|LLthermo_KS| & Continuous & Thermometer rating for Keir Starmer & 0–100\\
+\verb|LLthermo_NF| & Continuous & Thermometer rating for Nigel Farage & 0–100\\
+\verb|LLthermo_ED| & Continuous & Thermometer rating for Ed Davey & 0–100\\
+\addlinespace
+\verb|LLthermo_CD| & Continuous & Thermometer rating for Carla Denyer & 0–100\\
+\verb|LLthermo_AR| & Continuous & Thermometer rating for Adrian Ramsay & 0–100\\
+\verb|agreedisagree| & Ordinal & Trait-based measure of whether out-groups respect in-group beliefs & Strongly disagree; Tend to disagree; Neither agree nor disagree; Tend to agree; Strongly agree\\
+\verb|xtrust| & Ordinal & Level of trust in out-group to do what is right & Almost never; Once in a while; About half of the time; Most of the time; Always\\
+\verb|child| & Ordinal & Social-disance measure of a child marry an out-group voter & Extremely upset; Somewhat upset; Neither happy nor upset; Somewhat happy; Extremely happy\\
+\addlinespace
+\verb|MLthermoMean| & Continuous & Average thermometer score for most likely party & 0–100 (row mean of MLthermo scores)\\
+\verb|LLthermoMean| & Continuous & Average thermometer score for least likely party & 0–100 (row mean of LLthermo scores)\\
+\verb|thermo_gap| & Continuous & Difference between MLthermoMean and LLthermoMean & 0–100 (MLthermoMean - LLthermoMean)\\
+\verb|ai_treatment| & Binary & Treatment status for AI-generated content & 1 = Treated (shown AI-generated); 0 = Control (shown human-generated)\\
+\verb|label_treatment| & Binary & Treatment status for AI-labelled content & 1 = Treated (labelled as AI-generated); 0 = Control (labelled as human-generated)\\*
+\end{longtable}
+\endgroup{}

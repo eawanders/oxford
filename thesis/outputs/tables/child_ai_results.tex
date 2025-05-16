@@ -1,0 +1,55 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Generated Content: Comfort with Child Marrying Opposing Partisan \label{tab:child-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{36}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+AI Treatment                                & \num{0.041}   & \num{0.245}+  & \num{-0.599}  \\
+& (\num{0.115}) & (\num{0.132}) & (\num{0.583}) \\
+AI Treatment:Education LevelLow             &                &                & \num{-1.032}* \\
+&                &                & (\num{0.436}) \\
+AI Treatment:Education LevelMedium          &                &                & \num{-0.430}  \\
+&                &                & (\num{0.314}) \\
+AI Treatment:RegionEast of England          &                &                & \num{1.193}+  \\
+&                &                & (\num{0.616}) \\
+AI Treatment:RegionLondon                   &                &                & \num{0.504}   \\
+&                &                & (\num{0.631}) \\
+AI Treatment:RegionNorth East               &                &                & \num{1.921}*  \\
+&                &                & (\num{0.896}) \\
+AI Treatment:RegionNorth West               &                &                & \num{1.015}   \\
+&                &                & (\num{0.628}) \\
+AI Treatment:RegionScotland                 &                &                & \num{0.531}   \\
+&                &                & (\num{0.693}) \\
+AI Treatment:RegionSouth East               &                &                & \num{1.375}*  \\
+&                &                & (\num{0.596}) \\
+AI Treatment:RegionSouth West               &                &                & \num{1.243}+  \\
+&                &                & (\num{0.637}) \\
+AI Treatment:RegionWales                    &                &                & \num{1.028}   \\
+&                &                & (\num{0.891}) \\
+AI Treatment:RegionWest Midlands            &                &                & \num{0.313}   \\
+&                &                & (\num{0.635}) \\
+AI Treatment:RegionYorkshire and the Humber &                &                & \num{1.116}+  \\
+&                &                & (\num{0.655}) \\
+AI Treatment:mostlikelyGreen Party          &                &                & \num{-0.412}  \\
+&                &                & (\num{0.475}) \\
+AI Treatment:mostlikelyLabour Party         &                &                & \num{0.410}   \\
+&                &                & (\num{0.401}) \\
+AI Treatment:mostlikelyLiberal Democrats    &                &                & \num{0.388}   \\
+&                &                & (\num{0.451}) \\
+AI Treatment:mostlikelyReform UK            &                &                & \num{0.631}   \\
+&                &                & (\num{0.431}) \\
+Num.Obs.                                    & \num{1408}    & \num{1203}    & \num{1203}    \\
+RMSE                                        & \num{2.30}    & \num{2.26}    & \num{2.26}    \\
+Model                                       & (1)            & (2)            & (3)            \\
+\bottomrule
+\end{talltblr}
+\end{table}

@@ -1,0 +1,50 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Generated Content: Thermometer (leastlikely) Results \label{tab:thermo-ll-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{30}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+(Intercept)                              & \num{9.592}*** & \num{6.372}   & \num{6.369}     \\
+& (\num{0.683})  & (\num{4.331}) & (\num{4.262})   \\
+AI Treatment                             & \num{0.428}    & \num{1.580}   & \num{3.130}     \\
+& (\num{1.091})  & (\num{1.107}) & (\num{4.924})   \\
+mostlikelyGreen Party                    &                 &                & \num{-11.732}** \\
+&                 &                & (\num{3.987})   \\
+mostlikelyLabour Party                   &                 &                & \num{-8.797}*   \\
+&                 &                & (\num{4.142})   \\
+mostlikelyLiberal Democrats              &                 &                & \num{-4.275}    \\
+&                 &                & (\num{3.872})   \\
+mostlikelyReform UK                      &                 &                & \num{-3.420}    \\
+&                 &                & (\num{2.729})   \\
+AI Treatment:EURef VoteI voted to Leave  &                 &                & \num{-3.951}    \\
+&                 &                & (\num{3.978})   \\
+AI Treatment:EURef VoteI voted to Remain &                 &                & \num{-2.858}    \\
+&                 &                & (\num{3.423})   \\
+AI Treatment:EducationLow                &                 &                & \num{-1.269}    \\
+&                 &                & (\num{2.967})   \\
+AI Treatment:EducationMedium             &                 &                & \num{3.399}     \\
+&                 &                & (\num{2.722})   \\
+AI Treatment:mostlikelyGreen Party       &                 &                & \num{5.418}     \\
+&                 &                & (\num{4.754})   \\
+AI Treatment:mostlikelyLabour Party      &                 &                & \num{-1.814}    \\
+&                 &                & (\num{3.639})   \\
+AI Treatment:mostlikelyLiberal Democrats &                 &                & \num{-4.507}    \\
+&                 &                & (\num{4.010})   \\
+AI Treatment:mostlikelyReform UK         &                 &                & \num{0.407}     \\
+&                 &                & (\num{3.518})   \\
+Num.Obs.                                 & \num{1295}     & \num{1121}    & \num{1121}      \\
+R2                                       & \num{0.000}    & \num{0.073}   & \num{0.105}     \\
+RMSE                                     & \num{15.89}    & \num{14.86}   & \num{14.77}     \\
+Model                                    & (1)             & (2)            & (3)              \\
+\bottomrule
+\end{talltblr}
+\end{table}

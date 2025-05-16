@@ -1,0 +1,49 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Generated Content: Agree Out-Party Respect Beliefs \label{tab:agreedisagree-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{30}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+AI Treatment                                & \num{-0.137}   & \num{-0.115}   & \num{0.769}    \\
+& (\num{0.137})  & (\num{0.138})  & (\num{0.622})  \\
+Strongly disagree|Tend to disagree          & \num{0.711}*** & \num{-0.232}   & \num{0.264}    \\
+& (\num{0.092})  & (\num{0.438})  & (\num{0.552})  \\
+Tend to disagree|Neither agree nor disagree & \num{2.061}*** & \num{1.148}**  & \num{1.662}**  \\
+& (\num{0.116})  & (\num{0.444})  & (\num{0.560})  \\
+Neither agree nor disagree|Tend to agree    & \num{3.760}*** & \num{2.859}*** & \num{3.384}*** \\
+& (\num{0.229})  & (\num{0.455})  & (\num{0.573})  \\
+Tend to agree|Strongly agree                & \num{4.847}*** & \num{3.949}*** & \num{4.478}*** \\
+& (\num{0.385})  & (\num{0.563})  & (\num{0.683})  \\
+AI Treatment:Low Education                  &                 &                 & \num{-0.687}*  \\
+&                 &                 & (\num{0.347})  \\
+AI Treatment:Medium Education               &                 &                 & \num{-0.103}   \\
+&                 &                 & (\num{0.334})  \\
+AI Treatment:Not Working                    &                 &                 & \num{-0.610}   \\
+&                 &                 & (\num{0.889})  \\
+AI Treatment:Other                          &                 &                 & \num{-1.271}   \\
+&                 &                 & (\num{1.231})  \\
+AI Treatment:Retired                        &                 &                 & \num{-0.410}   \\
+&                 &                 & (\num{0.618})  \\
+AI Treatment:Unemployed                     &                 &                 & \num{-0.956}   \\
+&                 &                 & (\num{1.284})  \\
+AI Treatment:Working Full Time              &                 &                 & \num{-0.598}   \\
+&                 &                 & (\num{0.620})  \\
+AI Treatment:Working PT (8–29h)             &                 &                 & \num{-1.573}*  \\
+&                 &                 & (\num{0.684})  \\
+AI Treatment:Working PT (<8h)               &                 &                 & \num{-3.201}*  \\
+&                 &                 & (\num{1.611})  \\
+Num.Obs.                                    & \num{1334}     & \num{1334}     & \num{1334}     \\
+edf                                         & 5               & 17              & 26              \\
+Model                                       & (1)             & (2)             & (3)             \\
+\bottomrule
+\end{talltblr}
+\end{table}
