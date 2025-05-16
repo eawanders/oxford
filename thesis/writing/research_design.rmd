@@ -188,24 +188,21 @@ ATE models are presented in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo
 [^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}.
 
 ```{r fit-thermo-models, echo=FALSE, message=FALSE, results='hide'}
-source("../analysis/thermo_models.R")
 source("../analysis/survey_design.R")
+source("../analysis/thermo_models.R")
 
-# Fit all required thermometer models in a single step
-thermo_models_list <- fit_thermo_models(yougov_data, yougov_design)
+# Load all thermometer models saved to outputs/models
+thermo_gap_treat <- readRDS("../outputs/models/thermo_gap_ai_treatment_treat.rds")
+thermo_gap_treat_cov <- readRDS("../outputs/models/thermo_gap_ai_treatment_cov.rds")
+full_thermo_gap_model <- readRDS("../outputs/models/full_thermo_gap_ai_treatment_model.rds")
 
-# Assign objects for easier referencing throughout your document
-thermo_gap_treat <- thermo_models_list[["thermo_gap_ai_treatment_treat"]]
-thermo_gap_treat_cov <- thermo_models_list[["thermo_gap_ai_treatment_cov"]]
-full_thermo_gap_model <- thermo_models_list[["full_thermo_gap_ai_treatment_model"]]
+thermo_ml_treat <- readRDS("../outputs/models/thermo_ml_ai_treatment_treat.rds")
+thermo_ml_treat_cov <- readRDS("../outputs/models/thermo_ml_ai_treatment_cov.rds")
+full_thermo_ml_model <- readRDS("../outputs/models/full_thermo_ml_ai_treatment_model.rds")
 
-thermo_ml_treat <- thermo_models_list[["thermo_ml_ai_treatment_treat"]]
-thermo_ml_treat_cov <- thermo_models_list[["thermo_ml_ai_treatment_cov"]]
-full_thermo_ml_model <- thermo_models_list[["full_thermo_ml_ai_treatment_model"]]
-
-thermo_ll_treat <- thermo_models_list[["thermo_ll_ai_treatment_treat"]]
-thermo_ll_treat_cov <- thermo_models_list[["thermo_ll_ai_treatment_cov"]]
-full_thermo_ll_model <- thermo_models_list[["full_thermo_ll_ai_treatment_model"]]
+thermo_ll_treat <- readRDS("../outputs/models/thermo_ll_ai_treatment_treat.rds")
+thermo_ll_treat_cov <- readRDS("../outputs/models/thermo_ll_ai_treatment_cov.rds")
+full_thermo_ll_model <- readRDS("../outputs/models/full_thermo_ll_ai_treatment_model.rds")
 ```
 
 ```{r save-thermo-gap-table, echo=FALSE, warning=FALSE, message=FALSE}
