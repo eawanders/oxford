@@ -348,8 +348,8 @@ thermo_models <- function(data,
 thermo_models(
     data = yougov_data,
     design = yougov_design,
-    treatment = "ai_treatment",
-    outcome = "thermo_gap",
+    treatment = "label_treatment",
+    outcome = "LLthermoMean",
     covariates = c(
         "age",
         "political_attention",
@@ -360,7 +360,7 @@ thermo_models(
         "pastvote_EURef",
         "profile_GOR"
     ),
-    moderators = c("mostlikely", "profile_gender")
+    moderators = c("mostlikely")
 )
 
 

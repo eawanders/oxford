@@ -111,6 +111,72 @@ fit_thermo_models <- function(data, design) {
             treatment = "ai_treatment",
             covariates = covariates,
             moderators = c("pastvote_EURef", "education_recode", "mostlikely")
+        ),
+        # thermo_gap models with label_treatment
+        list(
+            name = "thermo_gap_label_treatment_treat",
+            outcome = "thermo_gap",
+            treatment = "label_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_gap_label_treatment_cov",
+            outcome = "thermo_gap",
+            treatment = "label_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_gap_label_treatment_model",
+            outcome = "thermo_gap",
+            treatment = "label_treatment",
+            covariates = covariates,
+            moderators = c("mostlikely", "political_attention")
+        ),
+        # MLthermoMean models with label_treatment
+        list(
+            name = "thermo_ml_label_treatment_treat",
+            outcome = "MLthermoMean",
+            treatment = "label_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_ml_label_treatment_cov",
+            outcome = "MLthermoMean",
+            treatment = "label_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_ml_label_treatment_model",
+            outcome = "MLthermoMean",
+            treatment = "label_treatment",
+            covariates = covariates,
+            moderators = c("age", "political_attention", "mostlikely")
+        ),
+        # LLthermoMean models with label_treatment
+        list(
+            name = "thermo_ll_label_treatment_treat",
+            outcome = "LLthermoMean",
+            treatment = "label_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_ll_label_treatment_cov",
+            outcome = "LLthermoMean",
+            treatment = "label_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_ll_label_treatment_model",
+            outcome = "LLthermoMean",
+            treatment = "label_treatment",
+            covariates = covariates,
+            moderators = c("profile_gender")
         )
     )
 

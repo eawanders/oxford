@@ -99,3 +99,73 @@ plot_thermo_patchwork <- function(models, treatment_var, subgroups, output_file,
     ggsave(filename = output_file, plot = patch, width = width, height = height, units = "in")
     invisible(output_file)
 }
+
+## Patchwork Plot for AI Treatment
+# Define the models to include
+models_ai <- list(
+    ML = full_thermo_ml_model,
+    LL = full_thermo_ll_model,
+    GAP = full_thermo_gap_model
+)
+
+# Define the subgroups for plotting
+subgroups_ai <- list(
+    Overall = list(
+        name = "Average Treatment Effect",
+        interaction_terms = NULL
+    ),
+    LibDem = list(
+        name = "Liberal Democrat Subgroup",
+        interaction_terms = c(
+            ML = "ai_treatment:mostlikelyLiberal Democrats",
+            LL = "ai_treatment:mostlikelyLiberal Democrats",
+            GAP = "ai_treatment:mostlikelyLiberal Democrats"
+        )
+    ),
+    Green = list(
+        name = "Green Party Subgroup",
+        interaction_terms = c(
+            ML = "ai_treatment:mostlikelyGreen Party",
+            LL = "ai_treatment:mostlikelyGreen Party",
+            GAP = "ai_treatment:mostlikelyGreen Party"
+        )
+    ),
+    LowEdu = list(
+        name = "Low Education Subgroup",
+        interaction_terms = c(
+            ML = "ai_treatment:education_recodeLow",
+            LL = "ai_treatment:education_recodeLow",
+            GAP = "ai_treatment:education_recodeLow"
+        )
+    )
+)
+
+## Patchwork Plot for Label Treatment
+models_label <- list(
+    ML = full_thermo_ml_label_model,
+    LL = full_thermo_ll_label_model,
+    GAP = full_thermo_gap_label_model
+)
+
+subgroups_label <- list(
+    Overall = list(
+        name = "Average Treatment Effect",
+        interaction_terms = NULL
+    ),
+    LibDem = list(
+        name = "Liberal Democrat Subgroup",
+        interaction_terms = c(
+            ML = "label_treatment:mostlikelyLiberal Democrats",
+            LL = "label_treatment:mostlikelyLiberal Democrats",
+            GAP = "label_treatment:mostlikelyLiberal Democrats"
+        )
+    ),
+    LowEdu = list(
+        name = "Low Education Subgroup",
+        interaction_terms = c(
+            ML = "label_treatment:education_recodeLow",
+            LL = "label_treatment:education_recodeLow",
+            GAP = "label_treatment:education_recodeLow"
+        )
+    )
+)
