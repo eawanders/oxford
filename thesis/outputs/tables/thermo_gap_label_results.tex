@@ -1,0 +1,44 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Labelled Content: Thermometer Gap Results \label{tab:thermo-gap-label-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{24}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+(Intercept)                                 & \num{59.820}*** & \num{41.697}*** & \num{41.616}*** \\
+& (\num{1.297})   & (\num{6.426})   & (\num{7.132})   \\
+Label Treatment                             & \num{-0.612}    & \num{-0.540}    & \num{-7.531}    \\
+& (\num{1.862})   & (\num{1.737})   & (\num{6.739})   \\
+mostlikelyGreen Party                       &                  &                  & \num{21.545}**  \\
+&                  &                  & (\num{7.160})   \\
+mostlikelyLabour Party                      &                  &                  & \num{19.567}*** \\
+&                  &                  & (\num{4.611})   \\
+mostlikelyLiberal Democrats                 &                  &                  & \num{21.799}*** \\
+&                  &                  & (\num{4.881})   \\
+mostlikelyReform UK                         &                  &                  & \num{17.826}*** \\
+&                  &                  & (\num{4.368})   \\
+Label Treatment:mostlikelyGreen Party       &                  &                  & \num{2.715}     \\
+&                  &                  & (\num{7.571})   \\
+Label Treatment:mostlikelyLabour Party      &                  &                  & \num{-4.904}    \\
+&                  &                  & (\num{4.908})   \\
+Label Treatment:mostlikelyLiberal Democrats &                  &                  & \num{-7.369}    \\
+&                  &                  & (\num{5.766})   \\
+Label Treatment:mostlikelyReform UK         &                  &                  & \num{-4.386}    \\
+&                  &                  & (\num{5.253})   \\
+Label Treatment:Political Attention         &                  &                  & \num{1.501}+    \\
+&                  &                  & (\num{0.876})   \\
+Num.Obs.                                    & \num{1095}      & \num{966}       & \num{966}       \\
+R2                                          & \num{0.000}     & \num{0.148}     & \num{0.187}     \\
+RMSE                                        & \num{28.32}     & \num{25.64}     & \num{25.09}     \\
+Model                                       & (1)              & (2)              & (3)              \\
+\bottomrule
+\end{talltblr}
+\end{table}

@@ -1,0 +1,48 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Labelled Content: Thermometer (mostlikely) Results \label{tab:thermo-ml-label-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{28}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+(Intercept)                                 & \num{69.287}*** & \num{41.276}*** & \num{47.104}*** \\
+& (\num{1.066})   & (\num{5.914})   & (\num{7.389})   \\
+Label Treatment                             & \num{-2.201}    & \num{-2.315}    & \num{-18.759}*  \\
+& (\num{1.596})   & (\num{1.531})   & (\num{9.477})   \\
+age                                         &                  & \num{0.207}**   & \num{0.121}     \\
+&                  & (\num{0.076})   & (\num{0.087})   \\
+mostlikelyGreen Party                       &                  &                  & \num{14.233}*   \\
+&                  &                  & (\num{5.830})   \\
+mostlikelyLabour Party                      &                  &                  & \num{13.970}*** \\
+&                  &                  & (\num{3.530})   \\
+mostlikelyLiberal Democrats                 &                  &                  & \num{22.290}*** \\
+&                  &                  & (\num{3.847})   \\
+mostlikelyReform UK                         &                  &                  & \num{18.994}*** \\
+&                  &                  & (\num{3.181})   \\
+Label Treatment:age                         &                  &                  & \num{0.136}     \\
+&                  &                  & (\num{0.094})   \\
+Label Treatment:Political Attention         &                  &                  & \num{2.244}*    \\
+&                  &                  & (\num{0.952})   \\
+Label Treatment:mostlikelyGreen Party       &                  &                  & \num{-0.192}    \\
+&                  &                  & (\num{6.556})   \\
+Label Treatment:mostlikelyLabour Party      &                  &                  & \num{-5.777}    \\
+&                  &                  & (\num{4.115})   \\
+Label Treatment:mostlikelyLiberal Democrats &                  &                  & \num{-11.210}*  \\
+&                  &                  & (\num{4.532})   \\
+Label Treatment:mostlikelyReform UK         &                  &                  & \num{-7.497}+   \\
+&                  &                  & (\num{4.115})   \\
+Num.Obs.                                    & \num{1251}      & \num{1088}      & \num{1088}      \\
+R2                                          & \num{0.002}     & \num{0.151}     & \num{0.207}     \\
+RMSE                                        & \num{23.32}     & \num{21.47}     & \num{20.85}     \\
+Model                                       & (1)              & (2)              & (3)              \\
+\bottomrule
+\end{talltblr}
+\end{table}
