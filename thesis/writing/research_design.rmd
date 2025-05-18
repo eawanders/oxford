@@ -32,8 +32,7 @@ linkcolor: blue
 
 ```{r setup, include=FALSE}
 source("../analysis/packages.R")
-source("../analysis/data.R")
-source("../analysis/data_cleaning.R")
+source("../writing/load_outputs.R")
 ```
 
 \newpage
@@ -164,16 +163,6 @@ The results show no statistically significant treatment effect of AI-generated c
 
 Thermometer analysis is one of the primary affective polarisation measures. Before determining a causal link between AI content exposure and the affective polarisation measures, a descriptive summary of the `thermo_gap` measures, averaged over all in- and out-party leaders, given for both treatments is presented in \hyperref[fig:thermo-graph]{Figure \ref*{fig:thermo-graph}}. This shows how net-difference thermometer scores are similar across both control and treatment groups, suggesting causal effects are likely to be minimal.
 
-```{r save-thermo-graph, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-source("../analysis/descriptive_analysis.R")
-save_thermo_gap_plot(
-    yougov_data,
-    file = "../outputs/figures/thermo_gap_plot.pdf",
-    width = 5,
-    height = 3
-)
-```
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{../outputs/figures/thermo_gap_plot.pdf}
@@ -187,106 +176,11 @@ ATE models are presented in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo
 
 [^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}.
 
-```{r fit-thermo-models, echo=FALSE, message=FALSE, results='hide'}
-source("../analysis/survey_design.R")
-source("../analysis/thermo_models.R")
-
-# Load all thermometer models saved to outputs/models
-thermo_gap_treat <- readRDS("../outputs/models/thermo_gap_ai_treatment_treat.rds")
-thermo_gap_treat_cov <- readRDS("../outputs/models/thermo_gap_ai_treatment_cov.rds")
-full_thermo_gap_model <- readRDS("../outputs/models/full_thermo_gap_ai_treatment_model.rds")
-
-thermo_ml_treat <- readRDS("../outputs/models/thermo_ml_ai_treatment_treat.rds")
-thermo_ml_treat_cov <- readRDS("../outputs/models/thermo_ml_ai_treatment_cov.rds")
-full_thermo_ml_model <- readRDS("../outputs/models/full_thermo_ml_ai_treatment_model.rds")
-
-thermo_ll_treat <- readRDS("../outputs/models/thermo_ll_ai_treatment_treat.rds")
-thermo_ll_treat_cov <- readRDS("../outputs/models/thermo_ll_ai_treatment_cov.rds")
-full_thermo_ll_model <- readRDS("../outputs/models/full_thermo_ll_ai_treatment_model.rds")
-```
-
-```{r save-thermo-gap-table, echo=FALSE, warning=FALSE, message=FALSE}
-source("../analysis/thermo_models.R")
-save_thermo_table(
-    file = "../outputs/tables/thermo_gap_ai_results.tex",
-    treat = thermo_gap_treat,
-    cov = thermo_gap_treat_cov,
-    full = full_thermo_gap_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
-    coef_rename = c(
-        "ai_treatment" = "AI Treatment",
-        "political_attention" = "Political Attention",
-        "education_recode" = "Education"
-    ),
-    title = "AI-Generated Content: Thermometer Gap Results \\label{tab:thermo-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
-    add_rows = tibble::tibble(
-        term = "Model",
-        `Treatment Only` = "(1)",
-        `Treatment + Covariates` = "(2)",
-        `Full Model` = "(3)"
-    )
-)
-```
-
 \input{../outputs/tables/thermo_gap_ai_results.tex}
 
 The primary takeaway from model (3) in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}} is that there is no significant treatment effect seen for the exposure to AI-generated content on the reported net-difference thermometer scores. The treatment group shows a slight decrease of **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " points")``** in the thermometer gap, but this is not statistically significant. However, reposndents who were most likely to vote for the Liberal Democrats showed a significant increase of **``r paste0(round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``** at the 95% confidence level in their net-difference thermometer gap, compared to those who were most likely to vote for the Conservative Party. This implies that Liberal Democrat voters are more susceptible to being polarised against their opposing partisans when exposed to AI-generated content. The effect size is notable too. The total treatment effect of AI exposure for Liberal Democrat voters on their affective polarisation is **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " + ", round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " = ", round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"] + coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``**. This is a significant effect size, and suggests that AI-generated content can have a polarising effect. Other than Liberal Democrat voters, the full model suggests that the treatment of exposure to AI-generated content does not have a significant differential effect on the thermometer gap for different sub-groups of respondents.
 
 To test what drives this affective polarisation, the models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated. These models are presented in the Appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}. Thermometer scores for both in- and out-party leaders show positive increases of **``r paste0(round(coef(summary(full_thermo_ml_model))["ai_treatment", "Estimate"], 3), " points")``** and **``r paste0(round(coef(summary(full_thermo_ll_model))["ai_treatment", "Estimate"], 3), " points")``** respectively to the treatment but the scores are not statistically significant. These models do not show any sub-group differences from moderator variables.
-
-```{r thermo_models_ai_plot, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-# Source required functions and models
-source("../analysis/thermo_models_plots.R")
-source("../analysis/thermo_models.R")
-
-# Define the models to include
-models_ai <- list(
-    ML = full_thermo_ml_model,
-    LL = full_thermo_ll_model,
-    GAP = full_thermo_gap_model
-)
-
-# Define the subgroups for plotting
-subgroups_ai <- list(
-    Overall = list(
-        name = "Average Treatment Effect",
-        interaction_terms = NULL
-    ),
-    LibDem = list(
-        name = "Liberal Democrat Subgroup",
-        interaction_terms = c(
-            ML = "ai_treatment:mostlikelyLiberal Democrats",
-            LL = "ai_treatment:mostlikelyLiberal Democrats",
-            GAP = "ai_treatment:mostlikelyLiberal Democrats"
-        )
-    ),
-    Green = list(
-        name = "Green Party Subgroup",
-        interaction_terms = c(
-            ML = "ai_treatment:mostlikelyGreen Party",
-            LL = "ai_treatment:mostlikelyGreen Party",
-            GAP = "ai_treatment:mostlikelyGreen Party"
-        )
-    ),
-    LowEdu = list(
-        name = "Low Education Subgroup",
-        interaction_terms = c(
-            ML = "ai_treatment:education_recodeLow",
-            LL = "ai_treatment:education_recodeLow",
-            GAP = "ai_treatment:education_recodeLow"
-        )
-    )
-)
-
-# Generate and save the patchwork plot
-plot_thermo_patchwork(
-    models = models_ai,
-    treatment_var = "ai_treatment",
-    subgroups = subgroups_ai,
-    output_file = "../outputs/figures/thermo_patchwork_ai_treatment.pdf"
-)
-```
 
 \begin{figure}[H]
     \centering
@@ -300,74 +194,6 @@ plot_thermo_patchwork(
 
 To further disect the affective polarisation caused by treatment to AI-generated content, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are next estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of respect, trust, and social-distance to opposing partisans are presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} respectively.
 
-```{r fit-ai-ordinal-models, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-source("../analysis/ordinal_models.R")
-
-agreedisagree_ai_treat <- readRDS("../outputs/models/agreedisagree_ai_treatment_treat.rds")
-agreedisagree_ai_cov <- readRDS("../outputs/models/agreedisagree_ai_treatment_cov.rds")
-full_agreedisagree_ai_model <- readRDS("../outputs/models/full_agreedisagree_ai_treatment_model.rds")
-
-xtrust_ai_treat <- readRDS("../outputs/models/xtrust_ai_treatment_treat.rds")
-xtrust_ai_cov <- readRDS("../outputs/models/xtrust_ai_treatment_cov.rds")
-full_xtrust_ai_model <- readRDS("../outputs/models/full_xtrust_ai_treatment_model.rds")
-
-child_ai_treat <- readRDS("../outputs/models/child_ai_treatment_treat.rds")
-child_ai_cov <- readRDS("../outputs/models/child_ai_treatment_cov.rds")
-full_child_ai_model <- readRDS("../outputs/models/full_child_ai_treatment_model.rds")
-```
-
-```{r ai-ordinal-plots, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-source("../analysis/ordinal_models_plots.R")
-# Generate the plots for each significant subgroup to plot
-plot_disagreement <- generate_plot_for_outcome(
-    data = yougov_data,
-    outcome = "agreedisagree",
-    treatment = "ai_treatment",
-    moderators = moderators_agreedisagree,
-    covariates = covariates_agreedisagree,
-    moderator_terms = moderator_terms_agreedisagree,
-    collapse_levels = c("Strongly disagree", "Tend to disagree"),
-    moderator_labels = moderator_labels_agreedisagree,
-    plot_title = "Do not Respect Beliefs (AI Treatment)"
-)
-
-plot_trust <- generate_plot_for_outcome(
-    data = yougov_data,
-    outcome = "xtrust",
-    treatment = "ai_treatment",
-    moderators = moderators_xtrust,
-    covariates = covariates_xtrust,
-    moderator_terms = moderator_terms_trust,
-    collapse_levels = c("Almost never", "Once in a while"),
-    moderator_labels = moderator_labels_trust,
-    plot_title = "Do not Trust to do Right (AI Treatment)"
-)
-
-plot_discomfort <- generate_plot_for_outcome(
-    data = yougov_data,
-    outcome = "child",
-    treatment = "ai_treatment",
-    moderators = moderators_child,
-    covariates = covariates_child,
-    moderator_terms = moderator_terms_child,
-    collapse_levels = c("Extremely upset", "Somewhat upset"),
-    moderator_labels = moderator_labels_child,
-    plot_title = "Discomfort with Marrying Out-Group (AI Treatment)"
-)
-
-# Combine plots with patchwork
-library(patchwork)
-combined_plot <- plot_disagreement + plot_trust + plot_discomfort +
-    plot_layout(ncol = 3, guides = "collect") &
-    theme(legend.position = "bottom")
-
-ggsave(
-    filename = "../outputs/figures/ordinal_patchwork_ai_treatment.pdf",
-    plot = combined_plot,
-    width = 10, height = 4
-)
-```
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../outputs/figures/ordinal_patchwork_ai_treatment.pdf}
@@ -376,8 +202,16 @@ ggsave(
 \end{figure}
 
 ## AI-Labelled Content Treatment {#sec-label-treatment}
-
 ### Thermometer Analysis {#sec-label-thermo-analysis}
+
+\input{../outputs/tables/thermo_gap_label_results.tex}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../outputs/figures/thermo_patchwork_label_treatment.pdf}
+  \caption{Thermometer Score Patchwork Plot for AI-Labelled Content}
+  \label{fig:thermo-patchwork-label}
+\end{figure}
 
 ### Ordinal Affective Polarisation Analysis {#sec-label-ordinal-analysis}
 
@@ -402,11 +236,7 @@ ggsave(
 
 The codebook in \hyperref[tab:codebook-table]{Table \ref*{tab:codebook-table}} below provides a summary of the variables used in the YouGov UniOM analysis. The variable names are provided in the first column, followed by the type of variable (e.g., categorical, continuous), a description of the variable, and the values that the variable can take. Note that the outcome variables of `agreedisagree`, `xtrust`, and `child` are ordinal variables on an ordered Likert scale.
 
-```{r codebook-table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-source("../analysis/codebook.R")
-cat(create_codebook_table())
-```
-
+\input{../outputs/tables/codebook_table.tex}
 
 \newpage
 
@@ -431,157 +261,28 @@ Note that the p-values are reported at the variable level, not for each individu
 
 For each of the categorical variables, there is a base reference category. For example, `profile_gender` uses the base reference category `Male` (reported as `Gender (Male)` in the balance tables). This base acts as the comparison group for the other categories, the p-value compares whether the distribution of the other categories is significantly different from the base category.
 
-```{r ai-balance, echo=FALSE, message=FALSE, results='asis'}
-source("../analysis/balance_analysis.R")
-```
+\input{../outputs/tables/balance_ai_treatment.tex}
+\input{../outputs/tables/balance_label_treatment.tex}
 
 ## Sensitivity Analysis
 
 Given the nature of the results often being reported as null effects, a sensitivity analysis to determine what the smallest true effect that could have detected 80% of the time is calculated.
 
-```{r Sensitivity Analysis, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-# === Sensitivity Analysis ===
-```
-
 ## `MLthermoMean` and `LLthermoMean` Analysis {#sec-MLthermo}
 
 The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}}. These models are presented in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}} respectvely.
 
-```{r save-thermo-ml-table, echo=FALSE, warning=FALSE, message=FALSE}
-source("../analysis/thermo_models.R")
-save_thermo_table(
-    file = "../outputs/tables/thermo_ml_ai_results.tex",
-    treat = thermo_ml_treat,
-    cov = thermo_ml_treat_cov,
-    full = full_thermo_ml_model,
-    coef_omit = "^(political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
-    coef_rename = c(
-        "ai_treatment" = "AI Treatment",
-        "age" = "Age",
-        "education_recode" = "Education"
-    ),
-    title = "AI-Generated Content: Thermometer (mostlikely) Results \\label{tab:thermo-ml-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
-    add_rows = tibble::tibble(
-        term = "Model",
-        `Treatment Only` = "(1)",
-        `Treatment + Covariates` = "(2)",
-        `Full Model` = "(3)"
-    )
-)
-```
-
-```{r save-thermo-ll-table, echo=FALSE, warning=FALSE, message=FALSE}
-source("../analysis/thermo_models.R")
-save_thermo_table(
-    file = "../outputs/tables/thermo_ll_ai_results.tex",
-    treat = thermo_ll_treat,
-    cov = thermo_ll_treat_cov,
-    full = full_thermo_ll_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|profile_GOR|pastvote_EURef)",
-    coef_rename = c(
-        "ai_treatment" = "AI Treatment",
-        "pastvote_EURef" = "EURef Vote",
-        "education_recode" = "Education"
-    ),
-    title = "AI-Generated Content: Thermometer (leastlikely) Results \\label{tab:thermo-ll-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
-    add_rows = tibble::tibble(
-        term = "Model",
-        `Treatment Only` = "(1)",
-        `Treatment + Covariates` = "(2)",
-        `Full Model` = "(3)"
-    )
-)
-```
-
 \input{../outputs/tables/thermo_ml_ai_results.tex}
 \input{../outputs/tables/thermo_ll_ai_results.tex}
+
+For the `label_treatment` models, the same model specification is used as for the `ai_treatment` models. The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-gap-label-results]{Table \ref*{tab:thermo-gap-label-results}}. These models are presented in \hyperref[tab:thermo-ml-label-results]{Table \ref*{tab:thermo-ml-label-results}} and \hyperref[tab:thermo-ll-label-results]{Table \ref*{tab:thermo-ll-label-results}} respectvely.
+
+\input{../outputs/tables/thermo_ml_label_results.tex}
+\input{../outputs/tables/thermo_ll_label_results.tex}
 
 ## Ordinal Affective Polarisation Results {#sec-ordinal-results}
 
 The following results presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} show the log-odds change in the probability of being in a higher level (a higher threshold cut point) of agreement, trust, or comfort respectively.
-
-```{r ordinal-tables, echo=FALSE, message=FALSE, results='asis'}
-source("../analysis/ordinal_models.R")
-save_ordinal_table(
-    file = "../outputs/tables/agreedisagree_ai_results.tex",
-    treat = agreedisagree_ai_treat,
-    cov = agreedisagree_ai_cov,
-    full = full_agreedisagree_ai_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat)",
-    coef_rename = c(
-        "ai_treatment" = "AI Treatment",
-        "education_recodeLow" = "Low Education",
-        "education_recodeMedium" = "Medium Education",
-        "profile_work_statNot working" = "Not Working",
-        "profile_work_statOther" = "Other",
-        "profile_work_statRetired" = "Retired",
-        "profile_work_statUnemployed" = "Unemployed",
-        "profile_work_statWorking full time (30 or more hours per week)" = "Working Full Time",
-        "profile_work_statWorking part time (8-29 hours a week)" = "Working PT (8–29h)",
-        "profile_work_statWorking part time (Less than 8 hours a week)" = "Working PT (<8h)",
-        "ai_treatment:education_recodeLow" = "AI Treatment:Low Education",
-        "ai_treatment:education_recodeMedium" = "AI Treatment:Medium Education",
-        "ai_treatment:profile_work_statNot working" = "AI Treatment:Not Working",
-        "ai_treatment:profile_work_statOther" = "AI Treatment:Other",
-        "ai_treatment:profile_work_statRetired" = "AI Treatment:Retired",
-        "ai_treatment:profile_work_statUnemployed" = "AI Treatment:Unemployed",
-        "ai_treatment:profile_work_statWorking full time (30 or more hours per week)" = "AI Treatment:Working Full Time",
-        "ai_treatment:profile_work_statWorking part time (8-29 hours a week)" = "AI Treatment:Working PT (8–29h)",
-        "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)" = "AI Treatment:Working PT (<8h)"
-    ),
-    title = "AI-Generated Content: Agree Out-Party Respect Beliefs \\label{tab:agreedisagree-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.",
-    add_rows = tibble::tibble(
-        term = "Model",
-        `Treatment Only` = "(1)",
-        `Treatment + Covariates` = "(2)",
-        `Full Model` = "(3)"
-    )
-)
-
-save_ordinal_table(
-    file = "../outputs/tables/xtrust_ai_results.tex",
-    treat = xtrust_ai_treat,
-    cov = xtrust_ai_cov,
-    full = full_xtrust_ai_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
-    coef_rename = c(
-        "ai_treatment" = "AI Treatment",
-        "education_recode" = "Education"
-    ),
-    title = "AI-Generated Content: Trust in Out-Party to Do What Is Right \\label{tab:xtrust-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are included but have no substantive interpretation.",
-    add_rows = tibble::tibble(
-        term = "Model",
-        `Treatment Only` = "(1)",
-        `Treatment + Covariates` = "(2)",
-        `Full Model` = "(3)"
-    )
-)
-
-save_ordinal_table(
-    file = "../outputs/tables/child_ai_results.tex",
-    treat = child_ai_treat,
-    cov = child_ai_cov,
-    full = full_child_ai_model,
-    coef_omit = "^(?!(ai_treatment(:|$))).*|\\|",
-    coef_rename = c(
-        "ai_treatment" = "AI Treatment",
-        "education_recode" = "Education Level",
-        "profile_GOR" = "Region"
-    ),
-    title = "AI-Generated Content: Comfort with Child Marrying Opposing Partisan \\label{tab:child-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.",
-    add_rows = tibble::tibble(
-        term = "Model",
-        `Treatment Only` = "(1)",
-        `Treatment + Covariates` = "(2)",
-        `Full Model` = "(3)"
-    )
-)
-```
 
 \input{../outputs/tables/agreedisagree_ai_results.tex}
 \input{../outputs/tables/xtrust_ai_results.tex}
