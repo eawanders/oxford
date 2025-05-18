@@ -1,0 +1,53 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Labelled Content: Agree Out-Party Respect Beliefs \label{tab:agreedisagree-label-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{34}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+Label Treatment                                & \num{-0.175}   & \num{-0.193}   & \num{-1.869}** \\
+& (\num{0.136})  & (\num{0.135})  & (\num{0.663})  \\
+Strongly disagree|Tend to disagree             & \num{0.690}*** & \num{-0.267}   & \num{-0.750}   \\
+& (\num{0.094})  & (\num{0.444})  & (\num{0.622})  \\
+Tend to disagree|Neither agree nor disagree    & \num{2.041}*** & \num{1.115}*   & \num{0.667}    \\
+& (\num{0.126})  & (\num{0.451})  & (\num{0.632})  \\
+Neither agree nor disagree|Tend to agree       & \num{3.741}*** & \num{2.828}*** & \num{2.401}*** \\
+& (\num{0.233})  & (\num{0.462})  & (\num{0.630})  \\
+Tend to agree|Strongly agree                   & \num{4.828}*** & \num{3.919}*** & \num{3.494}*** \\
+& (\num{0.391})  & (\num{0.571})  & (\num{0.718})  \\
+Label Treatment:Political Attention            &                 &                 & \num{0.121}+   \\
+&                 &                 & (\num{0.071})  \\
+Label Treatment:RegionEast of England          &                 &                 & \num{1.220}+   \\
+&                 &                 & (\num{0.663})  \\
+Label Treatment:RegionLondon                   &                 &                 & \num{1.126}+   \\
+&                 &                 & (\num{0.677})  \\
+Label Treatment:RegionNorth East               &                 &                 & \num{0.607}    \\
+&                 &                 & (\num{0.817})  \\
+Label Treatment:RegionNorth West               &                 &                 & \num{1.632}*   \\
+&                 &                 & (\num{0.665})  \\
+Label Treatment:RegionScotland                 &                 &                 & \num{0.003}    \\
+&                 &                 & (\num{0.710})  \\
+Label Treatment:RegionSouth East               &                 &                 & \num{0.902}    \\
+&                 &                 & (\num{0.636})  \\
+Label Treatment:RegionSouth West               &                 &                 & \num{0.060}    \\
+&                 &                 & (\num{0.688})  \\
+Label Treatment:RegionWales                    &                 &                 & \num{1.234}    \\
+&                 &                 & (\num{0.862})  \\
+Label Treatment:RegionWest Midlands            &                 &                 & \num{1.695}*   \\
+&                 &                 & (\num{0.744})  \\
+Label Treatment:RegionYorkshire and the Humber &                 &                 & \num{1.323}+   \\
+&                 &                 & (\num{0.695})  \\
+Num.Obs.                                       & \num{1334}     & \num{1334}     & \num{1334}     \\
+edf                                            & 5               & 17              & 38              \\
+Model                                          & (1)             & (2)             & (3)             \\
+\bottomrule
+\end{talltblr}
+\end{table}

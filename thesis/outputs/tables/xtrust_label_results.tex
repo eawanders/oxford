@@ -1,0 +1,51 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Labelled Content: Trust in Out-Party to Do What Is Right \label{tab:xtrust-label-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are included but have no substantive interpretation.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{32}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+Label Treatment                             & \num{-0.022}   & \num{-0.114}   & \num{-0.198}   \\
+& (\num{0.139})  & (\num{0.154})  & (\num{0.355})  \\
+Almost never|Once in a while                & \num{0.967}*** & \num{1.026}    & \num{0.637}    \\
+& (\num{0.098})  & (\num{0.830})  & (\num{0.820})  \\
+Once in a while|About half of the time      & \num{2.892}*** & \num{2.954}*** & \num{2.593}**  \\
+& (\num{0.145})  & (\num{0.832})  & (\num{0.823})  \\
+About half of the time|Always               & \num{4.067}*** & \num{4.217}*** & \num{3.861}*** \\
+& (\num{0.272})  & (\num{0.845})  & (\num{0.841})  \\
+Always|Most of the time                     & \num{4.547}*** & \num{4.770}*** & \num{4.415}*** \\
+& (\num{0.325})  & (\num{0.860})  & (\num{0.849})  \\
+mostlikelyGreen Party                       &                 &                 & \num{-1.155}** \\
+&                 &                 & (\num{0.439})  \\
+mostlikelyLabour Party                      &                 &                 & \num{-0.970}** \\
+&                 &                 & (\num{0.342})  \\
+mostlikelyLiberal Democrats                 &                 &                 & \num{-0.956}*  \\
+&                 &                 & (\num{0.429})  \\
+mostlikelyReform UK                         &                 &                 & \num{-0.760}*  \\
+&                 &                 & (\num{0.344})  \\
+Label Treatment:mostlikelyGreen Party       &                 &                 & \num{-0.429}   \\
+&                 &                 & (\num{0.576})  \\
+Label Treatment:mostlikelyLabour Party      &                 &                 & \num{0.164}    \\
+&                 &                 & (\num{0.433})  \\
+Label Treatment:mostlikelyLiberal Democrats &                 &                 & \num{-0.085}   \\
+&                 &                 & (\num{0.537})  \\
+Label Treatment:mostlikelyReform UK         &                 &                 & \num{0.392}    \\
+&                 &                 & (\num{0.421})  \\
+Label Treatment:EducationLow                &                 &                 & \num{0.374}    \\
+&                 &                 & (\num{0.444})  \\
+Label Treatment:EducationMedium             &                 &                 & \num{-0.198}   \\
+&                 &                 & (\num{0.348})  \\
+Num.Obs.                                    & \num{1346}     & \num{1119}     & \num{1119}     \\
+edf                                         & 5               & 38              & 48              \\
+Model                                       & (1)             & (2)             & (3)             \\
+\bottomrule
+\end{talltblr}
+\end{table}

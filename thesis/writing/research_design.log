@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.5.8)  18 MAY 2025 21:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.5.8)  18 MAY 2025 23:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -790,7 +790,7 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 [3]
 
 [4{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
-<../outputs/figures/thermo_gap_plot.pdf, id=171, 361.35pt x 216.81pt>
+<../outputs/figures/thermo_gap_plot.pdf, id=179, 361.35pt x 216.81pt>
 File: ../outputs/figures/thermo_gap_plot.pdf Graphic file (type pdf)
 <use ../outputs/figures/thermo_gap_plot.pdf>
 Package pdftex.def Info: ../outputs/figures/thermo_gap_plot.pdf  used on input line 382.
@@ -812,7 +812,7 @@ File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ))
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 393.
-<../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=189, 542.025pt x 469.755pt>
+<../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=197, 542.025pt x 469.755pt>
 File: ../outputs/figures/thermo_patchwork_ai_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/thermo_patchwork_ai_treatment.pdf>
 Package pdftex.def Info: ../outputs/figures/thermo_patchwork_ai_treatment.pdf  used on input line 399.
@@ -822,7 +822,7 @@ Package pdftex.def Info: ../outputs/figures/thermo_patchwork_ai_treatment.pdf  u
 [6]
 
 [7]
-<../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=206, 722.7pt x 289.08pt>
+<../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=214, 722.7pt x 289.08pt>
 File: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/ordinal_patchwork_ai_treatment.pdf>
 Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf  used on input line 410.
@@ -847,7 +847,7 @@ Overfull \hbox (3.02324pt too wide) in paragraph at lines 43--44
  []
 
 )
-<../outputs/figures/thermo_patchwork_label_treatment.pdf, id=218, 542.025pt x 469.755pt>
+<../outputs/figures/thermo_patchwork_label_treatment.pdf, id=226, 542.025pt x 469.755pt>
 File: ../outputs/figures/thermo_patchwork_label_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/thermo_patchwork_label_treatment.pdf>
 Package pdftex.def Info: ../outputs/figures/thermo_patchwork_label_treatment.pdf  used on input line 423.
@@ -857,20 +857,26 @@ Package pdftex.def Info: ../outputs/figures/thermo_patchwork_label_treatment.pdf
 [9 <../outputs/figures/ordinal_patchwork_ai_treatment.pdf>]
 
 [10]
+<../outputs/figures/ordinal_patchwork_label_treatment.pdf, id=243, 722.7pt x 289.08pt>
+File: ../outputs/figures/ordinal_patchwork_label_treatment.pdf Graphic file (type pdf)
+<use ../outputs/figures/ordinal_patchwork_label_treatment.pdf>
+Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_label_treatment.pdf  used on input line 432.
+(pdftex.def)             Requested size: 422.77664pt x 169.1089pt.
+
 
 [11 <../outputs/figures/thermo_patchwork_label_treatment.pdf>]
 
-[12]
+[12 <../outputs/figures/ordinal_patchwork_label_treatment.pdf>]
 
-LaTeX Warning: Hyper reference `tab:codebook-table' on page 13 undefined on input line 456.
+LaTeX Warning: Hyper reference `tab:codebook-table' on page 13 undefined on input line 463.
 
 
-LaTeX Warning: Reference `tab:codebook-table' on page 13 undefined on input line 456.
+LaTeX Warning: Reference `tab:codebook-table' on page 13 undefined on input line 463.
 
 (../outputs/tables/codebook_table.tex [13] [14])
 
 [15]
-Underfull \hbox (badness 1769) in paragraph at lines 470--471
+Underfull \hbox (badness 1769) in paragraph at lines 477--478
 \T1/lmtt/m/n/10 MLthermo_NF\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_ED\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_CD\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_AR\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_KB\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_KS\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_NF\T1/lmr/m/n/10 ,
  []
 
@@ -878,7 +884,7 @@ Underfull \hbox (badness 1769) in paragraph at lines 470--471
 
 [16] (../outputs/tables/balance_ai_treatment.tex) (../outputs/tables/balance_label_treatment.tex)
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 489.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 496.
 (../outputs/tables/thermo_ml_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -961,6 +967,57 @@ Overfull \hbox (11.32811pt too wide) in paragraph at lines 54--55
 
 LaTeX Warning: Float too large for page by 26.44716pt on input line 55.
 
+) (../outputs/tables/agreedisagree_label_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 24.52266pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (24.52266pt too wide) in paragraph at lines 52--53
+ [][] 
+ []
+
+) (../outputs/tables/xtrust_label_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 3.02324pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (3.02324pt too wide) in paragraph at lines 50--51
+ [][] 
+ []
+
+) (../outputs/tables/child_label_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 24.52266pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (24.52266pt too wide) in paragraph at lines 44--45
+ [][] 
+ []
+
 )
 
 [17]
@@ -983,7 +1040,13 @@ LaTeX Warning: Float too large for page by 26.44716pt on input line 55.
 
 [26]
 
-[27] (./research_design.aux)
+[27]
+
+[28]
+
+[29]
+
+[30] (./research_design.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -993,18 +1056,18 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 21279 strings out of 475172
- 420148 string characters out of 5764614
- 1118890 words of memory out of 5000000
- 43805 multiletter control sequences out of 15000+600000
- 666298 words of font info for 120 fonts, out of 8000000 for 9000
+ 21372 strings out of 475172
+ 423344 string characters out of 5764614
+ 1210941 words of memory out of 5000000
+ 43871 multiletter control sequences out of 15000+600000
+ 675365 words of font info for 129 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  89i,11n,110p,2655b,1334s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt9.pfb>
-Output written on research_design.pdf (32 pages, 473314 bytes).
+Output written on research_design.pdf (35 pages, 485445 bytes).
 PDF statistics:
- 510 PDF objects out of 1000 (max. 8388607)
- 425 compressed objects within 5 object streams
- 123 named destinations out of 1000 (max. 500000)
- 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 550 PDF objects out of 1000 (max. 8388607)
+ 460 compressed objects within 5 object streams
+ 141 named destinations out of 1000 (max. 500000)
+ 106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

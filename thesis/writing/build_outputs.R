@@ -110,8 +110,9 @@ save_thermo_table(
 )
 
 # === Add save_ordinal_table() calls here as needed ===
-
-greedisagree_ai_treat <- readRDS("../outputs/models/agreedisagree_ai_treatment_treat.rds")
+# Create the tables for the ordinal models
+# Load the ordinal models for AI treatment
+agreedisagree_ai_treat <- readRDS("../outputs/models/agreedisagree_ai_treatment_treat.rds")
 agreedisagree_ai_cov <- readRDS("../outputs/models/agreedisagree_ai_treatment_cov.rds")
 full_agreedisagree_ai_model <- readRDS("../outputs/models/full_agreedisagree_ai_treatment_model.rds")
 
@@ -201,6 +202,84 @@ save_ordinal_table(
     )
 )
 
+# Load the ordinal models for Label treatment
+agreedisagree_label_treat <- readRDS("../outputs/models/agreedisagree_label_treatment_treat.rds")
+agreedisagree_label_cov <- readRDS("../outputs/models/agreedisagree_label_treatment_cov.rds")
+full_agreedisagree_label_model <- readRDS("../outputs/models/full_agreedisagree_label_treatment_model.rds")
+
+xtrust_label_treat <- readRDS("../outputs/models/xtrust_label_treatment_treat.rds")
+xtrust_label_cov <- readRDS("../outputs/models/xtrust_label_treatment_cov.rds")
+full_xtrust_label_model <- readRDS("../outputs/models/full_xtrust_label_treatment_model.rds")
+
+child_label_treat <- readRDS("../outputs/models/child_label_treatment_treat.rds")
+child_label_cov <- readRDS("../outputs/models/child_label_treatment_cov.rds")
+full_child_label_model <- readRDS("../outputs/models/full_child_label_treatment_model.rds")
+
+# === Save Label Treatment Ordinal Tables ===
+save_ordinal_table(
+    file = "../outputs/tables/agreedisagree_label_results.tex",
+    treat = agreedisagree_label_treat,
+    cov = agreedisagree_label_cov,
+    full = full_agreedisagree_label_model,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|profile_GOR)",
+    coef_rename = c(
+        "label_treatment" = "Label Treatment",
+        "political_attention" = "Political Attention",
+        "profile_GOR" = "Region"
+    ),
+    title = "AI-Labelled Content: Agree Out-Party Respect Beliefs \\label{tab:agreedisagree-label-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+
+save_ordinal_table(
+    file = "../outputs/tables/xtrust_label_results.tex",
+    treat = xtrust_label_treat,
+    cov = xtrust_label_cov,
+    full = full_xtrust_label_model,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
+    coef_rename = c(
+        "label_treatment" = "Label Treatment",
+        "education_recode" = "Education"
+    ),
+    title = "AI-Labelled Content: Trust in Out-Party to Do What Is Right \\label{tab:xtrust-label-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are included but have no substantive interpretation.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+
+save_ordinal_table(
+    file = "../outputs/tables/child_label_results.tex",
+    treat = child_label_treat,
+    cov = child_label_cov,
+    full = full_child_label_model,
+    coef_omit = "^(?!(label_treatment(:|$))).*|\\|",
+    coef_rename = c(
+        "label_treatment" = "Label Treatment",
+        "political_attention" = "Political Attention",
+        "profile_GOR" = "Region"
+    ),
+    title = "AI-Labelled Content: Comfort with Child Marrying Opposing Partisan \\label{tab:child-label-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+
+
+
 # === Plotting Logic ===
 
 source("../analysis/thermo_models_plots.R")
@@ -239,11 +318,11 @@ plot_disagreement <- generate_plot_for_outcome(
     data = yougov_data,
     outcome = "agreedisagree",
     treatment = "ai_treatment",
-    moderators = moderators_agreedisagree,
-    covariates = covariates_agreedisagree,
-    moderator_terms = moderator_terms_agreedisagree,
+    moderators = moderators_agreedisagree_ai,
+    covariates = covariates_agreedisagree_ai,
+    moderator_terms = subgroups_agreedisagree,
     collapse_levels = c("Strongly disagree", "Tend to disagree"),
-    moderator_labels = moderator_labels_agreedisagree,
+    moderator_labels = subgroup_labels_agreedisagree,
     plot_title = "Do not Respect Beliefs (AI Treatment)"
 )
 
@@ -251,11 +330,11 @@ plot_trust <- generate_plot_for_outcome(
     data = yougov_data,
     outcome = "xtrust",
     treatment = "ai_treatment",
-    moderators = moderators_xtrust,
-    covariates = covariates_xtrust,
-    moderator_terms = moderator_terms_trust,
+    moderators = moderators_xtrust_ai,
+    covariates = covariates_xtrust_ai,
+    moderator_terms = subgroups_trust,
     collapse_levels = c("Almost never", "Once in a while"),
-    moderator_labels = moderator_labels_trust,
+    moderator_labels = subgroup_labels_trust,
     plot_title = "Do not Trust to do Right (AI Treatment)"
 )
 
@@ -263,11 +342,11 @@ plot_discomfort <- generate_plot_for_outcome(
     data = yougov_data,
     outcome = "child",
     treatment = "ai_treatment",
-    moderators = moderators_child,
-    covariates = covariates_child,
-    moderator_terms = moderator_terms_child,
+    moderators = moderators_child_ai,
+    covariates = covariates_child_ai,
+    moderator_terms = subgroups_child,
     collapse_levels = c("Extremely upset", "Somewhat upset"),
-    moderator_labels = moderator_labels_child,
+    moderator_labels = subgroup_labels_child,
     plot_title = "Discomfort with Marrying Out-Group (AI Treatment)"
 )
 
@@ -279,5 +358,55 @@ combined_plot <- plot_disagreement + plot_trust + plot_discomfort +
 ggsave(
     filename = "../outputs/figures/ordinal_patchwork_ai_treatment.pdf",
     plot = combined_plot,
+    width = 10, height = 4
+)
+
+
+# === Save Ordinal Plots for Label Treatment ===
+
+plot_disagreement_label <- generate_plot_for_outcome(
+    data = yougov_data,
+    outcome = "agreedisagree",
+    treatment = "label_treatment",
+    moderators = moderators_agreedisagree_label,
+    covariates = covariates_agreedisagree_label,
+    moderator_terms = subgroups_agreedisagree_label,
+    collapse_levels = c("Strongly disagree", "Tend to disagree"),
+    moderator_labels = labels_agreedisagree_label,
+    plot_title = "Do not Respect Beliefs (Label Treatment)"
+)
+
+plot_trust_label <- generate_plot_for_outcome(
+    data = yougov_data,
+    outcome = "xtrust",
+    treatment = "label_treatment",
+    moderators = moderators_xtrust_label,
+    covariates = covariates_xtrust_label,
+    moderator_terms = subgroups_trust_label,
+    collapse_levels = c("Almost never", "Once in a while"),
+    moderator_labels = subgroup_labels_trust_label,
+    plot_title = "Do not Trust to do Right (Label Treatment)"
+)
+
+plot_discomfort_label <- generate_plot_for_outcome(
+    data = yougov_data,
+    outcome = "child",
+    treatment = "label_treatment",
+    moderators = moderators_child_label,
+    covariates = covariates_child_label,
+    moderator_terms = subgroups_child_label,
+    collapse_levels = c("Extremely upset", "Somewhat upset"),
+    moderator_labels = subgroup_labels_child_label,
+    plot_title = "Discomfort with Marrying Out-Group (Label Treatment)"
+)
+
+# Combine and save
+combined_plot_label <- plot_disagreement_label + plot_trust_label + plot_discomfort_label +
+    plot_layout(ncol = 3, guides = "collect") &
+    theme(legend.position = "bottom")
+
+ggsave(
+    filename = "../outputs/figures/ordinal_patchwork_label_treatment.pdf",
+    plot = combined_plot_label,
     width = 10, height = 4
 )

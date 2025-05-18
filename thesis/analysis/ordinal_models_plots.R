@@ -1,6 +1,5 @@
 # This script generates plots for the ordinal regression models
 # using the ggpredict function from the ggeffects package instead of svolyr
-# analysis/ordinal_models_plots.R
 
 
 # 1. Fit an ordinal regression model (polr) with interactions and covariates
@@ -127,7 +126,7 @@ generate_ordinal_preds_plot <- function(
     return(p)
 }
 
-#' Generate plot for a single outcome (modular function)
+# Generate plot for a single outcome (modular function)
 generate_plot_for_outcome <- function(
     data,
     outcome,
@@ -152,44 +151,90 @@ generate_plot_for_outcome <- function(
 }
 
 # Defined terms and labels for each outcome
-moderator_terms_child <- list(
+subgroups_child <- list(
     "Low Education" = c("ai_treatment", "education_recode[Low]"),
     "North East" = c("ai_treatment", "profile_GOR[North East]"),
     "South East" = c("ai_treatment", "profile_GOR[South East]")
 )
-moderator_labels_child <- c(
+subgroup_labels_child <- c(
     "Low Education" = "Low Education",
     "North East" = "North East",
     "South East" = "South East"
 )
 
-moderator_terms_trust <- list(
+subgroups_trust <- list(
     "Labour" = c("ai_treatment", "mostlikely[Labour Party]"),
     "Liberal Democrats" = c("ai_treatment", "mostlikely[Liberal Democrats]"),
     "Low Education" = c("ai_treatment", "education_recode[Low]")
 )
-moderator_labels_trust <- c(
+subgroup_labels_trust <- c(
     "Labour" = "Labour",
     "Liberal Democrats" = "Liberal Democrats",
     "Low Education" = "Low Education"
 )
 
-moderator_terms_agreedisagree <- list(
+subgroups_agreedisagree <- list(
     "Low Education" = c("ai_treatment", "education_recode[Low]"),
     "Working PT (<8h)" = c("ai_treatment", "profile_work_stat[Working part time (Less than 8 hours a week)]"),
     "Working PT (8–29h)" = c("ai_treatment", "profile_work_stat[Working part time (8-29 hours a week)]")
 )
-moderator_labels_agreedisagree <- c(
+subgroup_labels_agreedisagree <- c(
     "Low Education" = "Low Education",
     "Working PT (<8h)" = "Working PT (<8h)",
     "Working PT (8–29h)" = "Working PT (8–29h)"
 )
 
-# Covariates and moderators (consistent for all)
-covariates_agreedisagree <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
-covariates_xtrust <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
-covariates_child <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
-# Model-specific moderators
-moderators_agreedisagree <- c("education_recode", "profile_work_stat")
-moderators_xtrust <- c("education_recode", "mostlikely")
-moderators_child <- c("education_recode", "profile_GOR")
+#
+# Covariates and moderators for AI treatment
+covariates_agreedisagree_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
+covariates_xtrust_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+covariates_child_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+
+# Model-specific moderators for AI treatment
+moderators_agreedisagree_ai <- c("education_recode", "profile_work_stat")
+moderators_xtrust_ai <- c("education_recode", "mostlikely")
+moderators_child_ai <- c("education_recode", "profile_GOR")
+
+# Covariates and moderators for Label treatment
+covariates_agreedisagree_label <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
+covariates_xtrust_label <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+covariates_child_label <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+
+# Model-specific moderators for Label treatment
+moderators_agreedisagree_label <- c("political_attention", "profile_GOR")
+moderators_xtrust_label <- c("education_recode", "mostlikely")
+moderators_child_label <- c("political_attention", "profile_GOR")
+
+# === Moderator Terms and Labels for Label Treatment Plots ===
+
+# agreedisagree: overall, political_attention, North West, West Midlands
+subgroups_agreedisagree_label <- list(
+    "North West" = c("label_treatment", "profile_GOR[North West]"),
+    "West Midlands" = c("label_treatment", "profile_GOR[West Midlands]")
+)
+labels_agreedisagree_label <- c(
+    "North West" = "North West",
+    "West Midlands" = "West Midlands"
+)
+
+# xtrust: overall, education_recodeLow, mostlikelyLiberal Democrats
+subgroups_trust_label <- list(
+    "Low Education" = c("label_treatment", "education_recode[Low]"),
+    "Liberal Democrats" = c("label_treatment", "mostlikely[Liberal Democrats]")
+)
+subgroup_labels_trust_label <- c(
+    "Low Education" = "Low Education",
+    "Liberal Democrats" = "Liberal Democrats"
+)
+
+# child: overall, political_attention, North West, West Midlands
+subgroups_child_label <- list(
+    "North West" = c("label_treatment", "profile_GOR[North West]"),
+    "West Midlands" = c("label_treatment", "profile_GOR[West Midlands]")
+)
+subgroup_labels_child_label <- c(
+    "North West" = "North West",
+    "West Midlands" = "West Midlands"
+)
+
+# Covariates already defined earlier will be reused

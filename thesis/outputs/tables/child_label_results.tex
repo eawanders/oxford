@@ -1,0 +1,45 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Labelled Content: Comfort with Child Marrying Opposing Partisan \label{tab:child-label-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{26}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+Label Treatment                                & \num{-0.024}  & \num{-0.100}  & \num{-2.529}*** \\
+& (\num{0.115}) & (\num{0.128}) & (\num{0.707})   \\
+Label Treatment:Political Attention            &                &                & \num{0.211}**   \\
+&                &                & (\num{0.069})   \\
+Label Treatment:RegionEast of England          &                &                & \num{1.072}+    \\
+&                &                & (\num{0.641})   \\
+Label Treatment:RegionLondon                   &                &                & \num{1.528}*    \\
+&                &                & (\num{0.645})   \\
+Label Treatment:RegionNorth East               &                &                & \num{-0.735}    \\
+&                &                & (\num{0.908})   \\
+Label Treatment:RegionNorth West               &                &                & \num{1.825}**   \\
+&                &                & (\num{0.633})   \\
+Label Treatment:RegionScotland                 &                &                & \num{0.365}     \\
+&                &                & (\num{0.709})   \\
+Label Treatment:RegionSouth East               &                &                & \num{0.470}     \\
+&                &                & (\num{0.603})   \\
+Label Treatment:RegionSouth West               &                &                & \num{0.668}     \\
+&                &                & (\num{0.647})   \\
+Label Treatment:RegionWales                    &                &                & \num{1.265}     \\
+&                &                & (\num{0.860})   \\
+Label Treatment:RegionWest Midlands            &                &                & \num{1.638}*    \\
+&                &                & (\num{0.637})   \\
+Label Treatment:RegionYorkshire and the Humber &                &                & \num{2.073}**   \\
+&                &                & (\num{0.648})   \\
+Num.Obs.                                       & \num{1408}    & \num{1203}    & \num{1203}      \\
+RMSE                                           & \num{2.30}    & \num{2.26}    & \num{2.26}      \\
+Model                                          & (1)            & (2)            & (3)              \\
+\bottomrule
+\end{talltblr}
+\end{table}

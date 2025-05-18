@@ -197,7 +197,7 @@ To further disect the affective polarisation caused by treatment to AI-generated
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../outputs/figures/ordinal_patchwork_ai_treatment.pdf}
-    \caption{Ordinal Affective Polarisation Patchwork Plot for AI-Generated Content}
+    \caption{Predicted Probabilities by Subgroup for AI-Generated Content}
     \label{fig:ordinal-patchwork-ai}
 \end{figure}
 
@@ -214,6 +214,13 @@ To further disect the affective polarisation caused by treatment to AI-generated
 \end{figure}
 
 ### Ordinal Affective Polarisation Analysis {#sec-label-ordinal-analysis}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../outputs/figures/ordinal_patchwork_label_treatment.pdf}
+  \caption{Predicted Probabilities by Subgroup for AI-Labelled Content}
+  \label{fig:ordinal-patchwork-label}
+\end{figure}
 
 ## Additional Analysis
 
@@ -282,11 +289,18 @@ For the `label_treatment` models, the same model specification is used as for th
 
 ## Ordinal Affective Polarisation Results {#sec-ordinal-results}
 
+### AI-Generated Content
 The following results presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} show the log-odds change in the probability of being in a higher level (a higher threshold cut point) of agreement, trust, or comfort respectively.
 
 \input{../outputs/tables/agreedisagree_ai_results.tex}
 \input{../outputs/tables/xtrust_ai_results.tex}
 \input{../outputs/tables/child_ai_results.tex}
+
+### AI-Labelled Content
+
+\input{../outputs/tables/agreedisagree_label_results.tex}
+\input{../outputs/tables/xtrust_label_results.tex}
+\input{../outputs/tables/child_label_results.tex}
 
 \newpage
 
