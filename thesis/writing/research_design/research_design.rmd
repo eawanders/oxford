@@ -1,7 +1,4 @@
 ---
-title: "MPhil Politics, Comparative Government"
-author: "Edward Anders"
-date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
     bookdown::pdf_document2:
         fig_width: 6
@@ -11,28 +8,25 @@ output:
         toc_depth: 2
         number_sections: true
         includes:
-            keep_tex: false
             in_header:
                 header.tex
+            before_body: titlepage.tex
+        keep_tex: false
+
 documentclass: article
+
 zotero: true
 link-citations: true
-csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
 bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
-header-includes:
-  - \usepackage{setspace}
-  - \setstretch{1.5}
-  - \usepackage[para]{threeparttable}
-  - \usepackage[margin=1in]{geometry}
-  - \setlength{\footnotesep}{1em}
-  - \setlength{\skip\footins}{2em}
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+
 urlcolor: blue
 linkcolor: blue
 ---
 
 ```{r setup, include=FALSE}
-source("../analysis/packages.R")
-source("../writing/build_outputs.R")
+source("../../analysis/packages.R")
+source("load_outputs.R")
 ```
 
 \newpage
@@ -40,6 +34,8 @@ source("../writing/build_outputs.R")
 \setcounter{page}{1}
 
 # Abstract {-}
+
+Machine learning advancements to efficiently handle sequential data inputs and outputs have popularised the field of Artificial Intelligence (AI). Amongst AI’s applications, generating hyper-realistic textual and visual content has become easily accessible, helping AI become an enabling informational tool. Yet, as unregulated AI technologies remain prone to hallucinations and misuse from bad actors, they are raising concern in social and political contexts. This research project assesses the possible negative effects of manipulative political information and deceitful deepfakes. In particular the mechanism of trust, and the association of AI with fake news, are explored to understand whether partisans exposed to AI-generated content become more affectively polarised to one another. This project uses survey experiments to explore exposure effects, using labels to indicate an AI- or human-generated provenance. Agent-based modelling will also be used to test repeated exposures. Initial hypotheses expect minimal effects, but negative unintended consequences of labelling AI-generated content may be found.
 
 \newpage
 \tableofcontents
@@ -94,6 +90,24 @@ As is The Origins and Consequences of Affective Polarization in the United State
 
 # Case Selection and Data Gathering {#sec-case-selection}
 
+## YouGov UniOM Survey Experiment {#sec-yougov}
+
+- Case selection (why focus on the UK?)
+    - I am to have external validity to my research/case?
+    - Can I make inferences to other cases?
+- What is the case?
+    - What is the unit of analysis?
+    - What is the time period?
+    - What is the geographical scope?
+    - What are the key variables?
+- Survey Design
+    - Note the use of a between-subjects survey experiment
+    - Deliberately chosen to avoid sensitivity issues noted by @levendusky2021
+    - Include treatment matrix
+- How is the data being collected?
+    - What is the sampling strategy?
+    - Note the UK weighting
+
 ## Outcome Measures {#sec-outcome-measures}
 
 The measures required to understand AI's affect on affective polarisation are multi-faceted. Different measures can be used to understand the primary outcome of affective polarisation; however, the implication of each measure differs. @druckman2019 clearly outline the best practices for these affective polarisation measures, and how the measures interact. Therefore, this research chooses to follow these measurement recommendations for use in survey self-reporting [@iyengar2019].
@@ -110,28 +124,6 @@ On the other hand, affective polarisation should also be interested in actual ta
 [^green-leaders]: The Green Party has two co-leaders, Carla Denyer and Adrian Ramsay. Therefore, ratings of both leaders are asked, and the thermometer scores for the Green Party are averaged to create a single score for the party. The variables `MLthermoMean` and `LLthermoMean` are used as the final thermometer measures for in- and out-group thermometer scores.
 
 [^codebook]: A full breakdown of the survey experiment variables and values can be found in the codebook \hyperref[sec-codebook]{Section \ref*{sec-codebook}} in the appendix.
-
-- See pre-analysis plan for details of what to include in this section
-- Case selection (why focus on the UK?)
-    - I am to have external validity to my research/case?
-    - Can I make inferences to other cases?
-- What is the case?
-    - What is the unit of analysis?
-    - What is the time period?
-    - What is the geographical scope?
-    - What are the key variables?
-- What data is being collected?
-- How is the data being collected?
-    - What is the sampling strategy?
-    - Note the UK weighting
-
-- Plan for using agentic modelling
-    - Why would I use agentic modelling?
-    - What is the agentic modelling?
-    - How will I use agentic modelling?
-
-- Note the use of a between-subjects survey experiment
-    - Deliberately chosen to avoid sensitivity issues noted by @levendusky2021
 
 # Data analysis {#sec-data-analysis}
 
@@ -165,7 +157,7 @@ Thermometer analysis is one of the primary affective polarisation measures. Befo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{../outputs/figures/thermo_gap_plot_combined.pdf}
+    \includegraphics[width=0.8\textwidth]{../../outputs/figures/thermo_gap_plot_combined.pdf}
     \caption{Average in- and out-party thermometer net-difference scores}
     \label{fig:thermo-graph}
 \end{figure}
@@ -176,19 +168,13 @@ ATE models are presented in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo
 
 [^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}.
 
-\input{../outputs/tables/thermo_gap_ai_results.tex}
+\input{../../outputs/tables/thermo_gap_ai_results.tex}
 
-<!--
-The primary takeaway from model (3) in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}} is that there is no significant treatment effect seen for the exposure to AI-generated content on the reported net-difference thermometer scores. The treatment group shows a slight decrease of **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " points")``** in the thermometer gap, but this is not statistically significant. However, reposndents who were most likely to vote for the Liberal Democrats showed a significant increase of **``r paste0(round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``** at the 95% confidence level in their net-difference thermometer gap, compared to those who were most likely to vote for the Conservative Party. This implies that Liberal Democrat voters are more susceptible to being polarised against their opposing partisans when exposed to AI-generated content. The effect size is notable too. The total treatment effect of AI exposure for Liberal Democrat voters on their affective polarisation is **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " + ", round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " = ", round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"] + coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``**. This is a significant effect size, and suggests that AI-generated content can have a polarising effect. Other than Liberal Democrat voters, the full model suggests that the treatment of exposure to AI-generated content does not have a significant differential effect on the thermometer gap for different sub-groups of respondents.
 
-To test what drives this possible affective polarisation, the models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated. These models are presented in the Appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}. Thermometer scores for both in- and out-party leaders show positive increases of **``r paste0(round(coef(summary(full_thermo_ml_model))["ai_treatment", "Estimate"], 3), " points")``** and **``r paste0(round(coef(summary(full_thermo_ll_model))["ai_treatment", "Estimate"], 3), " points")``** respectively to the treatment but the scores are not statistically significant. Yet, when looking at significant subgroup interaction terms, the increased rating gap between the in- and out-party leaders appears driven by an increased warmth towards the in-party leader, rather than a decrease in warmth towards the out-party leader, shown in \hyperref[fig:thermo-patchwork-ai]{Figure \ref*{fig:thermo-patchwork-ai}}.[^low-education-significance] While the interaction effects for the `MLthermoMean` and `LLthermoMean` party leaders are not statistically significant, the results suggest the direction of possible of effects remains interesting. The divide between in- and out-group ratings appears driven by an increased warmth towards the in-party, rather than the decreased rating of the opposition which was expected and reported by @iyengar2012 in the US.
-One possible explanation could be that...
-
--->
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{../outputs/figures/thermo_patchwork_ai_treatment.pdf}
+    \includegraphics[width=0.85\textwidth]{../../outputs/figures/thermo_patchwork_ai_treatment.pdf}
     \caption{Thermometer Score Patchwork Plot for AI-Generated Content}
     \label{fig:thermo-patchwork-ai}
 \end{figure}
@@ -199,9 +185,7 @@ One possible explanation could be that...
 
 To get a better picture of the treatment effects of AI-generated content on the affective polarisation, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are also estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of *respect*, *trust*, and emotional, social-distance measures of *discomfort* towards opposing partisans are presented in full in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} respectively in the Appendix. None of the full models --- estimated with relevant covariates and moderators --- show any significant overall treatment effect of AI-generated content on the ordinal measures of affective polarisation, again giving credence to the viscocity of political attitudes and even a particularly divisive AI-generated article not being able to further polarise respondents' views.
 
-<!--
-These results are visualised in \hyperref[fig:ordinal-patchwork-ai]{Figure \ref*{fig:ordinal-patchwork-ai}} which shows the predicted probabilities of the ordinal measures of affective polarisation by sub-group.[^preds-model-measurement] The predicted probabilities are calculated as the sum of the probability of a respondent being at the polarised end of the ordinal outcome levels, meaning a higher probability indicates greater affective polarisation.[^summed-preds] The included levels show the statistically significant sub-groups for *respect* and *discomfort* measures, indicating those who are most susceptible to being polarised by the treatment.[^ai-subgroups] In particular, low-educated, part-time-working respondents are significantly more likely to express more polarised attitudes towards their out-party. The greatest effect size is seen when respondents consider their discomfort with having a child marry an out-party voter, with the predicted probability of discomfort for those low-educated in the treatment group being **`r paste0(round(low_edu_treatment, 3) * 100, " %")`** compared to **`r paste0(round(low_edu_control, 3) * 100, " %")`** for the control group. This is/is not to be expected due to...
--->
+
 
 [^preds-model-measurement]: Predicted probabilities are calculated using the `polr()` function in R instead of `svyolr()` as `ggpredict()` does not work with the `svyolr()` function. Therefore, probabilities in the visualisation are not representative of the survey-weighted population. Confidence intervals are also not included due to the complications of colapsing the ordinal levels.
 [^summed-preds]: `Strongly disagree` and `Tend to Disagree` for the `agreedisagree` outcome variable; `Almost never` and `Once in a while` for `xtrust`; and `Extremely upset` and `Somewhat upset` for `child`.
@@ -209,7 +193,7 @@ These results are visualised in \hyperref[fig:ordinal-patchwork-ai]{Figure \ref*
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{../outputs/figures/ordinal_patchwork_ai_treatment.pdf}
+    \includegraphics[width=1\textwidth]{../../outputs/figures/ordinal_patchwork_ai_treatment.pdf}
     \caption{Predicted Probabilities by Subgroup for AI-Generated Content}
     \label{fig:ordinal-patchwork-ai}
 \end{figure}
@@ -224,11 +208,11 @@ The results show that there is no significant treatment effect of AI-labelled co
 
 ### Thermometer Analysis {#sec-label-thermo-analysis}
 
-\input{../outputs/tables/thermo_gap_label_results.tex}
+\input{../../outputs/tables/thermo_gap_label_results.tex}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{../outputs/figures/thermo_patchwork_label_treatment.pdf}
+  \includegraphics[width=0.85\textwidth]{../../outputs/figures/thermo_patchwork_label_treatment.pdf}
   \caption{Thermometer Score Patchwork Plot for AI-Labelled Content}
   \label{fig:thermo-patchwork-label}
 \end{figure}
@@ -237,7 +221,7 @@ The results show that there is no significant treatment effect of AI-labelled co
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{../outputs/figures/ordinal_patchwork_label_treatment.pdf}
+  \includegraphics[width=0.9\textwidth]{../../outputs/figures/ordinal_patchwork_label_treatment.pdf}
   \caption{Predicted Probabilities by Subgroup for AI-Labelled Content}
   \label{fig:ordinal-patchwork-label}
 \end{figure}
@@ -253,7 +237,6 @@ The results show that there is no significant treatment effect of AI-labelled co
 - Why is agentic-based modelling important?
 - How will I use agentic-based modelling?
 
-
 \newpage
 \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
 
@@ -263,7 +246,7 @@ The results show that there is no significant treatment effect of AI-labelled co
 
 The codebook in \hyperref[tab:codebook-table]{Table \ref*{tab:codebook-table}} below provides a summary of the variables used in the YouGov UniOM analysis. The variable names are provided in the first column, followed by the type of variable (e.g., categorical, continuous), a description of the variable, and the values that the variable can take. Note that the outcome variables of `agreedisagree`, `xtrust`, and `child` are ordinal variables on an ordered Likert scale.
 
-\input{../outputs/tables/codebook_table.tex}
+\input{../../outputs/tables/codebook_table.tex}
 
 \newpage
 
@@ -288,8 +271,8 @@ Note that the p-values are reported at the variable level, not for each individu
 
 For each of the categorical variables, there is a base reference category. For example, `profile_gender` uses the base reference category `Male` (reported as `Gender (Male)` in the balance tables). This base acts as the comparison group for the other categories, the p-value compares whether the distribution of the other categories is significantly different from the base category.
 
-\input{../outputs/tables/balance_ai_treatment.tex}
-\input{../outputs/tables/balance_label_treatment.tex}
+\input{../../outputs/tables/balance_ai_treatment.tex}
+\input{../../outputs/tables/balance_label_treatment.tex}
 
 ## Sensitivity Analysis
 
@@ -299,29 +282,27 @@ Given the nature of the results often being reported as null effects, a sensitiv
 
 The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}}. These models are presented in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}} respectvely.
 
-\input{../outputs/tables/thermo_ml_ai_results.tex}
-\input{../outputs/tables/thermo_ll_ai_results.tex}
+\input{../../outputs/tables/thermo_ml_ai_results.tex}
+\input{../../outputs/tables/thermo_ll_ai_results.tex}
 
 For the `label_treatment` models, the same model specification is used as for the `ai_treatment` models. The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-gap-label-results]{Table \ref*{tab:thermo-gap-label-results}}. These models are presented in \hyperref[tab:thermo-ml-label-results]{Table \ref*{tab:thermo-ml-label-results}} and \hyperref[tab:thermo-ll-label-results]{Table \ref*{tab:thermo-ll-label-results}} respectvely.
 
-\input{../outputs/tables/thermo_ml_label_results.tex}
-\input{../outputs/tables/thermo_ll_label_results.tex}
+\input{../../outputs/tables/thermo_ml_label_results.tex}
+\input{../../outputs/tables/thermo_ll_label_results.tex}
 
 ## Ordinal Affective Polarisation Results {#sec-ordinal-results}
 
 ### AI-Generated Content
 The following results presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} show the log-odds change in the probability of being in a higher level (a higher threshold cut point) of agreement, trust, or comfort respectively.
 
-\input{../outputs/tables/agreedisagree_ai_results.tex}
-\input{../outputs/tables/xtrust_ai_results.tex}
-\input{../outputs/tables/child_ai_results.tex}
+\input{../../outputs/tables/agreedisagree_ai_results.tex}
+\input{../../outputs/tables/xtrust_ai_results.tex}
+\input{../../outputs/tables/child_ai_results.tex}
 
 ### AI-Labelled Content
 
-\input{../outputs/tables/agreedisagree_label_results.tex}
-\input{../outputs/tables/xtrust_label_results.tex}
-\input{../outputs/tables/child_label_results.tex}
+\input{../../outputs/tables/agreedisagree_label_results.tex}
+\input{../../outputs/tables/xtrust_label_results.tex}
+\input{../../outputs/tables/child_label_results.tex}
 
-\newpage
-
-# Bibliography
+# References {-}

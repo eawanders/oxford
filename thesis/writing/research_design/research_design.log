@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.5.8)  20 MAY 2025 21:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.5.20)  20 MAY 2025 23:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -247,161 +247,195 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 \pandoc@box=\box62
 \cslhangindent=\skip63
 \csllabelwidth=\skip64
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/tabularray/tabularray.sty (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/l3kernel/expl3.sty
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+\Gm@cnth=\count295
+\Gm@cntv=\count296
+\c@Gm@tempcnt=\count297
+\Gm@bindingoffset=\dimen172
+\Gm@wd@mp=\dimen173
+\Gm@odd@mp=\dimen174
+\Gm@even@mp=\dimen175
+\Gm@layoutwidth=\dimen176
+\Gm@layoutheight=\dimen177
+\Gm@layouthoffset=\dimen178
+\Gm@layoutvoffset=\dimen179
+\Gm@dimlist=\toks27
+) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/setspace/setspace.sty
+Package: setspace 2022/12/04 v6.7b set line spacing
+) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/tabularray/tabularray.sty (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/l3kernel/expl3.sty
 Package: expl3 2025-01-18 L3 programming layer (loader) 
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count295
+\l__color_backend_stack_int=\count298
 \l__pdf_internal_box=\box63
 ))
 Package: tabularray 2024-02-16 v2024A Typeset tabulars and arrays with LaTeX3
-\l__tblr_a_int=\count296
-\l__tblr_c_int=\count297
-\l__tblr_r_int=\count298
-\l__tblr_d_dim=\dimen172
-\l__tblr_h_dim=\dimen173
-\l__tblr_o_dim=\dimen174
-\l__tblr_p_dim=\dimen175
-\l__tblr_q_dim=\dimen176
-\l__tblr_r_dim=\dimen177
-\l__tblr_s_dim=\dimen178
-\l__tblr_t_dim=\dimen179
-\l__tblr_v_dim=\dimen180
-\l__tblr_w_dim=\dimen181
+\l__tblr_a_int=\count299
+\l__tblr_c_int=\count300
+\l__tblr_r_int=\count301
+\l__tblr_d_dim=\dimen180
+\l__tblr_h_dim=\dimen181
+\l__tblr_o_dim=\dimen182
+\l__tblr_p_dim=\dimen183
+\l__tblr_q_dim=\dimen184
+\l__tblr_r_dim=\dimen185
+\l__tblr_s_dim=\dimen186
+\l__tblr_t_dim=\dimen187
+\l__tblr_v_dim=\dimen188
+\l__tblr_w_dim=\dimen189
 \l__tblr_a_box=\box64
 \l__tblr_b_box=\box65
 \l__tblr_c_box=\box66
 \l__tblr_d_box=\box67
-\g__tblr_table_count_int=\count299
-\c@rownum=\count300
-\c@colnum=\count301
-\c@rowcount=\count302
-\c@colcount=\count303
-\abovesep=\dimen182
-\belowsep=\dimen183
-\leftsep=\dimen184
-\rightsep=\dimen185
-\g_tblr_level_int=\count304
-\g__tblr_data_row_key_count_int=\count305
-\g__tblr_data_column_key_count_int=\count306
-\g__tblr_data_cell_key_count_int=\count307
-\g__tblr_array_int=\count308
-\l__tblr_key_count_int=\count309
-\l__tblr_key_quotient_int=\count310
-\l__tblr_key_quotient_two_int=\count311
-\l__tblr_key_remainder_int=\count312
-\g__tblr_data_str_value_count_int=\count313
-\rulewidth=\dimen186
-\l__tblr_strut_dp_dim=\dimen187
-\l__tblr_strut_ht_dim=\dimen188
-\g__tblr_cell_wd_dim=\dimen189
-\g__tblr_cell_ht_dim=\dimen190
-\g__tblr_cell_head_dim=\dimen191
-\g__tblr_cell_foot_dim=\dimen192
-\l__column_target_dim=\dimen193
+\g__tblr_table_count_int=\count302
+\c@rownum=\count303
+\c@colnum=\count304
+\c@rowcount=\count305
+\c@colcount=\count306
+\abovesep=\dimen190
+\belowsep=\dimen191
+\leftsep=\dimen192
+\rightsep=\dimen193
+\g_tblr_level_int=\count307
+\g__tblr_data_row_key_count_int=\count308
+\g__tblr_data_column_key_count_int=\count309
+\g__tblr_data_cell_key_count_int=\count310
+\g__tblr_array_int=\count311
+\l__tblr_key_count_int=\count312
+\l__tblr_key_quotient_int=\count313
+\l__tblr_key_quotient_two_int=\count314
+\l__tblr_key_remainder_int=\count315
+\g__tblr_data_str_value_count_int=\count316
+\rulewidth=\dimen194
+\l__tblr_strut_dp_dim=\dimen195
+\l__tblr_strut_ht_dim=\dimen196
+\g__tblr_cell_wd_dim=\dimen197
+\g__tblr_cell_ht_dim=\dimen198
+\g__tblr_cell_head_dim=\dimen199
+\g__tblr_cell_foot_dim=\dimen256
+\l__column_target_dim=\dimen257
 \l__tblr_caption_box=\box68
 \l__tblr_caption_left_box=\box69
 \l__tblr_row_head_box=\box70
 \l__tblr_row_foot_box=\box71
-\l__tblr_row_head_foot_dim=\dimen194
-\tablewidth=\dimen195
+\l__tblr_row_head_foot_dim=\dimen258
+\tablewidth=\dimen259
 \l__tblr_table_firsthead_box=\box72
 \l__tblr_table_middlehead_box=\box73
 \l__tblr_table_lasthead_box=\box74
 \l__tblr_table_firstfoot_box=\box75
 \l__tblr_table_middlefoot_box=\box76
 \l__tblr_table_lastfoot_box=\box77
-\l__tblr_remain_height_dim=\dimen196
-\l__tblr_long_from_int=\count314
-\l__tblr_long_to_int=\count315
-\l__tblr_curr_i_int=\count316
-\l__tblr_prev_i_int=\count317
-\l__tblr_table_page_int=\count318
+\l__tblr_remain_height_dim=\dimen260
+\l__tblr_long_from_int=\count317
+\l__tblr_long_to_int=\count318
+\l__tblr_curr_i_int=\count319
+\l__tblr_prev_i_int=\count320
+\l__tblr_table_page_int=\count321
 \l__tblr_table_head_box=\box78
 \l__tblr_table_foot_box=\box79
-\l__tblr_table_head_foot_dim=\dimen197
-\l__tblr_table_head_body_foot_dim=\dimen198
+\l__tblr_table_head_foot_dim=\dimen261
+\l__tblr_table_head_body_foot_dim=\dimen262
 \l__tblr_table_box=\box80
 \l__tblr_table_hlines_box=\box81
 \l__tblr_hline_box=\box82
 \l__tblr_row_box=\box83
-\l__tblr_col_o_wd_dim=\dimen199
-\l__tblr_col_b_wd_dim=\dimen256
-\l__tblr_hline_leftskip_dim=\dimen257
-\l__tblr_hline_rightskip_dim=\dimen258
-\l__tblr_row_ht_dim=\dimen259
-\l__tblr_row_dp_dim=\dimen260
-\l__tblr_row_abovesep_dim=\dimen261
-\l__tblr_row_belowsep_dim=\dimen262
+\l__tblr_col_o_wd_dim=\dimen263
+\l__tblr_col_b_wd_dim=\dimen264
+\l__tblr_hline_leftskip_dim=\dimen265
+\l__tblr_hline_rightskip_dim=\dimen266
+\l__tblr_row_ht_dim=\dimen267
+\l__tblr_row_dp_dim=\dimen268
+\l__tblr_row_abovesep_dim=\dimen269
+\l__tblr_row_belowsep_dim=\dimen270
 \l__tblr_row_vlines_box=\box84
 \l__tblr_vline_box=\box85
 \l__tblr_cell_box=\box86
-\l__row_upper_dim=\dimen263
-\l__row_lower_dim=\dimen264
-\l__row_vpace_dim=\dimen265
-\l__tblr_vline_aboveskip_dim=\dimen266
-\l__tblr_vline_belowskip_dim=\dimen267
-\l__tblr_cell_wd_dim=\dimen268
-\l__tblr_cell_ht_dim=\dimen269
+\l__row_upper_dim=\dimen271
+\l__row_lower_dim=\dimen272
+\l__row_vpace_dim=\dimen273
+\l__tblr_vline_aboveskip_dim=\dimen274
+\l__tblr_vline_belowskip_dim=\dimen275
+\l__tblr_cell_wd_dim=\dimen276
+\l__tblr_cell_ht_dim=\dimen277
 \l__tblr_diag_box=\box87
+) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/tools/tabularx.sty
+Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
+\TX@col@width=\dimen278
+\TX@old@table=\dimen279
+\TX@old@col=\dimen280
+\TX@target=\dimen281
+\TX@delta=\dimen282
+\TX@cols=\count322
+\TX@ftn=\toks28
+) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/threeparttable/threeparttable.sty
+Package: threeparttable 2003/06/13  v 3.0
+\@tempboxb=\box88
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/siunitx/siunitx.sty
 Package: siunitx 2025-02-27 v3.4.6 A comprehensive (SI) units package
-\l__siunitx_number_uncert_offset_int=\count319
-\l__siunitx_number_exponent_fixed_int=\count320
-\l__siunitx_number_min_decimal_int=\count321
-\l__siunitx_number_min_integer_int=\count322
-\l__siunitx_number_round_precision_int=\count323
-\l__siunitx_number_lower_threshold_int=\count324
-\l__siunitx_number_upper_threshold_int=\count325
-\l__siunitx_number_group_first_int=\count326
-\l__siunitx_number_group_size_int=\count327
-\l__siunitx_number_group_minimum_int=\count328
-\l__siunitx_angle_tmp_dim=\dimen270
-\l__siunitx_angle_marker_box=\box88
-\l__siunitx_angle_unit_box=\box89
-\l__siunitx_compound_count_int=\count329
-\l__siunitx_table_tmp_box=\box90
-\l__siunitx_table_tmp_dim=\dimen271
-\l__siunitx_table_column_width_dim=\dimen272
-\l__siunitx_table_integer_box=\box91
-\l__siunitx_table_decimal_box=\box92
-\l__siunitx_table_uncert_box=\box93
-\l__siunitx_table_before_box=\box94
-\l__siunitx_table_after_box=\box95
-\l__siunitx_table_before_dim=\dimen273
-\l__siunitx_table_carry_dim=\dimen274
-\l__siunitx_unit_tmp_int=\count330
-\l__siunitx_unit_position_int=\count331
-\l__siunitx_unit_total_int=\count332
+\l__siunitx_number_uncert_offset_int=\count323
+\l__siunitx_number_exponent_fixed_int=\count324
+\l__siunitx_number_min_decimal_int=\count325
+\l__siunitx_number_min_integer_int=\count326
+\l__siunitx_number_round_precision_int=\count327
+\l__siunitx_number_lower_threshold_int=\count328
+\l__siunitx_number_upper_threshold_int=\count329
+\l__siunitx_number_group_first_int=\count330
+\l__siunitx_number_group_size_int=\count331
+\l__siunitx_number_group_minimum_int=\count332
+\l__siunitx_angle_tmp_dim=\dimen283
+\l__siunitx_angle_marker_box=\box89
+\l__siunitx_angle_unit_box=\box90
+\l__siunitx_compound_count_int=\count333
+\l__siunitx_table_tmp_box=\box91
+\l__siunitx_table_tmp_dim=\dimen284
+\l__siunitx_table_column_width_dim=\dimen285
+\l__siunitx_table_integer_box=\box92
+\l__siunitx_table_decimal_box=\box93
+\l__siunitx_table_uncert_box=\box94
+\l__siunitx_table_before_box=\box95
+\l__siunitx_table_after_box=\box96
+\l__siunitx_table_before_dim=\dimen286
+\l__siunitx_table_carry_dim=\dimen287
+\l__siunitx_unit_tmp_int=\count334
+\l__siunitx_unit_position_int=\count335
+\l__siunitx_unit_total_int=\count336
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count333
-\float@exts=\toks27
-\float@box=\box96
-\@float@everytoks=\toks28
-\@floatcapt=\box97
+\c@float@type=\count337
+\float@exts=\toks29
+\float@box=\box97
+\@float@everytoks=\toks30
+\@floatcapt=\box98
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/caption/caption.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen275
-\captionmargin=\dimen276
-\caption@leftmargin=\dimen277
-\caption@rightmargin=\dimen278
-\caption@width=\dimen279
-\caption@indent=\dimen280
-\caption@parindent=\dimen281
-\caption@hangindent=\dimen282
+\caption@tempdima=\dimen288
+\captionmargin=\dimen289
+\caption@leftmargin=\dimen290
+\caption@rightmargin=\dimen291
+\caption@width=\dimen292
+\caption@indent=\dimen293
+\caption@parindent=\dimen294
+\caption@hangindent=\dimen295
 Package caption Info: Standard document class detected.
 )
-\c@caption@flags=\count334
-\c@continuedfloat=\count335
+\c@caption@flags=\count338
+\c@continuedfloat=\count339
 Package caption Info: float package is loaded.
 Package caption Info: longtable package is loaded.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/caption/ltcaption.sty
 Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
-))
-\@float@every@figure=\toks29
+)
+Package caption Info: threeparttable package is loaded.
+)
+\@float@every@figure=\toks31
+\@float@every@table=\toks32
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@headwidth=\skip65
@@ -418,45 +452,23 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@widthL=\skip76
 \f@nch@widthC=\skip77
 \f@nch@widthR=\skip78
-\@temptokenb=\toks30
-) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/setspace/setspace.sty
-Package: setspace 2022/12/04 v6.7b set line spacing
-) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/threeparttable/threeparttable.sty
-Package: threeparttable 2003/06/13  v 3.0
-\@tempboxb=\box98
-) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/geometry/geometry.sty
-Package: geometry 2020/01/02 v5.9 Page Geometry
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/iftex/ifvtex.sty
-Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
-)
-\Gm@cnth=\count336
-\Gm@cntv=\count337
-\c@Gm@tempcnt=\count338
-\Gm@bindingoffset=\dimen283
-\Gm@wd@mp=\dimen284
-\Gm@odd@mp=\dimen285
-\Gm@even@mp=\dimen286
-\Gm@layoutwidth=\dimen287
-\Gm@layoutheight=\dimen288
-\Gm@layouthoffset=\dimen289
-\Gm@layoutvoffset=\dimen290
-\Gm@dimlist=\toks31
+\@temptokenb=\toks33
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip79
-\multirow@cntb=\count339
+\multirow@cntb=\count340
 \multirow@dima=\skip80
-\bigstrutjot=\dimen291
+\bigstrutjot=\dimen296
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/wrapfig/wrapfig.sty
-\wrapoverhang=\dimen292
-\WF@size=\dimen293
-\c@WF@wrappedlines=\count340
+\wrapoverhang=\dimen297
+\WF@size=\dimen298
+\c@WF@wrappedlines=\count341
 \WF@box=\box99
-\WF@everypar=\toks32
+\WF@everypar=\toks34
 Package: wrapfig 2003/01/31  v 3.6
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/colortbl/colortbl.sty
 Package: colortbl 2024/07/06 v1.0i Color table columns (DPC)
-\everycr=\toks33
+\everycr=\toks35
 \minrowclearance=\skip81
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape.sty
 Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
@@ -471,27 +483,27 @@ Package: tabu 2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/varwidth/varwidth.sty
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@box=\box100
-\sift@deathcycles=\count341
-\@vwid@loff=\dimen294
-\@vwid@roff=\dimen295
+\sift@deathcycles=\count342
+\@vwid@loff=\dimen299
+\@vwid@roff=\dimen300
 )
-\c@taburow=\count342
-\tabu@nbcols=\count343
-\tabu@cnt=\count344
-\tabu@Xcol=\count345
-\tabu@alloc=\count346
-\tabu@nested=\count347
-\tabu@target=\dimen296
-\tabu@spreadtarget=\dimen297
-\tabu@naturalX=\dimen298
-\tabucolX=\dimen299
-\tabu@Xsum=\dimen300
-\extrarowdepth=\dimen301
-\abovetabulinesep=\dimen302
-\belowtabulinesep=\dimen303
-\tabustrutrule=\dimen304
-\tabu@thebody=\toks34
-\tabu@footnotes=\toks35
+\c@taburow=\count343
+\tabu@nbcols=\count344
+\tabu@cnt=\count345
+\tabu@Xcol=\count346
+\tabu@alloc=\count347
+\tabu@nested=\count348
+\tabu@target=\dimen301
+\tabu@spreadtarget=\dimen302
+\tabu@naturalX=\dimen303
+\tabucolX=\dimen304
+\tabu@Xsum=\dimen305
+\extrarowdepth=\dimen306
+\abovetabulinesep=\dimen307
+\belowtabulinesep=\dimen308
+\tabustrutrule=\dimen309
+\tabu@thebody=\toks36
+\tabu@footnotes=\toks37
 \tabu@box=\box101
 \tabu@arstrutbox=\box102
 \tabu@hleads=\box103
@@ -509,18 +521,18 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 \UL@box=\box105
 \UL@hyphenbox=\box106
 \UL@skip=\skip84
-\UL@hook=\toks36
-\UL@height=\dimen305
-\UL@pe=\count348
-\UL@pixel=\dimen306
+\UL@hook=\toks38
+\UL@height=\dimen310
+\UL@pe=\count349
+\UL@pixel=\dimen311
 \ULC@box=\box107
 Package: ulem 2019/11/18
-\ULdepth=\dimen307
+\ULdepth=\dimen312
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/makecell/makecell.sty
 Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
-\rotheadsize=\dimen308
-\c@nlinenum=\count349
-\TeXr@lab=\toks37
+\rotheadsize=\dimen313
+\c@nlinenum=\count350
+\TeXr@lab=\toks39
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty
@@ -552,13 +564,13 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count350
+\c@section@level=\count351
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
 )
-\@linkdim=\dimen309
-\Hy@linkcounter=\count351
-\Hy@pagecounter=\count352
+\@linkdim=\dimen314
+\Hy@linkcounter=\count352
+\Hy@pagecounter=\count353
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2024-11-05 v7.01l Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -566,7 +578,7 @@ Now handling font encoding PD1 ...
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count353
+\Hy@SavedSpaceFactor=\count354
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def
 File: puenc.def 2024-11-05 v7.01l Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -580,21 +592,21 @@ Package hyperref Info: Plain pages OFF on input line 4172.
 Package hyperref Info: Backreferencing OFF on input line 4177.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4424.
-\c@Hy@tempcnt=\count354
+\c@Hy@tempcnt=\count355
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4763.
-\XeTeXLinkMargin=\dimen310
+\XeTeXLinkMargin=\dimen315
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
-\Fld@menulength=\count355
-\Field@Width=\dimen311
-\Fld@charsize=\dimen312
+\Fld@menulength=\count356
+\Field@Width=\dimen316
+\Fld@charsize=\dimen317
 Package hyperref Info: Hyper figures OFF on input line 6042.
 Package hyperref Info: Link nesting OFF on input line 6047.
 Package hyperref Info: Hyper index ON on input line 6050.
@@ -606,9 +618,9 @@ Package hyperref Info: PDF/A mode OFF on input line 6072.
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count356
-\c@Item=\count357
-\c@Hfootnote=\count358
+\Hy@abspage=\count357
+\c@Item=\count358
+\c@Hfootnote=\count359
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def
@@ -617,8 +629,8 @@ File: hpdftex.def 2024-11-05 v7.01l Hyperref driver for pdfTeX
 Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend package
 with kernel methods
 )
-\Fld@listcount=\count359
-\c@bookmark@seq@number=\count360
+\Fld@listcount=\count360
+\c@bookmark@seq@number=\count361
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
@@ -629,48 +641,39 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 \Hy@SectionHShift=\skip85
 ) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
 File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
-\BKM@id=\count361
+\BKM@id=\count362
 ))
-Package hyperref Info: Option `colorlinks' set `true' on input line 167.
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 173.
+Package hyperref Info: Option `colorlinks' set `true' on input line 164.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 169.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (./research_design.aux)
 \openout1 = `research_design.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 169.
+LaTeX Font Info:    ... okay on input line 169.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
-)) (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/ninecolors/ninecolors.sty
-Package: ninecolors 2022-02-13 v2022D Select colors with proper color contrast
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
-Package: xparse 2024-08-16 L3 Experimental document command parser
 ))
-Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: hyperref package is loaded.
-Package caption Info: threeparttable package is loaded.
-Package caption Info: wrapfig package is loaded.
-Package caption Info: End \AtBeginDocument code.
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -705,69 +708,79 @@ Package caption Info: End \AtBeginDocument code.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 173.
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 175.
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
-File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 175.
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
-File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 175.
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
-File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 175.
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
-File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 175.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 175.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 175.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 175.
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Trying to load font information for U+msb on input line 175.
-(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/ninecolors/ninecolors.sty
+Package: ninecolors 2022-02-13 v2022D Select colors with proper color contrast
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+Package: xparse 2024-08-16 L3 Experimental document command parser
+))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: hyperref package is loaded.
+Package caption Info: wrapfig package is loaded.
+Package caption Info: End \AtBeginDocument code.
+Package hyperref Info: Link coloring ON on input line 169.
+</Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf, id=4, 845.04686pt x 597.50786pt>
+File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf Graphic file (type pdf)
+<use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf>
+Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf  used on input line 181.
+(pdftex.def)             Requested size: 234.8775pt x 166.07022pt.
+
 
 [1
 
-{/Users/edwardanders/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
+{/Users/edwardanders/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc} </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf, page is rotated 90 degrees>]
 
 [1] (./research_design.toc
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7.
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
+File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7.
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 7.
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 7.
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <10> on input line 7.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <7> on input line 7.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 7.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 7.
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
+LaTeX Font Info:    Trying to load font information for U+msb on input line 7.
+(/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+))
 \tf@toc=\write3
 \openout3 = `research_design.toc'.
 
 
 
-[2] (./research_design.lot)
+[2]
+
+[3] (./research_design.lot)
 \tf@lot=\write4
 \openout4 = `research_design.lot'.
 
 
 
-[3] (./research_design.lof)
+[4] (./research_design.lof)
 \tf@lof=\write5
 \openout5 = `research_design.lof'.
 
 
 
-[4]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 216.
+[5]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 238.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -776,28 +789,33 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.268   W
+l.290   W
          ith more than one hypothesis you will need to specify a procedure f... [1
 
 {/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 281.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 355.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 355.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 355.
+
 
 [2]
 
 [3]
 
 [4{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
-<../outputs/figures/thermo_gap_plot_combined.pdf, id=179, 361.35pt x 216.81pt>
-File: ../outputs/figures/thermo_gap_plot_combined.pdf Graphic file (type pdf)
-<use ../outputs/figures/thermo_gap_plot_combined.pdf>
-Package pdftex.def Info: ../outputs/figures/thermo_gap_plot_combined.pdf  used on input line 391.
+<../../outputs/figures/thermo_gap_plot_combined.pdf, id=191, 361.35pt x 216.81pt>
+File: ../../outputs/figures/thermo_gap_plot_combined.pdf Graphic file (type pdf)
+<use ../../outputs/figures/thermo_gap_plot_combined.pdf>
+Package pdftex.def Info: ../../outputs/figures/thermo_gap_plot_combined.pdf  used on input line 403.
 (pdftex.def)             Requested size: 375.80544pt x 225.48369pt.
 
 
-[5] (../outputs/tables/thermo_gap_ai_results.tex
+[5 <../../outputs/figures/thermo_gap_plot_combined.pdf>] (../../outputs/tables/thermo_gap_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -810,24 +828,22 @@ LaTeX Font Info:    Trying to load font information for T1+lmss on input line 37
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ))
-<../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=189, 542.025pt x 469.755pt>
-File: ../outputs/figures/thermo_patchwork_ai_treatment.pdf Graphic file (type pdf)
-<use ../outputs/figures/thermo_patchwork_ai_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/thermo_patchwork_ai_treatment.pdf  used on input line 404.
+<../../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=206, 542.025pt x 469.755pt>
+File: ../../outputs/figures/thermo_patchwork_ai_treatment.pdf Graphic file (type pdf)
+<use ../../outputs/figures/thermo_patchwork_ai_treatment.pdf>
+Package pdftex.def Info: ../../outputs/figures/thermo_patchwork_ai_treatment.pdf  used on input line 416.
 (pdftex.def)             Requested size: 399.29463pt x 346.065pt.
 
 
-[6 <../outputs/figures/thermo_gap_plot_combined.pdf>]
-
-[7]
-<../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=210, 722.7pt x 289.08pt>
-File: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf Graphic file (type pdf)
-<use ../outputs/figures/ordinal_patchwork_ai_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf  used on input line 415.
+[6]
+<../../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=217, 722.7pt x 289.08pt>
+File: ../../outputs/figures/ordinal_patchwork_ai_treatment.pdf Graphic file (type pdf)
+<use ../../outputs/figures/ordinal_patchwork_ai_treatment.pdf>
+Package pdftex.def Info: ../../outputs/figures/ordinal_patchwork_ai_treatment.pdf  used on input line 427.
 (pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
 
 
-[8 <../outputs/figures/thermo_patchwork_ai_treatment.pdf>] (../outputs/tables/thermo_gap_label_results.tex
+[7 <../../outputs/figures/thermo_patchwork_ai_treatment.pdf>] (../../outputs/tables/thermo_gap_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -838,44 +854,44 @@ Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf  
 > Step: build the whole table.
 
 
-[9 <../outputs/figures/ordinal_patchwork_ai_treatment.pdf>])
-<../outputs/figures/thermo_patchwork_label_treatment.pdf, id=232, 542.025pt x 469.755pt>
-File: ../outputs/figures/thermo_patchwork_label_treatment.pdf Graphic file (type pdf)
-<use ../outputs/figures/thermo_patchwork_label_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/thermo_patchwork_label_treatment.pdf  used on input line 434.
+[8 <../../outputs/figures/ordinal_patchwork_ai_treatment.pdf>])
+<../../outputs/figures/thermo_patchwork_label_treatment.pdf, id=239, 542.025pt x 469.755pt>
+File: ../../outputs/figures/thermo_patchwork_label_treatment.pdf Graphic file (type pdf)
+<use ../../outputs/figures/thermo_patchwork_label_treatment.pdf>
+Package pdftex.def Info: ../../outputs/figures/thermo_patchwork_label_treatment.pdf  used on input line 446.
 (pdftex.def)             Requested size: 399.29463pt x 346.065pt.
 
 
-[10]
-<../outputs/figures/ordinal_patchwork_label_treatment.pdf, id=240, 722.7pt x 289.08pt>
-File: ../outputs/figures/ordinal_patchwork_label_treatment.pdf Graphic file (type pdf)
-<use ../outputs/figures/ordinal_patchwork_label_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_label_treatment.pdf  used on input line 443.
+[9]
+<../../outputs/figures/ordinal_patchwork_label_treatment.pdf, id=246, 722.7pt x 289.08pt>
+File: ../../outputs/figures/ordinal_patchwork_label_treatment.pdf Graphic file (type pdf)
+<use ../../outputs/figures/ordinal_patchwork_label_treatment.pdf>
+Package pdftex.def Info: ../../outputs/figures/ordinal_patchwork_label_treatment.pdf  used on input line 455.
 (pdftex.def)             Requested size: 422.77664pt x 169.1089pt.
 
 
-[11 <../outputs/figures/thermo_patchwork_label_treatment.pdf> <../outputs/figures/ordinal_patchwork_label_treatment.pdf>]
+[10 <../../outputs/figures/thermo_patchwork_label_treatment.pdf> <../../outputs/figures/ordinal_patchwork_label_treatment.pdf>]
 
-[12]
+[11]
 
-LaTeX Warning: Hyper reference `tab:codebook-table' on page 13 undefined on input line 474.
+LaTeX Warning: Hyper reference `tab:codebook-table' on page 12 undefined on input line 486.
 
 
-LaTeX Warning: Reference `tab:codebook-table' on page 13 undefined on input line 474.
+LaTeX Warning: Reference `tab:codebook-table' on page 12 undefined on input line 486.
 
-(../outputs/tables/codebook_table.tex [13] [14])
+(../../outputs/tables/codebook_table.tex [12] [13])
 
-[15]
-Underfull \hbox (badness 1769) in paragraph at lines 488--489
+[14]
+Underfull \hbox (badness 1769) in paragraph at lines 500--501
 \T1/lmtt/m/n/10 MLthermo_NF\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_ED\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_CD\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_AR\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_KB\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_KS\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_NF\T1/lmr/m/n/10 ,
  []
 
 
 
-[16] (../outputs/tables/balance_ai_treatment.tex) (../outputs/tables/balance_label_treatment.tex)
+[15] (../../outputs/tables/balance_ai_treatment.tex) (../../outputs/tables/balance_label_treatment.tex)
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 507.
-(../outputs/tables/thermo_ml_ai_results.tex
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 519.
+(../../outputs/tables/thermo_ml_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -884,7 +900,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/thermo_ll_ai_results.tex
+) (../../outputs/tables/thermo_ll_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -893,7 +909,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/thermo_ml_label_results.tex
+) (../../outputs/tables/thermo_ml_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -902,7 +918,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/thermo_ll_label_results.tex
+) (../../outputs/tables/thermo_ll_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -911,7 +927,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/agreedisagree_ai_results.tex
+) (../../outputs/tables/agreedisagree_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -920,7 +936,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/xtrust_ai_results.tex
+) (../../outputs/tables/xtrust_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -929,7 +945,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/child_ai_results.tex
+) (../../outputs/tables/child_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -938,7 +954,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../outputs/tables/agreedisagree_label_results.tex
+) (../../outputs/tables/agreedisagree_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -955,7 +971,7 @@ Overfull \hbox (24.52266pt too wide) in paragraph at lines 50--51
  [][] 
  []
 
-) (../outputs/tables/xtrust_label_results.tex
+) (../../outputs/tables/xtrust_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -972,7 +988,7 @@ Overfull \hbox (3.02324pt too wide) in paragraph at lines 38--39
  [][] 
  []
 
-) (../outputs/tables/child_label_results.tex
+) (../../outputs/tables/child_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -990,6 +1006,8 @@ Overfull \hbox (24.52266pt too wide) in paragraph at lines 48--49
  []
 
 )
+
+[16]
 
 [17]
 
@@ -1013,9 +1031,7 @@ Overfull \hbox (24.52266pt too wide) in paragraph at lines 48--49
 
 [27]
 
-[28]
-
-[29] (./research_design.aux)
+[28] (./research_design.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -1025,18 +1041,18 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 21401 strings out of 475172
- 424480 string characters out of 5764614
- 1132832 words of memory out of 5000000
- 43900 multiletter control sequences out of 15000+600000
- 669481 words of font info for 128 fonts, out of 8000000 for 9000
+ 21408 strings out of 475172
+ 424941 string characters out of 5764613
+ 1132662 words of memory out of 5000000
+ 43916 multiletter control sequences out of 15000+600000
+ 664400 words of font info for 123 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,11n,110p,2655b,1331s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 89i,11n,110p,2655b,1350s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt9.pfb>
-Output written on research_design.pdf (34 pages, 479851 bytes).
+Output written on research_design.pdf (34 pages, 529410 bytes).
 PDF statistics:
- 544 PDF objects out of 1000 (max. 8388607)
- 455 compressed objects within 5 object streams
- 141 named destinations out of 1000 (max. 500000)
- 106 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 542 PDF objects out of 1000 (max. 8388607)
+ 450 compressed objects within 5 object streams
+ 130 named destinations out of 1000 (max. 500000)
+ 111 words of extra memory for PDF output out of 10000 (max. 10000000)
 
