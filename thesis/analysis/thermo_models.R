@@ -1,5 +1,10 @@
 # Thermometer Model Analysis to allow for flexible modeling of different thermometer outcome models
 
+# Source the necessary files to run this script
+source("../analysis/data.R")
+source("../analysis/data_cleaning.R")
+source("../analysis/survey_design.R")
+
 thermo_models <- function(data,
                           design,
                           outcome = c("thermo_gap", "MLthermoMean", "LLthermoMean"),
@@ -33,7 +38,7 @@ thermo_models <- function(data,
 
 # This function will create a list of models for each combination of outcome and treatment
 
-fit_thermo_models <- function(data, design) {
+fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", "label_treatment")) {
     covariates <- c(
         "age",
         "political_attention",
@@ -66,7 +71,7 @@ fit_thermo_models <- function(data, design) {
             outcome = "thermo_gap",
             treatment = "ai_treatment",
             covariates = covariates,
-            moderators = c("mostlikely", "political_attention", "education_recode")
+            moderators = c("pastvote_ge_2024")
         ),
         # MLthermoMean models with ai_treatment
         list(
@@ -88,7 +93,7 @@ fit_thermo_models <- function(data, design) {
             outcome = "MLthermoMean",
             treatment = "ai_treatment",
             covariates = covariates,
-            moderators = c("age", "education_recode", "mostlikely")
+            moderators = c("profile_work_stat")
         ),
         # LLthermoMean models with ai_treatment
         list(
@@ -110,7 +115,7 @@ fit_thermo_models <- function(data, design) {
             outcome = "LLthermoMean",
             treatment = "ai_treatment",
             covariates = covariates,
-            moderators = c("pastvote_EURef", "education_recode", "mostlikely")
+            moderators = c("age")
         ),
         # thermo_gap models with label_treatment
         list(
@@ -180,6 +185,9 @@ fit_thermo_models <- function(data, design) {
         )
     )
 
+    # Filter model_specs to only include models matching the given treatment_group
+    model_specs <- Filter(function(spec) spec$treatment == treatment_group, model_specs)
+
     result <- list()
     for (spec in model_specs) {
         mod <- thermo_models(
@@ -229,31 +237,47 @@ save_thermo_table <- function(
     )
 }
 
-# Fit all thermometer models for the AI treatment only (can easily extend to label_treatment later)
-thermo_models_list <- fit_thermo_models(
-    data = yougov_data,
-    design = yougov_design
+
+# Fit all thermometer models for the AI treatment
+thermo_models_list_ai <- fit_thermo_models(
+    data = yougov_data_ai,
+    design = yougov_design_ai,
+    treatment_group = "ai_treatment"
 )
 
-# Assign objects for easier referencing throughout your document
-thermo_gap_treat <- thermo_models_list[["thermo_gap_ai_treatment_treat"]]
-thermo_gap_treat_cov <- thermo_models_list[["thermo_gap_ai_treatment_cov"]]
-full_thermo_gap_model <- thermo_models_list[["full_thermo_gap_ai_treatment_model"]]
+# Fit all thermometer models for the Label treatment
+thermo_models_list_label <- fit_thermo_models(
+    data = yougov_data_label,
+    design = yougov_design_label,
+    treatment_group = "label_treatment"
+)
 
-thermo_ml_treat <- thermo_models_list[["thermo_ml_ai_treatment_treat"]]
-thermo_ml_treat_cov <- thermo_models_list[["thermo_ml_ai_treatment_cov"]]
-full_thermo_ml_model <- thermo_models_list[["full_thermo_ml_ai_treatment_model"]]
+# Assign objects for easier referencing throughout your document (AI models)
+thermo_gap_treat <- thermo_models_list_ai[["thermo_gap_ai_treatment_treat"]]
+thermo_gap_treat_cov <- thermo_models_list_ai[["thermo_gap_ai_treatment_cov"]]
+full_thermo_gap_model <- thermo_models_list_ai[["full_thermo_gap_ai_treatment_model"]]
 
-thermo_ll_treat <- thermo_models_list[["thermo_ll_ai_treatment_treat"]]
-thermo_ll_treat_cov <- thermo_models_list[["thermo_ll_ai_treatment_cov"]]
-full_thermo_ll_model <- thermo_models_list[["full_thermo_ll_ai_treatment_model"]]
+thermo_ml_treat <- thermo_models_list_ai[["thermo_ml_ai_treatment_treat"]]
+thermo_ml_treat_cov <- thermo_models_list_ai[["thermo_ml_ai_treatment_cov"]]
+full_thermo_ml_model <- thermo_models_list_ai[["full_thermo_ml_ai_treatment_model"]]
+
+thermo_ll_treat <- thermo_models_list_ai[["thermo_ll_ai_treatment_treat"]]
+thermo_ll_treat_cov <- thermo_models_list_ai[["thermo_ll_ai_treatment_cov"]]
+full_thermo_ll_model <- thermo_models_list_ai[["full_thermo_ll_ai_treatment_model"]]
 
 models_dir <- "../outputs/models"
 
-# Save each model as an .rds
-for (model_name in names(thermo_models_list)) {
+# Save each model as an .rds for both AI and Label lists
+for (model_name in names(thermo_models_list_ai)) {
     saveRDS(
-        thermo_models_list[[model_name]],
+        thermo_models_list_ai[[model_name]],
+        file = file.path(models_dir, paste0(model_name, ".rds"))
+    )
+}
+
+for (model_name in names(thermo_models_list_label)) {
+    saveRDS(
+        thermo_models_list_label[[model_name]],
         file = file.path(models_dir, paste0(model_name, ".rds"))
     )
 }

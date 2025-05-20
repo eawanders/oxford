@@ -10,6 +10,11 @@
 #'
 #' @return Named list of model objects
 
+# Load required scripts to run the analysis in this file
+source("../analysis/data.R")
+source("../analysis/data_cleaning.R")
+source("../analysis/survey_design.R")
+
 
 fit_ordinal_models <- function(
     data,
@@ -19,29 +24,29 @@ fit_ordinal_models <- function(
     covariates = list(
         agreedisagree = list(
             ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat"),
-            label_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
+            label_treatment = NULL
         ),
         xtrust = list(
-            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR"),
-            label_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat"),
+            label_treatment = NULL
         ),
         child = list(
-            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR"),
+            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat"),
             label_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
         )
     ),
     moderators = list(
         agreedisagree = list(
-            ai_treatment = c("education_recode", "profile_work_stat"),
-            label_treatment = c("political_attention", "profile_GOR")
+            ai_treatment = c("mostlikely"),
+            label_treatment = c("profile_GOR", "mostlikely")
         ),
         xtrust = list(
-            ai_treatment = c("mostlikely", "education_recode"),
-            label_treatment = c("mostlikely", "education_recode")
+            ai_treatment = c("profile_work_stat"),
+            label_treatment = c("mostlikely")
         ),
         child = list(
-            ai_treatment = c("education_recode", "profile_GOR", "mostlikely"),
-            label_treatment = c("political_attention", "profile_GOR")
+            ai_treatment = c("education_recode"),
+            label_treatment = c("profile_gender", "profile_GOR", "pastvote_EURef")
         )
     )) {
     results_list <- list()
@@ -60,7 +65,8 @@ fit_ordinal_models <- function(
 
             # 3. Full Model: Treatment + Covariates + Moderators + Interactions
             rhs <- c(
-                treat, covariates[[out]][[treat]],
+                treat,
+                covariates[[out]][[treat]],
                 moderators[[out]][[treat]],
                 paste(treat, moderators[[out]][[treat]], sep = ":")
             )
@@ -72,47 +78,62 @@ fit_ordinal_models <- function(
     return(results_list)
 }
 
-# Fit all ordinal models for the AI treatment only (can easily extend to label_treatment later)
-ordinal_models_list <- fit_ordinal_models(
-    data = yougov_data,
-    design = yougov_design,
+#
+# Fit all ordinal models for the AI and Label treatments separately
+ordinal_models_list_ai <- fit_ordinal_models(
+    data = yougov_data_ai,
+    design = yougov_design_ai,
     outcomes = c("agreedisagree", "xtrust", "child"),
-    treatments = c("ai_treatment", "label_treatment")
+    treatments = c("ai_treatment")
+)
+
+ordinal_models_list_label <- fit_ordinal_models(
+    data = yougov_data_label,
+    design = yougov_design_label,
+    outcomes = c("agreedisagree", "xtrust", "child"),
+    treatments = c("label_treatment")
 )
 
 # === Save Models ===
 # Assign objects for each ai model
-agreedisagree_ai_treat <- ordinal_models_list[["agreedisagree_ai_treatment_treat"]]
-agreedisagree_ai_cov <- ordinal_models_list[["agreedisagree_ai_treatment_cov"]]
-full_agreedisagree_ai_model <- ordinal_models_list[["full_agreedisagree_ai_treatment_model"]]
+agreedisagree_ai_treat <- ordinal_models_list_ai[["agreedisagree_ai_treatment_treat"]]
+agreedisagree_ai_cov <- ordinal_models_list_ai[["agreedisagree_ai_treatment_cov"]]
+full_agreedisagree_ai_model <- ordinal_models_list_ai[["full_agreedisagree_ai_treatment_model"]]
 
-xtrust_ai_treat <- ordinal_models_list[["xtrust_ai_treatment_treat"]]
-xtrust_ai_cov <- ordinal_models_list[["xtrust_ai_treatment_cov"]]
-full_xtrust_ai_model <- ordinal_models_list[["full_xtrust_ai_treatment_model"]]
+xtrust_ai_treat <- ordinal_models_list_ai[["xtrust_ai_treatment_treat"]]
+xtrust_ai_cov <- ordinal_models_list_ai[["xtrust_ai_treatment_cov"]]
+full_xtrust_ai_model <- ordinal_models_list_ai[["full_xtrust_ai_treatment_model"]]
 
-child_ai_treat <- ordinal_models_list[["child_ai_treatment_treat"]]
-child_ai_cov <- ordinal_models_list[["child_ai_treatment_cov"]]
-full_child_ai_model <- ordinal_models_list[["full_child_ai_treatment_model"]]
+child_ai_treat <- ordinal_models_list_ai[["child_ai_treatment_treat"]]
+child_ai_cov <- ordinal_models_list_ai[["child_ai_treatment_cov"]]
+full_child_ai_model <- ordinal_models_list_ai[["full_child_ai_treatment_model"]]
 
 # Assign objects for each label model
-agreedisagree_label_treat <- ordinal_models_list[["agreedisagree_label_treatment_treat"]]
-agreedisagree_label_cov <- ordinal_models_list[["agreedisagree_label_treatment_cov"]]
-full_agreedisagree_label_model <- ordinal_models_list[["full_agreedisagree_label_treatment_model"]]
+agreedisagree_label_treat <- ordinal_models_list_label[["agreedisagree_label_treatment_treat"]]
+agreedisagree_label_cov <- ordinal_models_list_label[["agreedisagree_label_treatment_cov"]]
+full_agreedisagree_label_model <- ordinal_models_list_label[["full_agreedisagree_label_treatment_model"]]
 
-xtrust_label_treat <- ordinal_models_list[["xtrust_label_treatment_treat"]]
-xtrust_label_cov <- ordinal_models_list[["xtrust_label_treatment_cov"]]
-full_xtrust_label_model <- ordinal_models_list[["full_xtrust_label_treatment_model"]]
+xtrust_label_treat <- ordinal_models_list_label[["xtrust_label_treatment_treat"]]
+xtrust_label_cov <- ordinal_models_list_label[["xtrust_label_treatment_cov"]]
+full_xtrust_label_model <- ordinal_models_list_label[["full_xtrust_label_treatment_model"]]
 
-child_label_treat <- ordinal_models_list[["child_label_treatment_treat"]]
-child_label_cov <- ordinal_models_list[["child_label_treatment_cov"]]
-full_child_label_model <- ordinal_models_list[["full_child_label_treatment_model"]]
+child_label_treat <- ordinal_models_list_label[["child_label_treatment_treat"]]
+child_label_cov <- ordinal_models_list_label[["child_label_treatment_cov"]]
+full_child_label_model <- ordinal_models_list_label[["full_child_label_treatment_model"]]
 
 models_dir <- "../outputs/models"
 
 # Save each model as an .rds
-for (model_name in names(ordinal_models_list)) {
+for (model_name in names(ordinal_models_list_ai)) {
     saveRDS(
-        ordinal_models_list[[model_name]],
+        ordinal_models_list_ai[[model_name]],
+        file = file.path(models_dir, paste0(model_name, ".rds"))
+    )
+}
+
+for (model_name in names(ordinal_models_list_label)) {
+    saveRDS(
+        ordinal_models_list_label[[model_name]],
         file = file.path(models_dir, paste0(model_name, ".rds"))
     )
 }

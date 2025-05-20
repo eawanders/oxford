@@ -1,6 +1,11 @@
 # This script generates plots for the ordinal regression models
 # using the ggpredict function from the ggeffects package instead of svolyr
 
+# Load required scripts to run the analysis in this file
+source("../analysis/data.R")
+source("../analysis/data_cleaning.R")
+source("../analysis/survey_design.R")
+source("../analysis/ordinal_models.R")
 
 # 1. Fit an ordinal regression model (polr) with interactions and covariates
 fit_polr_model <- function(data, outcome, treatment, moderators = NULL, covariates = NULL) {
@@ -74,11 +79,10 @@ generate_ordinal_preds_plot <- function(
     plot_title = NULL,
     y_label = "Predicted Probability",
     shape_labels = c("Control", "Treatment")) {
-    # 1. Fit model
     model <- fit_polr_model(data, outcome, treatment, moderators, covariates)
 
-    # 2. Predictions for subgroups and overall
     preds_overall <- get_overall_preds(model, treatment, collapse_levels, shape_labels)
+
     preds_subgroups <- get_preds_for_subgroups(model, moderator_terms, collapse_levels, shape_labels)
 
     # 3. Combine
@@ -152,89 +156,75 @@ generate_plot_for_outcome <- function(
 
 # Defined terms and labels for each outcome
 subgroups_child <- list(
+    "Male" = c("ai_treatment", "profile_gender[Male]"),
     "Low Education" = c("ai_treatment", "education_recode[Low]"),
-    "North East" = c("ai_treatment", "profile_GOR[North East]"),
-    "South East" = c("ai_treatment", "profile_GOR[South East]")
+    "Working FT" = c("ai_treatment", "profile_work_stat[Working full time (30 or more hours per week)]")
 )
 subgroup_labels_child <- c(
+    "Male" = "Male",
     "Low Education" = "Low Education",
-    "North East" = "North East",
-    "South East" = "South East"
+    "Working FT" = "Working FT"
 )
 
 subgroups_trust <- list(
-    "Labour" = c("ai_treatment", "mostlikely[Labour Party]"),
-    "Liberal Democrats" = c("ai_treatment", "mostlikely[Liberal Democrats]"),
-    "Low Education" = c("ai_treatment", "education_recode[Low]")
+    "Working FT" = c("ai_treatment", "profile_work_stat[Working full time (30 or more hours per week)]")
 )
 subgroup_labels_trust <- c(
-    "Labour" = "Labour",
-    "Liberal Democrats" = "Liberal Democrats",
-    "Low Education" = "Low Education"
+    "Working FT" = "Working FT"
 )
 
 subgroups_agreedisagree <- list(
-    "Low Education" = c("ai_treatment", "education_recode[Low]"),
-    "Working PT (<8h)" = c("ai_treatment", "profile_work_stat[Working part time (Less than 8 hours a week)]"),
-    "Working PT (8–29h)" = c("ai_treatment", "profile_work_stat[Working part time (8-29 hours a week)]")
+    "Liberal Democrats" = c("ai_treatment", "mostlikely[Liberal Democrats]")
 )
 subgroup_labels_agreedisagree <- c(
-    "Low Education" = "Low Education",
-    "Working PT (<8h)" = "Working PT (<8h)",
-    "Working PT (8–29h)" = "Working PT (8–29h)"
+    "Liberal Democrats" = "Liberal Democrats"
 )
 
-#
+
 # Covariates and moderators for AI treatment
 covariates_agreedisagree_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
-covariates_xtrust_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+covariates_xtrust_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
 covariates_child_ai <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
 
 # Model-specific moderators for AI treatment
-moderators_agreedisagree_ai <- c("education_recode", "profile_work_stat")
-moderators_xtrust_ai <- c("education_recode", "mostlikely")
-moderators_child_ai <- c("education_recode", "profile_GOR")
+moderators_agreedisagree_ai <- c("mostlikely")
+moderators_xtrust_ai <- c("profile_work_stat")
+moderators_child_ai <- c("profile_gender", "profile_work_stat", "education_recode")
 
 # Covariates and moderators for Label treatment
-covariates_agreedisagree_label <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat")
-covariates_xtrust_label <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
-covariates_child_label <- c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
+covariates_agreedisagree_label <- NULL
+covariates_xtrust_label <- NULL
+covariates_child_label <- c("age", "political_attention", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef")
 
 # Model-specific moderators for Label treatment
-moderators_agreedisagree_label <- c("political_attention", "profile_GOR")
-moderators_xtrust_label <- c("education_recode", "mostlikely")
-moderators_child_label <- c("political_attention", "profile_GOR")
+moderators_agreedisagree_label <- c("profile_GOR", "mostlikely")
+moderators_xtrust_label <- c("mostlikely")
+moderators_child_label <- c("profile_gender", "profile_GOR")
 
 # === Moderator Terms and Labels for Label Treatment Plots ===
 
 # agreedisagree: overall, political_attention, North West, West Midlands
 subgroups_agreedisagree_label <- list(
-    "North West" = c("label_treatment", "profile_GOR[North West]"),
+    "Liberal Democrats" = c("label_treatment", "mostlikely[Liberal Democrats]"),
     "West Midlands" = c("label_treatment", "profile_GOR[West Midlands]")
 )
 labels_agreedisagree_label <- c(
-    "North West" = "North West",
+    "Liberal Democrats" = "Liberal Democrats",
     "West Midlands" = "West Midlands"
 )
 
-# xtrust: overall, education_recodeLow, mostlikelyLiberal Democrats
 subgroups_trust_label <- list(
-    "Low Education" = c("label_treatment", "education_recode[Low]"),
     "Liberal Democrats" = c("label_treatment", "mostlikely[Liberal Democrats]")
 )
 subgroup_labels_trust_label <- c(
-    "Low Education" = "Low Education",
     "Liberal Democrats" = "Liberal Democrats"
 )
 
-# child: overall, political_attention, North West, West Midlands
 subgroups_child_label <- list(
-    "North West" = c("label_treatment", "profile_GOR[North West]"),
+    "Male" = c("label_treatment", "profile_gender[Male]"),
     "West Midlands" = c("label_treatment", "profile_GOR[West Midlands]")
 )
 subgroup_labels_child_label <- c(
-    "North West" = "North West",
+    "Male" = "Male",
     "West Midlands" = "West Midlands"
 )
-
-# Covariates already defined earlier will be reused

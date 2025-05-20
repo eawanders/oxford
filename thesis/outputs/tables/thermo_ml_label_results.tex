@@ -9,40 +9,32 @@ note{ }={Note: Models weighted using YouGov survey weights. The coefficients are
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{28}={1,2,3,4}{solid, black, 0.05em},
+hline{20}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-(Intercept)                                 & \num{69.287}*** & \num{41.276}*** & \num{47.104}*** \\
-& (\num{1.066})   & (\num{5.914})   & (\num{7.389})   \\
-Label Treatment                             & \num{-2.201}    & \num{-2.315}    & \num{-18.759}*  \\
-& (\num{1.596})   & (\num{1.531})   & (\num{9.477})   \\
-age                                         &                  & \num{0.207}**   & \num{0.121}     \\
-&                  & (\num{0.076})   & (\num{0.087})   \\
-mostlikelyGreen Party                       &                  &                  & \num{14.233}*   \\
-&                  &                  & (\num{5.830})   \\
-mostlikelyLabour Party                      &                  &                  & \num{13.970}*** \\
-&                  &                  & (\num{3.530})   \\
-mostlikelyLiberal Democrats                 &                  &                  & \num{22.290}*** \\
-&                  &                  & (\num{3.847})   \\
-mostlikelyReform UK                         &                  &                  & \num{18.994}*** \\
-&                  &                  & (\num{3.181})   \\
-Label Treatment:age                         &                  &                  & \num{0.136}     \\
-&                  &                  & (\num{0.094})   \\
-Label Treatment:Political Attention         &                  &                  & \num{2.244}*    \\
-&                  &                  & (\num{0.952})   \\
-Label Treatment:mostlikelyGreen Party       &                  &                  & \num{-0.192}    \\
-&                  &                  & (\num{6.556})   \\
-Label Treatment:mostlikelyLabour Party      &                  &                  & \num{-5.777}    \\
-&                  &                  & (\num{4.115})   \\
-Label Treatment:mostlikelyLiberal Democrats &                  &                  & \num{-11.210}*  \\
-&                  &                  & (\num{4.532})   \\
-Label Treatment:mostlikelyReform UK         &                  &                  & \num{-7.497}+   \\
-&                  &                  & (\num{4.115})   \\
-Num.Obs.                                    & \num{1251}      & \num{1088}      & \num{1088}      \\
-R2                                          & \num{0.002}     & \num{0.151}     & \num{0.207}     \\
-RMSE                                        & \num{23.32}     & \num{21.47}     & \num{20.85}     \\
-Model                                       & (1)              & (2)              & (3)              \\
+(Intercept)                         & \num{69.504}*** & \num{32.728}*** & \num{32.559}**  \\
+& (\num{1.494})   & (\num{9.153})   & (\num{10.056})  \\
+Label Treatment                     & \num{-3.251}    & \num{-2.357}    & \num{0.427}     \\
+& (\num{2.168})   & (\num{2.080})   & (\num{10.447})  \\
+age                                 &                  & \num{0.256}*    & \num{0.279}*    \\
+&                  & (\num{0.103})   & (\num{0.113})   \\
+Label Treatment:Age                 &                  &                  & \num{-0.097}    \\
+&                  &                  & (\num{0.121})   \\
+Label Treatment:Political Attention &                  &                  & \num{1.899}+    \\
+&                  &                  & (\num{0.976})   \\
+Label Treatment:Greens              &                  &                  & \num{-8.272}    \\
+&                  &                  & (\num{10.014})  \\
+Label Treatment:Labour              &                  &                  & \num{-15.070}** \\
+&                  &                  & (\num{5.507})   \\
+Label Treatment:LibDem              &                  &                  & \num{-19.598}** \\
+&                  &                  & (\num{6.625})   \\
+Label Treatment:Reform              &                  &                  & \num{-9.345}+   \\
+&                  &                  & (\num{5.612})   \\
+Num.Obs.                            & \num{626}       & \num{541}       & \num{541}       \\
+R2                                  & \num{0.005}     & \num{0.187}     & \num{0.245}     \\
+RMSE                                & \num{23.57}     & \num{21.76}     & \num{21.18}     \\
+Model                               & (1)              & (2)              & (3)              \\
 \bottomrule
 \end{talltblr}
 \end{table}

@@ -101,11 +101,10 @@ plot_thermo_patchwork <- function(models, treatment_var, subgroups, output_file,
 }
 
 ## Patchwork Plot for AI Treatment
-# Define the models to include
 models_ai <- list(
-    ML = full_thermo_ml_model,
-    LL = full_thermo_ll_model,
-    GAP = full_thermo_gap_model
+    ML = thermo_models_list_ai[["full_thermo_ml_ai_treatment_model"]],
+    LL = thermo_models_list_ai[["full_thermo_ll_ai_treatment_model"]],
+    GAP = thermo_models_list_ai[["full_thermo_gap_ai_treatment_model"]]
 )
 
 # Define the subgroups for plotting
@@ -130,21 +129,21 @@ subgroups_ai <- list(
             GAP = "ai_treatment:mostlikelyGreen Party"
         )
     ),
-    LowEdu = list(
-        name = "Low Education Subgroup",
+    PartTime = list(
+        name = "Part Time Work",
         interaction_terms = c(
-            ML = "ai_treatment:education_recodeLow",
-            LL = "ai_treatment:education_recodeLow",
-            GAP = "ai_treatment:education_recodeLow"
+            ML = "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)",
+            LL = "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)",
+            GAP = "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)"
         )
     )
 )
 
 ## Patchwork Plot for Label Treatment
 models_label <- list(
-    ML = full_thermo_ml_label_model,
-    LL = full_thermo_ll_label_model,
-    GAP = full_thermo_gap_label_model
+    ML = thermo_models_list_label[["full_thermo_ml_label_treatment_model"]],
+    LL = thermo_models_list_label[["full_thermo_ll_label_treatment_model"]],
+    GAP = thermo_models_list_label[["full_thermo_gap_label_treatment_model"]]
 )
 
 subgroups_label <- list(
@@ -160,12 +159,20 @@ subgroups_label <- list(
             GAP = "label_treatment:mostlikelyLiberal Democrats"
         )
     ),
-    LowEdu = list(
-        name = "Low Education Subgroup",
+    London = list(
+        name = "London Subgroup",
         interaction_terms = c(
-            ML = "label_treatment:education_recodeLow",
-            LL = "label_treatment:education_recodeLow",
-            GAP = "label_treatment:education_recodeLow"
+            ML = "label_treatment:profile_GORLondon",
+            LL = "label_treatment:profile_GORLondon",
+            GAP = "label_treatment:profile_GORLondon"
+        )
+    ),
+    FullTime = list(
+        name = "Full Time Work",
+        interaction_terms = c(
+            ML = "label_treatment:profile_work_statWorking full time (30 hours or more a week)",
+            LL = "label_treatment:profile_work_statWorking full time (30 hours or more a week)",
+            GAP = "label_treatment:profile_work_statWorking full time (30 hours or more a week)"
         )
     )
 )

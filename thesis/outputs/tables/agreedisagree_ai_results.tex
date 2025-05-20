@@ -9,41 +9,39 @@ note{ }={Note: Ordered logistic regression with survey weights and robust standa
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{30}={1,2,3,4}{solid, black, 0.05em},
+hline{28}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-AI Treatment                                & \num{-0.137}   & \num{-0.115}   & \num{0.769}    \\
-& (\num{0.137})  & (\num{0.138})  & (\num{0.622})  \\
-Strongly disagree|Tend to disagree          & \num{0.711}*** & \num{-0.232}   & \num{0.264}    \\
-& (\num{0.092})  & (\num{0.438})  & (\num{0.552})  \\
-Tend to disagree|Neither agree nor disagree & \num{2.061}*** & \num{1.148}**  & \num{1.662}**  \\
-& (\num{0.116})  & (\num{0.444})  & (\num{0.560})  \\
-Neither agree nor disagree|Tend to agree    & \num{3.760}*** & \num{2.859}*** & \num{3.384}*** \\
-& (\num{0.229})  & (\num{0.455})  & (\num{0.573})  \\
-Tend to agree|Strongly agree                & \num{4.847}*** & \num{3.949}*** & \num{4.478}*** \\
-& (\num{0.385})  & (\num{0.563})  & (\num{0.683})  \\
-AI Treatment:Low Education                  &                 &                 & \num{-0.687}*  \\
-&                 &                 & (\num{0.347})  \\
-AI Treatment:Medium Education               &                 &                 & \num{-0.103}   \\
-&                 &                 & (\num{0.334})  \\
-AI Treatment:Not Working                    &                 &                 & \num{-0.610}   \\
-&                 &                 & (\num{0.889})  \\
-AI Treatment:Other                          &                 &                 & \num{-1.271}   \\
-&                 &                 & (\num{1.231})  \\
-AI Treatment:Retired                        &                 &                 & \num{-0.410}   \\
-&                 &                 & (\num{0.618})  \\
-AI Treatment:Unemployed                     &                 &                 & \num{-0.956}   \\
-&                 &                 & (\num{1.284})  \\
-AI Treatment:Working Full Time              &                 &                 & \num{-0.598}   \\
-&                 &                 & (\num{0.620})  \\
-AI Treatment:Working PT (8–29h)             &                 &                 & \num{-1.573}*  \\
-&                 &                 & (\num{0.684})  \\
-AI Treatment:Working PT (<8h)               &                 &                 & \num{-3.201}*  \\
-&                 &                 & (\num{1.611})  \\
-Num.Obs.                                    & \num{1334}     & \num{1334}     & \num{1334}     \\
-edf                                         & 5               & 17              & 26              \\
-Model                                       & (1)             & (2)             & (3)             \\
+AI Treatment                                & \num{-0.305}   & \num{-0.306}+  & \num{-0.538}    \\
+& (\num{0.185})  & (\num{0.185})  & (\num{0.342})   \\
+Strongly disagree|Tend to disagree          & \num{0.557}*** & \num{-1.195}*  & \num{-2.347}*** \\
+& (\num{0.126})  & (\num{0.594})  & (\num{0.624})   \\
+Tend to disagree|Neither agree nor disagree & \num{1.842}*** & \num{0.147}    & \num{-0.947}    \\
+& (\num{0.163})  & (\num{0.588})  & (\num{0.620})   \\
+Neither agree nor disagree|Tend to agree    & \num{3.397}*** & \num{1.726}**  & \num{0.646}     \\
+& (\num{0.286})  & (\num{0.605})  & (\num{0.617})   \\
+Tend to agree|Strongly agree                & \num{4.615}*** & \num{2.950}*** & \num{1.867}**   \\
+& (\num{0.450})  & (\num{0.721})  & (\num{0.713})   \\
+mostlikelyGreen Party                       &                 &                 & \num{-1.176}**  \\
+&                 &                 & (\num{0.364})   \\
+mostlikelyLabour Party                      &                 &                 & \num{-1.085}**  \\
+&                 &                 & (\num{0.360})   \\
+mostlikelyLiberal Democrats                 &                 &                 & \num{-1.528}*** \\
+&                 &                 & (\num{0.410})   \\
+mostlikelyReform UK                         &                 &                 & \num{-0.551}    \\
+&                 &                 & (\num{0.338})   \\
+AI Treatment:mostlikelyGreen Party          &                 &                 & \num{0.089}     \\
+&                 &                 & (\num{0.662})   \\
+AI Treatment:mostlikelyLabour Party         &                 &                 & \num{-0.079}    \\
+&                 &                 & (\num{0.542})   \\
+AI Treatment:mostlikelyLiberal Democrats    &                 &                 & \num{1.437}**   \\
+&                 &                 & (\num{0.548})   \\
+AI Treatment:mostlikelyReform UK            &                 &                 & \num{0.026}     \\
+&                 &                 & (\num{0.533})   \\
+Num.Obs.                                    & \num{658}      & \num{658}      & \num{658}       \\
+edf                                         & 5               & 17              & 25               \\
+Model                                       & (1)             & (2)             & (3)              \\
 \bottomrule
 \end{talltblr}
 \end{table}

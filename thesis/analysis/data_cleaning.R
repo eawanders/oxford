@@ -77,32 +77,6 @@ yougov_data <- yougov_data %>%
     filter(mostlikely != "None of these" & leastlikely != "None of these")
 
 
-# Create a new treatment status variable for AI-generated content
-## Where treatment == 1, the respondent was shown AI-generated content
-## Where treatment == 0, the respondent was shown human-generated content
-## When 'split == 1 or 2', the respondent was shown AI-generated content
-yougov_data <- yougov_data %>%
-    mutate(ai_treatment = case_when(
-        split == 1 ~ 1,
-        split == 2 ~ 1,
-        split == 3 ~ 0,
-        split == 4 ~ 0,
-        TRUE ~ NA_real_
-    ))
-
-# Create a new treatment status variable for AI-labelled content
-## Where treatment == 1, respondents shown content labelled as AI-generated
-## Where treatment == 0, respondents shown content labelled as human-generated
-## When 'split == 2 or 3', the respondent was shown AI-labelled content
-yougov_data <- yougov_data %>%
-    mutate(label_treatment = case_when(
-        split == 2 ~ 1,
-        split == 3 ~ 1,
-        split == 1 ~ 0,
-        split == 4 ~ 0,
-        TRUE ~ NA_real_
-    ))
-
 # Refactor child variable
 yougov_data <- yougov_data %>%
     mutate(child = na_if(child, "Don't know")) %>%
@@ -157,7 +131,7 @@ yougov_data <- yougov_data %>%
     mutate(
         pastvote_EURef = na_if(pastvote_EURef, "Can’t remember"),
         pastvote_EURef = droplevels(pastvote_EURef),
-        pastvote_EURef = relevel(pastvote_EURef, ref = "I did not vote")
+        pastvote_EURef = relevel(pastvote_EURef, ref = "I voted to Remain")
     )
 
 # Rename profile_education_level_recode
@@ -174,3 +148,19 @@ yougov_data$mostlikely <- droplevels(
 # Create a new `thermo_gap` variable for the difference between MLthermo and LLthermo
 yougov_data <- yougov_data %>%
     mutate(thermo_gap = MLthermoMean - LLthermoMean)
+
+# Create AI treatment subset: AI-generated vs Human-generated (no labels)
+yougov_data_ai <- yougov_data %>%
+    filter(split %in% c(1, 4)) %>%
+    mutate(ai_treatment = case_when(
+        split == 1 ~ 1, # AI-generated, unlabelled
+        split == 4 ~ 0 # Human-generated, unlabelled
+    ))
+
+# Create Label treatment subset: Labelled AI vs Unlabelled AI
+yougov_data_label <- yougov_data %>%
+    filter(split %in% c(1, 2)) %>%
+    mutate(label_treatment = case_when(
+        split == 2 ~ 1, # AI-generated, labelled
+        split == 1 ~ 0 # AI-generated, unlabelled
+    ))

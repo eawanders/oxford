@@ -9,37 +9,41 @@ note{ }={Note: Ordered logistic regression with survey weights and robust standa
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{26}={1,2,3,4}{solid, black, 0.05em},
+hline{30}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-Label Treatment                                & \num{-0.024}  & \num{-0.100}  & \num{-2.529}*** \\
-& (\num{0.115}) & (\num{0.128}) & (\num{0.707})   \\
-Label Treatment:Political Attention            &                &                & \num{0.211}**   \\
-&                &                & (\num{0.069})   \\
-Label Treatment:RegionEast of England          &                &                & \num{1.072}+    \\
-&                &                & (\num{0.641})   \\
-Label Treatment:RegionLondon                   &                &                & \num{1.528}*    \\
-&                &                & (\num{0.645})   \\
-Label Treatment:RegionNorth East               &                &                & \num{-0.735}    \\
-&                &                & (\num{0.908})   \\
-Label Treatment:RegionNorth West               &                &                & \num{1.825}**   \\
-&                &                & (\num{0.633})   \\
-Label Treatment:RegionScotland                 &                &                & \num{0.365}     \\
-&                &                & (\num{0.709})   \\
-Label Treatment:RegionSouth East               &                &                & \num{0.470}     \\
-&                &                & (\num{0.603})   \\
-Label Treatment:RegionSouth West               &                &                & \num{0.668}     \\
-&                &                & (\num{0.647})   \\
-Label Treatment:RegionWales                    &                &                & \num{1.265}     \\
-&                &                & (\num{0.860})   \\
-Label Treatment:RegionWest Midlands            &                &                & \num{1.638}*    \\
-&                &                & (\num{0.637})   \\
-Label Treatment:RegionYorkshire and the Humber &                &                & \num{2.073}**   \\
-&                &                & (\num{0.648})   \\
-Num.Obs.                                       & \num{1408}    & \num{1203}    & \num{1203}      \\
-RMSE                                           & \num{2.30}    & \num{2.26}    & \num{2.26}      \\
-Model                                          & (1)            & (2)            & (3)              \\
+Label Treatment                                & \num{0.032}   & \num{-0.106}  & \num{-1.850}* \\
+& (\num{0.165}) & (\num{0.187}) & (\num{0.742}) \\
+Label Treatment:GenderMale                     &                &                & \num{1.172}** \\
+&                &                & (\num{0.408}) \\
+Label Treatment:RegionEast of England          &                &                & \num{2.312}** \\
+&                &                & (\num{0.883}) \\
+Label Treatment:RegionLondon                   &                &                & \num{1.717}+  \\
+&                &                & (\num{0.977}) \\
+Label Treatment:RegionNorth East               &                &                & \num{0.780}   \\
+&                &                & (\num{1.247}) \\
+Label Treatment:RegionNorth West               &                &                & \num{2.553}*  \\
+&                &                & (\num{1.000}) \\
+Label Treatment:RegionScotland                 &                &                & \num{0.350}   \\
+&                &                & (\num{0.890}) \\
+Label Treatment:RegionSouth East               &                &                & \num{0.858}   \\
+&                &                & (\num{0.846}) \\
+Label Treatment:RegionSouth West               &                &                & \num{2.039}*  \\
+&                &                & (\num{0.914}) \\
+Label Treatment:RegionWales                    &                &                & \num{1.139}   \\
+&                &                & (\num{1.000}) \\
+Label Treatment:RegionWest Midlands            &                &                & \num{2.250}*  \\
+&                &                & (\num{0.933}) \\
+Label Treatment:RegionYorkshire and the Humber &                &                & \num{2.086}*  \\
+&                &                & (\num{0.886}) \\
+Label Treatment:EU VoteI did not vote          &                &                & \num{-0.634}  \\
+&                &                & (\num{0.615}) \\
+Label Treatment:EU VoteI voted to Leave        &                &                & \num{-0.890}* \\
+&                &                & (\num{0.427}) \\
+Num.Obs.                                       & \num{699}     & \num{595}     & \num{595}     \\
+RMSE                                           & \num{2.33}    & \num{2.31}    & \num{2.31}    \\
+Model                                          & (1)            & (2)            & (3)            \\
 \bottomrule
 \end{talltblr}
 \end{table}

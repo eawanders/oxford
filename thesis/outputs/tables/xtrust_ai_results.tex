@@ -9,43 +9,37 @@ note{ }={Note: Ordered logistic regression with survey weights and robust standa
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{32}={1,2,3,4}{solid, black, 0.05em},
+hline{26}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-AI Treatment                             & \num{-0.086}   & \num{-0.032}   & \num{-0.216}   \\
-& (\num{0.140})  & (\num{0.156})  & (\num{0.360})  \\
-Almost never|Once in a while             & \num{0.935}*** & \num{1.068}    & \num{0.669}    \\
-& (\num{0.098})  & (\num{0.814})  & (\num{0.862})  \\
-Once in a while|About half of the time   & \num{2.860}*** & \num{2.994}*** & \num{2.622}**  \\
-& (\num{0.149})  & (\num{0.818})  & (\num{0.864})  \\
-About half of the time|Always            & \num{4.035}*** & \num{4.257}*** & \num{3.891}*** \\
-& (\num{0.278})  & (\num{0.835})  & (\num{0.877})  \\
-Always|Most of the time                  & \num{4.516}*** & \num{4.811}*** & \num{4.446}*** \\
-& (\num{0.322})  & (\num{0.845})  & (\num{0.886})  \\
-mostlikelyGreen Party                    &                 &                 & \num{-1.446}** \\
-&                 &                 & (\num{0.483})  \\
-mostlikelyLabour Party                   &                 &                 & \num{-1.004}** \\
-&                 &                 & (\num{0.371})  \\
-mostlikelyLiberal Democrats              &                 &                 & \num{-1.319}** \\
-&                 &                 & (\num{0.434})  \\
-mostlikelyReform UK                      &                 &                 & \num{-0.589}+  \\
-&                 &                 & (\num{0.329})  \\
-AI Treatment:mostlikelyGreen Party       &                 &                 & \num{0.099}    \\
-&                 &                 & (\num{0.568})  \\
-AI Treatment:mostlikelyLabour Party      &                 &                 & \num{0.171}    \\
-&                 &                 & (\num{0.430})  \\
-AI Treatment:mostlikelyLiberal Democrats &                 &                 & \num{0.626}    \\
-&                 &                 & (\num{0.524})  \\
-AI Treatment:mostlikelyReform UK         &                 &                 & \num{0.095}    \\
-&                 &                 & (\num{0.428})  \\
-AI Treatment:EducationLow                &                 &                 & \num{-0.199}   \\
-&                 &                 & (\num{0.450})  \\
-AI Treatment:EducationMedium             &                 &                 & \num{0.115}    \\
-&                 &                 & (\num{0.351})  \\
-Num.Obs.                                 & \num{1346}     & \num{1119}     & \num{1119}     \\
-edf                                      & 5               & 38              & 48              \\
-Model                                    & (1)             & (2)             & (3)             \\
+AI Treatment                           & \num{-0.188}   & \num{-0.156}   & \num{1.598}    \\
+& (\num{0.193})  & (\num{0.187})  & (\num{1.008})  \\
+Almost never|Once in a while           & \num{0.873}*** & \num{0.658}    & \num{1.934}*   \\
+& (\num{0.137})  & (\num{0.671})  & (\num{0.927})  \\
+Once in a while|About half of the time & \num{2.846}*** & \num{2.678}*** & \num{3.966}*** \\
+& (\num{0.214})  & (\num{0.652})  & (\num{0.936})  \\
+About half of the time|Always          & \num{3.990}*** & \num{3.820}*** & \num{5.107}*** \\
+& (\num{0.385})  & (\num{0.760})  & (\num{1.033})  \\
+Always|Most of the time                & \num{4.146}*** & \num{3.977}*** & \num{5.264}*** \\
+& (\num{0.425})  & (\num{0.779})  & (\num{1.018})  \\
+AI Treatment:Not Working               &                 &                 & \num{-2.406}+  \\
+&                 &                 & (\num{1.306})  \\
+AI Treatment:Other                     &                 &                 & \num{-2.388}+  \\
+&                 &                 & (\num{1.331})  \\
+AI Treatment:Retired                   &                 &                 & \num{-1.434}   \\
+&                 &                 & (\num{1.050})  \\
+AI Treatment:Unemployed                &                 &                 & \num{-3.604}+  \\
+&                 &                 & (\num{1.936})  \\
+AI Treatment:Working Full Time         &                 &                 & \num{-2.022}+  \\
+&                 &                 & (\num{1.054})  \\
+AI Treatment:Working PT (8–29h)        &                 &                 & \num{-1.420}   \\
+&                 &                 & (\num{1.204})  \\
+AI Treatment:Working PT (<8h)          &                 &                 & \num{-2.019}   \\
+&                 &                 & (\num{1.911})  \\
+Num.Obs.                               & \num{664}      & \num{664}      & \num{664}      \\
+edf                                    & 5               & 17              & 24              \\
+Model                                  & (1)             & (2)             & (3)             \\
 \bottomrule
 \end{talltblr}
 \end{table}

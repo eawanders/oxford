@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.5.8)  18 MAY 2025 23:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.5.8)  20 MAY 2025 21:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -631,31 +631,31 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
 \BKM@id=\count361
 ))
-Package hyperref Info: Option `colorlinks' set `true' on input line 158.
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 164.
+Package hyperref Info: Option `colorlinks' set `true' on input line 167.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 173.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (./research_design.aux)
 \openout1 = `research_design.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 164.
-LaTeX Font Info:    ... okay on input line 164.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 173.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -705,34 +705,34 @@ Package caption Info: End \AtBeginDocument code.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 164.
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 166.
+Package hyperref Info: Link coloring ON on input line 173.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 175.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 166.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 175.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 166.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 175.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 166.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 175.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 166.
+(Font)              <12> on input line 175.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 166.
+(Font)              <8> on input line 175.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 166.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 166.
+(Font)              <6> on input line 175.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 175.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 166.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 175.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -767,7 +767,7 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 
 
 [4]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 207.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 216.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -776,11 +776,11 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.259   W
+l.268   W
          ith more than one hypothesis you will need to specify a procedure f... [1
 
 {/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 272.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 281.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -790,14 +790,14 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 [3]
 
 [4{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
-<../outputs/figures/thermo_gap_plot.pdf, id=179, 361.35pt x 216.81pt>
-File: ../outputs/figures/thermo_gap_plot.pdf Graphic file (type pdf)
-<use ../outputs/figures/thermo_gap_plot.pdf>
-Package pdftex.def Info: ../outputs/figures/thermo_gap_plot.pdf  used on input line 382.
+<../outputs/figures/thermo_gap_plot_combined.pdf, id=179, 361.35pt x 216.81pt>
+File: ../outputs/figures/thermo_gap_plot_combined.pdf Graphic file (type pdf)
+<use ../outputs/figures/thermo_gap_plot_combined.pdf>
+Package pdftex.def Info: ../outputs/figures/thermo_gap_plot_combined.pdf  used on input line 391.
 (pdftex.def)             Requested size: 375.80544pt x 225.48369pt.
 
 
-[5 <../outputs/figures/thermo_gap_plot.pdf>] (../outputs/tables/thermo_gap_ai_results.tex
+[5] (../outputs/tables/thermo_gap_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -806,26 +806,24 @@ Package pdftex.def Info: ../outputs/figures/thermo_gap_plot.pdf  used on input l
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 47.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 37.
 (/Users/edwardanders/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ))
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 393.
-<../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=197, 542.025pt x 469.755pt>
+<../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=189, 542.025pt x 469.755pt>
 File: ../outputs/figures/thermo_patchwork_ai_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/thermo_patchwork_ai_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/thermo_patchwork_ai_treatment.pdf  used on input line 399.
+Package pdftex.def Info: ../outputs/figures/thermo_patchwork_ai_treatment.pdf  used on input line 404.
 (pdftex.def)             Requested size: 399.29463pt x 346.065pt.
 
 
-[6]
+[6 <../outputs/figures/thermo_gap_plot_combined.pdf>]
 
 [7]
-<../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=214, 722.7pt x 289.08pt>
+<../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=210, 722.7pt x 289.08pt>
 File: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/ordinal_patchwork_ai_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf  used on input line 410.
+Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf  used on input line 415.
 (pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
 
 
@@ -837,46 +835,38 @@ Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_ai_treatment.pdf  
 > Step: parse table inner spec.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
-
-Package tabularray Warning: Table width is too small, need 3.02324pt more!
-
 > Step: build the whole table.
 
-Overfull \hbox (3.02324pt too wide) in paragraph at lines 43--44
- [][] 
- []
 
-)
-<../outputs/figures/thermo_patchwork_label_treatment.pdf, id=226, 542.025pt x 469.755pt>
+[9 <../outputs/figures/ordinal_patchwork_ai_treatment.pdf>])
+<../outputs/figures/thermo_patchwork_label_treatment.pdf, id=232, 542.025pt x 469.755pt>
 File: ../outputs/figures/thermo_patchwork_label_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/thermo_patchwork_label_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/thermo_patchwork_label_treatment.pdf  used on input line 423.
+Package pdftex.def Info: ../outputs/figures/thermo_patchwork_label_treatment.pdf  used on input line 434.
 (pdftex.def)             Requested size: 399.29463pt x 346.065pt.
 
 
-[9 <../outputs/figures/ordinal_patchwork_ai_treatment.pdf>]
-
 [10]
-<../outputs/figures/ordinal_patchwork_label_treatment.pdf, id=243, 722.7pt x 289.08pt>
+<../outputs/figures/ordinal_patchwork_label_treatment.pdf, id=240, 722.7pt x 289.08pt>
 File: ../outputs/figures/ordinal_patchwork_label_treatment.pdf Graphic file (type pdf)
 <use ../outputs/figures/ordinal_patchwork_label_treatment.pdf>
-Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_label_treatment.pdf  used on input line 432.
+Package pdftex.def Info: ../outputs/figures/ordinal_patchwork_label_treatment.pdf  used on input line 443.
 (pdftex.def)             Requested size: 422.77664pt x 169.1089pt.
 
 
-[11 <../outputs/figures/thermo_patchwork_label_treatment.pdf>]
+[11 <../outputs/figures/thermo_patchwork_label_treatment.pdf> <../outputs/figures/ordinal_patchwork_label_treatment.pdf>]
 
-[12 <../outputs/figures/ordinal_patchwork_label_treatment.pdf>]
+[12]
 
-LaTeX Warning: Hyper reference `tab:codebook-table' on page 13 undefined on input line 463.
+LaTeX Warning: Hyper reference `tab:codebook-table' on page 13 undefined on input line 474.
 
 
-LaTeX Warning: Reference `tab:codebook-table' on page 13 undefined on input line 463.
+LaTeX Warning: Reference `tab:codebook-table' on page 13 undefined on input line 474.
 
 (../outputs/tables/codebook_table.tex [13] [14])
 
 [15]
-Underfull \hbox (badness 1769) in paragraph at lines 477--478
+Underfull \hbox (badness 1769) in paragraph at lines 488--489
 \T1/lmtt/m/n/10 MLthermo_NF\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_ED\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_CD\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 MLthermo_AR\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_KB\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_KS\T1/lmr/m/n/10 , \T1/lmtt/m/n/10 LLthermo_NF\T1/lmr/m/n/10 ,
  []
 
@@ -884,7 +874,7 @@ Underfull \hbox (badness 1769) in paragraph at lines 477--478
 
 [16] (../outputs/tables/balance_ai_treatment.tex) (../outputs/tables/balance_label_treatment.tex)
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 496.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 507.
 (../outputs/tables/thermo_ml_ai_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -911,15 +901,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: parse table inner spec.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
-
-Package tabularray Warning: Table width is too small, need 3.02324pt more!
-
 > Step: build the whole table.
-
-Overfull \hbox (3.02324pt too wide) in paragraph at lines 47--48
- [][] 
- []
-
 ) (../outputs/tables/thermo_ll_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -955,18 +937,7 @@ Overfull \hbox (3.02324pt too wide) in paragraph at lines 47--48
 > Step: parse table inner spec.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
-
-Package tabularray Warning: Table width is too small, need 11.32811pt more!
-
 > Step: build the whole table.
-
-Overfull \hbox (11.32811pt too wide) in paragraph at lines 54--55
- [][] 
- []
-
-
-LaTeX Warning: Float too large for page by 26.44716pt on input line 55.
-
 ) (../outputs/tables/agreedisagree_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -980,7 +951,7 @@ Package tabularray Warning: Table width is too small, need 24.52266pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (24.52266pt too wide) in paragraph at lines 52--53
+Overfull \hbox (24.52266pt too wide) in paragraph at lines 50--51
  [][] 
  []
 
@@ -997,7 +968,7 @@ Package tabularray Warning: Table width is too small, need 3.02324pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (3.02324pt too wide) in paragraph at lines 50--51
+Overfull \hbox (3.02324pt too wide) in paragraph at lines 38--39
  [][] 
  []
 
@@ -1014,7 +985,7 @@ Package tabularray Warning: Table width is too small, need 24.52266pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (24.52266pt too wide) in paragraph at lines 44--45
+Overfull \hbox (24.52266pt too wide) in paragraph at lines 48--49
  [][] 
  []
 
@@ -1044,9 +1015,7 @@ Overfull \hbox (24.52266pt too wide) in paragraph at lines 44--45
 
 [28]
 
-[29]
-
-[30] (./research_design.aux)
+[29] (./research_design.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -1056,18 +1025,18 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 21372 strings out of 475172
- 423344 string characters out of 5764614
- 1210941 words of memory out of 5000000
- 43871 multiletter control sequences out of 15000+600000
- 675365 words of font info for 129 fonts, out of 8000000 for 9000
+ 21401 strings out of 475172
+ 424480 string characters out of 5764614
+ 1132832 words of memory out of 5000000
+ 43900 multiletter control sequences out of 15000+600000
+ 669481 words of font info for 128 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,11n,110p,2655b,1334s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 89i,11n,110p,2655b,1331s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></Users/edwardanders/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt9.pfb>
-Output written on research_design.pdf (35 pages, 485445 bytes).
+Output written on research_design.pdf (34 pages, 479851 bytes).
 PDF statistics:
- 550 PDF objects out of 1000 (max. 8388607)
- 460 compressed objects within 5 object streams
+ 544 PDF objects out of 1000 (max. 8388607)
+ 455 compressed objects within 5 object streams
  141 named destinations out of 1000 (max. 500000)
  106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -13,16 +13,16 @@ hline{8}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-(Intercept)                & \num{9.935}*** & \num{8.055}+  & \num{9.499}*  \\
-& (\num{0.725})  & (\num{4.488}) & (\num{4.836}) \\
-Label Treatment            & \num{-0.247}   & \num{-0.688}  & \num{-2.789}+ \\
-& (\num{1.091})  & (\num{1.064}) & (\num{1.530}) \\
-Label Treatment:GenderMale &                 &                & \num{3.909}+  \\
-&                 &                & (\num{2.335}) \\
-Num.Obs.                   & \num{1295}     & \num{1121}    & \num{1121}    \\
-R2                         & \num{0.000}    & \num{0.071}   & \num{0.074}   \\
-RMSE                       & \num{15.89}    & \num{14.86}   & \num{14.85}   \\
-Model                      & (1)             & (2)            & (3)            \\
+(Intercept)          & \num{9.357}*** & \num{5.785}   & \num{7.826}   \\
+& (\num{1.017})  & (\num{7.242}) & (\num{7.730}) \\
+Label Treatment      & \num{1.264}    & \num{0.420}   & \num{-2.334}  \\
+& (\num{1.677})  & (\num{1.730}) & (\num{2.337}) \\
+Label Treatment:Male &                 &                & \num{5.420}   \\
+&                 &                & (\num{3.806}) \\
+Num.Obs.             & \num{643}      & \num{547}     & \num{547}     \\
+R2                   & \num{0.001}    & \num{0.111}   & \num{0.116}   \\
+RMSE                 & \num{16.01}    & \num{15.41}   & \num{15.39}   \\
+Model                & (1)             & (2)            & (3)            \\
 \bottomrule
 \end{talltblr}
 \end{table}

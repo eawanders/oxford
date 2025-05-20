@@ -32,7 +32,7 @@ linkcolor: blue
 
 ```{r setup, include=FALSE}
 source("../analysis/packages.R")
-source("../writing/load_outputs.R")
+source("../writing/build_outputs.R")
 ```
 
 \newpage
@@ -157,7 +157,7 @@ In this full specitifcation, $\beta_1$ estimates the average treatment effect wh
 
 ## AI-Generated Content Treatment {#sec-ai-treatment}
 
-The results show no statistically significant treatment effect of AI-generated content on in- and out-party, nor net-difference thermometer scores. However, it is found that Liberal Democrat voters are significantly susceptible to being polarised from expsure to AI-generated content. Trait-based ratings of opposing parties/voters' respect and trust show...
+The results show no statistically significant treatment effect of AI-generated content on in- and out-party, nor net-difference thermometer scores. However, it is found that Liberal Democrat voters are significantly susceptible to being polarised from expsure to AI-generated content. Trait-based and emotional ratings and views towards opposing parties and voters are also not signficantly affected by the deliberately divsive treatment of the AI-generated content. Nevertheless, the treatment is significantly more likely to polarise lower-educated respondents, and part-time workers on views of respect and emotional discomfort towards opposing partisans. Together, these results suggest that AI-generated content does not significantly polarise respondents' affective polarisation measures, but there are some sub-group differences in the treatment effect.
 
 ### Thermometer Analysis {#sec-thermo-analysis}
 
@@ -165,7 +165,7 @@ Thermometer analysis is one of the primary affective polarisation measures. Befo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{../outputs/figures/thermo_gap_plot.pdf}
+    \includegraphics[width=0.8\textwidth]{../outputs/figures/thermo_gap_plot_combined.pdf}
     \caption{Average in- and out-party thermometer net-difference scores}
     \label{fig:thermo-graph}
 \end{figure}
@@ -178,9 +178,13 @@ ATE models are presented in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo
 
 \input{../outputs/tables/thermo_gap_ai_results.tex}
 
+<!--
 The primary takeaway from model (3) in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}} is that there is no significant treatment effect seen for the exposure to AI-generated content on the reported net-difference thermometer scores. The treatment group shows a slight decrease of **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " points")``** in the thermometer gap, but this is not statistically significant. However, reposndents who were most likely to vote for the Liberal Democrats showed a significant increase of **``r paste0(round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``** at the 95% confidence level in their net-difference thermometer gap, compared to those who were most likely to vote for the Conservative Party. This implies that Liberal Democrat voters are more susceptible to being polarised against their opposing partisans when exposed to AI-generated content. The effect size is notable too. The total treatment effect of AI exposure for Liberal Democrat voters on their affective polarisation is **``r paste0(round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"], 3), " + ", round(coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " = ", round(coef(summary(full_thermo_gap_model))["ai_treatment", "Estimate"] + coef(summary(full_thermo_gap_model))["mostlikelyLiberal Democrats", "Estimate"], 3), " points")``**. This is a significant effect size, and suggests that AI-generated content can have a polarising effect. Other than Liberal Democrat voters, the full model suggests that the treatment of exposure to AI-generated content does not have a significant differential effect on the thermometer gap for different sub-groups of respondents.
 
-To test what drives this affective polarisation, the models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated. These models are presented in the Appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}. Thermometer scores for both in- and out-party leaders show positive increases of **``r paste0(round(coef(summary(full_thermo_ml_model))["ai_treatment", "Estimate"], 3), " points")``** and **``r paste0(round(coef(summary(full_thermo_ll_model))["ai_treatment", "Estimate"], 3), " points")``** respectively to the treatment but the scores are not statistically significant. These models do not show any sub-group differences from moderator variables.
+To test what drives this possible affective polarisation, the models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated. These models are presented in the Appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}. Thermometer scores for both in- and out-party leaders show positive increases of **``r paste0(round(coef(summary(full_thermo_ml_model))["ai_treatment", "Estimate"], 3), " points")``** and **``r paste0(round(coef(summary(full_thermo_ll_model))["ai_treatment", "Estimate"], 3), " points")``** respectively to the treatment but the scores are not statistically significant. Yet, when looking at significant subgroup interaction terms, the increased rating gap between the in- and out-party leaders appears driven by an increased warmth towards the in-party leader, rather than a decrease in warmth towards the out-party leader, shown in \hyperref[fig:thermo-patchwork-ai]{Figure \ref*{fig:thermo-patchwork-ai}}.[^low-education-significance] While the interaction effects for the `MLthermoMean` and `LLthermoMean` party leaders are not statistically significant, the results suggest the direction of possible of effects remains interesting. The divide between in- and out-group ratings appears driven by an increased warmth towards the in-party, rather than the decreased rating of the opposition which was expected and reported by @iyengar2012 in the US.
+One possible explanation could be that...
+
+-->
 
 \begin{figure}[H]
     \centering
@@ -189,10 +193,19 @@ To test what drives this affective polarisation, the models for the outcome vari
     \label{fig:thermo-patchwork-ai}
 \end{figure}
 
+[^low-education-significance]: The interaction terms used for plotting are significant for `thermo_gap` only. For the `education_recode` variable however, this is not statistically significant but is a useful comparison for analysis of other models.
 
 ### Ordinal Affective Polarisation Analysis {#sec-ordinal-analysis}
 
-To further disect the affective polarisation caused by treatment to AI-generated content, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are next estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of respect, trust, and social-distance to opposing partisans are presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} respectively.
+To get a better picture of the treatment effects of AI-generated content on the affective polarisation, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are also estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of *respect*, *trust*, and emotional, social-distance measures of *discomfort* towards opposing partisans are presented in full in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} respectively in the Appendix. None of the full models --- estimated with relevant covariates and moderators --- show any significant overall treatment effect of AI-generated content on the ordinal measures of affective polarisation, again giving credence to the viscocity of political attitudes and even a particularly divisive AI-generated article not being able to further polarise respondents' views.
+
+<!--
+These results are visualised in \hyperref[fig:ordinal-patchwork-ai]{Figure \ref*{fig:ordinal-patchwork-ai}} which shows the predicted probabilities of the ordinal measures of affective polarisation by sub-group.[^preds-model-measurement] The predicted probabilities are calculated as the sum of the probability of a respondent being at the polarised end of the ordinal outcome levels, meaning a higher probability indicates greater affective polarisation.[^summed-preds] The included levels show the statistically significant sub-groups for *respect* and *discomfort* measures, indicating those who are most susceptible to being polarised by the treatment.[^ai-subgroups] In particular, low-educated, part-time-working respondents are significantly more likely to express more polarised attitudes towards their out-party. The greatest effect size is seen when respondents consider their discomfort with having a child marry an out-party voter, with the predicted probability of discomfort for those low-educated in the treatment group being **`r paste0(round(low_edu_treatment, 3) * 100, " %")`** compared to **`r paste0(round(low_edu_control, 3) * 100, " %")`** for the control group. This is/is not to be expected due to...
+-->
+
+[^preds-model-measurement]: Predicted probabilities are calculated using the `polr()` function in R instead of `svyolr()` as `ggpredict()` does not work with the `svyolr()` function. Therefore, probabilities in the visualisation are not representative of the survey-weighted population. Confidence intervals are also not included due to the complications of colapsing the ordinal levels.
+[^summed-preds]: `Strongly disagree` and `Tend to Disagree` for the `agreedisagree` outcome variable; `Almost never` and `Once in a while` for `xtrust`; and `Extremely upset` and `Somewhat upset` for `child`.
+[^ai-subgroups]: No sub-groups for *trust* were statistically significant, but the predicted probabilities are still shown for reference for sub-groups which provide useful comparison.
 
 \begin{figure}[H]
     \centering
@@ -201,7 +214,14 @@ To further disect the affective polarisation caused by treatment to AI-generated
     \label{fig:ordinal-patchwork-ai}
 \end{figure}
 
+These results show that a single exposure to an AI-generated article does not significantly polarise UK respondents towards their political opponents. The treatment does not significantly polarise thermometer ratings, nor the trait- and emotional-based measures of *respect*, *trust*, and *discomfort* towards out-groips. While this appears to be an encouraging null result to help dampen fears towards AI-generated content, there are some subgroups who show significant susceptibility to polarisation. Noteably, Liberal Democrats show increase warmth towards their in-party leader; whereas, low-educated, part-time-working respondents show increased discomfort towards out-party voters. Explanations and theoretical implications of these results are to be investigated.
+
 ## AI-Labelled Content Treatment {#sec-label-treatment}
+
+Building on @altay2024, the AI-label treatment is designed to test whether the labelling of content as AI-generated can mitigate the polarising effects of AI-generated content, or whether the association with AI-generated content is enough to polarise respondents. The treatment group is shown the same article as the AI-generated content group, but labelled as AI-generated. The control group is shown the same article but labelled as human-generated. The treatment and control groups are compared to see if there is a significant difference in the thermometer scores, trait-based measures of affective polarisation, and emotional discomfort measures.
+
+The results show that there is no significant treatment effect of AI-labelled content on thermometer scores, nor trait-based measures of affective polarisation. However, there is a significant treatment effect on the emotional discomfort measure of having a child marry an out-party voter. This suggests that labelling content as AI-generated can help mitigate the polarising effects of AI-generated content.
+
 ### Thermometer Analysis {#sec-label-thermo-analysis}
 
 \input{../outputs/tables/thermo_gap_label_results.tex}

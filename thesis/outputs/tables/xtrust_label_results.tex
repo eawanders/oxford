@@ -9,42 +9,30 @@ note{ }={Note: Ordered logistic regression with survey weights and robust standa
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{32}={1,2,3,4}{solid, black, 0.05em},
+hline{20}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-Label Treatment                             & \num{-0.022}   & \num{-0.114}   & \num{-0.198}   \\
-& (\num{0.139})  & (\num{0.154})  & (\num{0.355})  \\
-Almost never|Once in a while                & \num{0.967}*** & \num{1.026}    & \num{0.637}    \\
-& (\num{0.098})  & (\num{0.830})  & (\num{0.820})  \\
-Once in a while|About half of the time      & \num{2.892}*** & \num{2.954}*** & \num{2.593}**  \\
-& (\num{0.145})  & (\num{0.832})  & (\num{0.823})  \\
-About half of the time|Always               & \num{4.067}*** & \num{4.217}*** & \num{3.861}*** \\
-& (\num{0.272})  & (\num{0.845})  & (\num{0.841})  \\
-Always|Most of the time                     & \num{4.547}*** & \num{4.770}*** & \num{4.415}*** \\
-& (\num{0.325})  & (\num{0.860})  & (\num{0.849})  \\
-mostlikelyGreen Party                       &                 &                 & \num{-1.155}** \\
-&                 &                 & (\num{0.439})  \\
-mostlikelyLabour Party                      &                 &                 & \num{-0.970}** \\
-&                 &                 & (\num{0.342})  \\
-mostlikelyLiberal Democrats                 &                 &                 & \num{-0.956}*  \\
-&                 &                 & (\num{0.429})  \\
-mostlikelyReform UK                         &                 &                 & \num{-0.760}*  \\
-&                 &                 & (\num{0.344})  \\
-Label Treatment:mostlikelyGreen Party       &                 &                 & \num{-0.429}   \\
-&                 &                 & (\num{0.576})  \\
-Label Treatment:mostlikelyLabour Party      &                 &                 & \num{0.164}    \\
-&                 &                 & (\num{0.433})  \\
-Label Treatment:mostlikelyLiberal Democrats &                 &                 & \num{-0.085}   \\
-&                 &                 & (\num{0.537})  \\
-Label Treatment:mostlikelyReform UK         &                 &                 & \num{0.392}    \\
-&                 &                 & (\num{0.421})  \\
-Label Treatment:EducationLow                &                 &                 & \num{0.374}    \\
-&                 &                 & (\num{0.444})  \\
-Label Treatment:EducationMedium             &                 &                 & \num{-0.198}   \\
-&                 &                 & (\num{0.348})  \\
-Num.Obs.                                    & \num{1346}     & \num{1119}     & \num{1119}     \\
-edf                                         & 5               & 38              & 48              \\
+Label Treatment                             & \num{0.082}    & \num{0.082}    & \num{0.221}    \\
+& (\num{0.198})  & (\num{0.198})  & (\num{0.366})  \\
+Almost never|Once in a while                & \num{1.066}*** & \num{1.066}*** & \num{0.506}+   \\
+& (\num{0.139})  & (\num{0.139})  & (\num{0.270})  \\
+Once in a while|About half of the time      & \num{2.951}*** & \num{2.951}*** & \num{2.435}*** \\
+& (\num{0.191})  & (\num{0.191})  & (\num{0.311})  \\
+About half of the time|Always               & \num{4.212}*** & \num{4.212}*** & \num{3.702}*** \\
+& (\num{0.350})  & (\num{0.350})  & (\num{0.426})  \\
+Always|Most of the time                     & \num{4.739}*** & \num{4.739}*** & \num{4.229}*** \\
+& (\num{0.380})  & (\num{0.380})  & (\num{0.457})  \\
+Label Treatment:mostlikelyGreen Party       &                 &                 & \num{-0.215}   \\
+&                 &                 & (\num{0.798})  \\
+Label Treatment:mostlikelyLabour Party      &                 &                 & \num{0.025}    \\
+&                 &                 & (\num{0.556})  \\
+Label Treatment:mostlikelyLiberal Democrats &                 &                 & \num{-1.097}+  \\
+&                 &                 & (\num{0.634})  \\
+Label Treatment:mostlikelyReform UK         &                 &                 & \num{0.020}    \\
+&                 &                 & (\num{0.555})  \\
+Num.Obs.                                    & \num{678}      & \num{678}      & \num{678}      \\
+edf                                         & 5               & 5               & 13              \\
 Model                                       & (1)             & (2)             & (3)             \\
 \bottomrule
 \end{talltblr}
