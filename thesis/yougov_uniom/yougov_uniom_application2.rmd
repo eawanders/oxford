@@ -1,0 +1,75 @@
+---
+title: 'University of Oxford: MPhil in Politics'
+author: "YouGov Survey Design"
+date: "Edward Anders"
+output: pdf_document
+header-includes:
+  - \setlength{\footnotesep}{1em} % Adjusts the spacing between footnotes
+  - \setlength{\skip\footins}{2em} % Adds space between the main text and footnotes
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+citation_package: biblatex
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+link-citations: true
+---
+
+## Research Project and Aims
+
+Machine learning advancements to efficiently handle sequential data inputs and outputs have popularised the field of Artificial Intelligence (AI). Amongst AI’s applications, generating hyper-realistic textual and visual content has become easily accessible, helping AI become an enabling informational tool. Yet, as unregulated AI technologies remain prone to hallucinations and misuse from bad actors, they are raising concern in social and political contexts. This research project is interested in AI’s capacity to ‘amplify social injustice, erode social stability, […] customised mass manipulation, and pervasive surveillance’ [@bengio2024]. These social and political risks of AI are often discussed anecdotally, but there remains little research nor evidence on what these risks look like. The UK Government's @departmentforsciencetechnology&innovation2025 views ‘manipulation and deception of populations’ a significant threat to political systems and societies; but, the extent to which politically targeted generative AI can be used to distort, deceive, and direct an electorate  remains unclear. Therefore, this project aims to answer:
+
+\begin{quote}
+\textit{Does exposure to AI-generated political content increase affective polarisation?}
+\end{quote}
+
+After running an initial pilot survey experiment with YouGov, it was found that AI-generated and AI-labelled content did not have statistically significant effect on either thermometer ratings nor trait- and emotional-based attitudes towards the respondents' out-group. However, certain subgroups showed clearly increased affective polarisation measures. To better understand the mechanisms behind these results, and in particular test the emotional and cognitive pathways suggested by the literature, I hope to run a second experiment testing respondents' assignments of particular emotional feelings towards the content in the AI-generated and AI-labelled conditions.
+
+
+```{r Experiment Design, echo=FALSE, results='asis'}
+library(knitr)
+library(kableExtra)
+
+# Table data with normal content
+table_data <- data.frame(
+    ` ` = c("Control", "Treatment"),
+    `No Labels` = c("Human-generated Article", "AI-generated Article"),
+    `Labelled as AI` = c("Human-generated Article", "AI-generated Article"),
+    check.names = FALSE
+)
+
+# Create the table without using footnote()
+kable(table_data, align = "l", escape = FALSE, caption = "Treatments and Control for AI-generated News Exposure.") %>%
+    kable_styling(full_width = FALSE, position = "center") %>%
+    add_header_above(c(" " = 1, "News Article Labelling" = 2), escape = FALSE) %>% # Bold top header
+    row_spec(0, bold = TRUE) %>% # Bold the "True" and "False" headers
+    column_spec(1, width = "4cm") %>% # Widen the first column
+    column_spec(2, width = "4cm") %>% # Widen "True" column
+    column_spec(3, width = "4cm") # Widen "False" column
+```
+
+## Draft Survey Questions
+
+These questions will be used to measure whether AI-generated and AI-labelled content triggers statistically significantly different emotional reations that those from the control group.
+
+## Post-Exposure Survey Questions
+
+| **No.**   | **Question**                                                                   | **Options**                                                                                           |
+|-----------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **1**     | **Strength of Political Identity**                                              |                                                                                                       |
+| 1.1       | When people criticise *[your preferred party]*, it feels like a personal insult.| 5-point Likert: Strongly disagree – Strongly agree                                                     |
+| 1.2       | When I speak about *[your preferred party]*, I usually say “we” instead of “they.” | 5-point Likert: Strongly disagree – Strongly agree                                                 |
+| 1.3       | If *[your preferred party]* performs poorly in an election or poll, my day is ruined. | 5-point Likert: Strongly disagree – Strongly agree                                                 |
+|           |                                                                                 |                                                                                                       |
+| **2**     | **Emotional Responses to Political Content**                                    |                                                                                                       |
+| 2.1       | How angry did you feel while viewing this content?                              | Numeric scale: 0 (Not at all angry) – 10 (Extremely angry)                                            |
+| 2.2       | How anxious or worried did you feel about the issue presented?                  | Numeric scale: 0 (Not at all anxious) – 10 (Extremely anxious)                                        |
+| 2.3       | How disgusted did you feel while viewing this content?                          | Numeric scale: 0 (Not at all disgusted) – 10 (Extremely disgusted)                                    |
+| 2.4       | To what extent do you trust the information presented in the video/article?     | 5-point Likert: Do not trust at all – Completely trust                                                |
+|           |                                                                                 |                                                                                                       |
+| **3**     | **Partisan Schadenfreude**                                                      |                                                                                                       |
+| 3.1       | I am happy when negative things happen to *[the opposing party or its supporters]*. | 5-point Likert: Strongly disagree – Strongly agree                                                 |
+| 3.2       | I would be pleased by the misfortune that happened to a politician from *[opposing party]*. | 5-point Likert: Strongly disagree – Strongly agree                                            |                                      |
+
+\newpage
+
+# References
