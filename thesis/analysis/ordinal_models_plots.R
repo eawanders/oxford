@@ -1,11 +1,13 @@
 # This script generates plots for the ordinal regression models
 # using the ggpredict function from the ggeffects package instead of svolyr
 
+library(here)
+
 # Load required scripts to run the analysis in this file
-source("../analysis/data.R")
-source("../analysis/data_cleaning.R")
-source("../analysis/survey_design.R")
-source("../analysis/ordinal_models.R")
+source(here("thesis", "analysis", "data.R"))
+source(here("thesis", "analysis", "data_cleaning.R"))
+source(here("thesis", "analysis", "survey_design.R"))
+source(here("thesis", "analysis", "ordinal_models.R"))
 
 # 1. Fit an ordinal regression model (polr) with interactions and covariates
 fit_polr_model <- function(data, outcome, treatment, moderators = NULL, covariates = NULL) {

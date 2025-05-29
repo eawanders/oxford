@@ -149,7 +149,8 @@ yougov_data$mostlikely <- droplevels(
 yougov_data <- yougov_data %>%
     mutate(thermo_gap = MLthermoMean - LLthermoMean)
 
-# Create AI treatment subset: AI-generated vs Human-generated (no labels)
+# Create AI treatment subset: AI-generated vs Human-generated (no labels) --- this is the total effect of AI content when not labelled
+# to account for the detection and discounting of AI content
 yougov_data_ai <- yougov_data %>%
     filter(split %in% c(1, 4)) %>%
     mutate(ai_treatment = case_when(
@@ -157,10 +158,20 @@ yougov_data_ai <- yougov_data %>%
         split == 4 ~ 0 # Human-generated, unlabelled
     ))
 
-# Create Label treatment subset: Labelled AI vs Unlabelled AI
+# Create Label treatment subset: Labelled AI vs Unlabelled AI --- this is the detection effect of AI content when labelled
+# which is the role of source detection in moderating discounting
 yougov_data_label <- yougov_data %>%
     filter(split %in% c(1, 2)) %>%
     mutate(label_treatment = case_when(
         split == 2 ~ 1, # AI-generated, labelled
         split == 1 ~ 0 # AI-generated, unlabelled
     ))
+
+# Create a labelled AI treatment subset: Labelled AI vs Human-generated (no labels) --- this is the detection effect of AI content when labelled
+# this is the Source Credibility Effect to test the trust penalty for labelled AI content
+# yougov_data_labelled_ai <- yougov_data %>%
+#   filter(split %in% c(2, 4)) %>%
+#   mutate(labelled_ai_treatment = case_when(
+#       split == 2 ~ 1, # AI-generated, labelled
+#       split == 4 ~ 0 # Human-generated, unlabelled
+#   ))

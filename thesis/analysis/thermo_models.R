@@ -1,9 +1,11 @@
 # Thermometer Model Analysis to allow for flexible modeling of different thermometer outcome models
 
+library(here)
+
 # Source the necessary files to run this script
-source("../analysis/data.R")
-source("../analysis/data_cleaning.R")
-source("../analysis/survey_design.R")
+source(here("thesis", "analysis", "data.R"))
+source(here("thesis", "analysis", "data_cleaning.R"))
+source(here("thesis", "analysis", "survey_design.R"))
 
 thermo_models <- function(data,
                           design,
@@ -265,7 +267,7 @@ thermo_ll_treat <- thermo_models_list_ai[["thermo_ll_ai_treatment_treat"]]
 thermo_ll_treat_cov <- thermo_models_list_ai[["thermo_ll_ai_treatment_cov"]]
 full_thermo_ll_model <- thermo_models_list_ai[["full_thermo_ll_ai_treatment_model"]]
 
-models_dir <- "../outputs/models"
+models_dir <- here("thesis", "outputs", "models")
 
 # Save each model as an .rds for both AI and Label lists
 for (model_name in names(thermo_models_list_ai)) {

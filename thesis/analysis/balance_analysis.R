@@ -1,5 +1,7 @@
 # This file contains the code to create balance tables for covariates by treatment groups.
 
+library(here)
+
 # Function to create and save a formatted balance table as .tex
 save_balance_table <- function(data, treatment_var, covariates, caption, file, treatment_levels = c("Control", "Treatment")) {
     actual_levels <- levels(factor(data[[treatment_var]]))
@@ -127,7 +129,7 @@ cat(save_balance_table(
     treatment_var = "ai_treatment",
     covariates = balance_covariates,
     caption = "Balance Table of Covariates by AI Treatment Group \\label{tab:ai-balance}",
-    file = "../outputs/tables/balance_ai_treatment.tex"
+    file = here("thesis", "outputs", "tables", "balance_ai_treatment.tex")
 ))
 
 cat(save_balance_table(
@@ -135,5 +137,5 @@ cat(save_balance_table(
     treatment_var = "label_treatment",
     covariates = balance_covariates,
     caption = "Balance Table of Covariates by Label Treatment Group \\label{tab:label-balance}",
-    file = "../outputs/tables/balance_label_treatment.tex"
+    file = here("thesis", "outputs", "tables", "balance_label_treatment.tex")
 ))

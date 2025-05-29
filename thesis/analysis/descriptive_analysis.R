@@ -1,5 +1,7 @@
 # This script contains functions to perform descriptive analysis on the data.
 
+library(here)
+
 # Plotting
 create_thermo_gap_plot <- function(data, treatment_var = c("ai_treatment", "label_treatment")) {
     treatment_var <- match.arg(treatment_var)
@@ -53,7 +55,7 @@ create_thermo_gap_plot <- function(data, treatment_var = c("ai_treatment", "labe
 }
 
 # Save the plot output
-save_thermo_gap_plot <- function(data, treatment_var, file = "../outputs/figures/thermo_gap_plot.pdf", width = 5, height = 3) {
+save_thermo_gap_plot <- function(data, treatment_var, file = here("thesis", "outputs", "figures", "thermo_gap_plot.pdf"), width = 5, height = 3) {
     plot <- create_thermo_gap_plot(data, treatment_var = treatment_var)
     ggplot2::ggsave(
         filename = file,
@@ -107,4 +109,8 @@ create_combined_thermo_gap_plot <- function(data) {
 
 # Save the combined plot
 combined_plot <- create_combined_thermo_gap_plot(combined_thermo_data)
-ggplot2::ggsave("../outputs/figures/thermo_gap_plot_combined.pdf", combined_plot, width = 5, height = 3)
+ggplot2::ggsave(
+    filename = here("thesis", "outputs", "figures", "thermo_gap_plot_combined.pdf"),
+    plot = combined_plot,
+    width = 5, height = 3
+)

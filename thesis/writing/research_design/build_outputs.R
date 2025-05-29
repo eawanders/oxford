@@ -1,48 +1,51 @@
+# Use here for project-rooted file paths
+library(here)
 # This script builds the tables and figures for the thesis.
 # It loads the necessary data and models, generates the tables and figures, and saves them to the specified output directory.
 # The objective is to allow for instant knitting of the thesis without having to run the entire analysis again.
 
+# setwd() is no longer required due to here()
 
 # Load dependencies
-source("../../analysis/data.R")
-source("../../analysis/data_cleaning.R")
-source("../../analysis/descriptive_analysis.R")
-source("../../analysis/survey_design.R")
-source("../../analysis/thermo_models.R")
-source("../../analysis/ordinal_models.R")
-source("../../outputs/helpers/model_output_helpers.R")
+source(here("thesis", "analysis", "data.R"))
+source(here("thesis", "analysis", "data_cleaning.R"))
+source(here("thesis", "analysis", "descriptive_analysis.R"))
+source(here("thesis", "analysis", "survey_design.R"))
+source(here("thesis", "analysis", "thermo_models.R"))
+source(here("thesis", "analysis", "ordinal_models.R"))
+source(here("thesis", "outputs", "helpers", "model_output_helpers.R"))
 
 # === Load AI Treatment Thermometer Models ===
-thermo_gap_treat <- readRDS("../../outputs/models/thermo_gap_ai_treatment_treat.rds")
-thermo_gap_treat_cov <- readRDS("../../outputs/models/thermo_gap_ai_treatment_cov.rds")
-full_thermo_gap_model <- readRDS("../../outputs/models/full_thermo_gap_ai_treatment_model.rds")
+thermo_gap_treat <- readRDS(here("thesis", "outputs", "models", "thermo_gap_ai_treatment_treat.rds"))
+thermo_gap_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_gap_ai_treatment_cov.rds"))
+full_thermo_gap_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_gap_ai_treatment_model.rds"))
 
-thermo_ml_treat <- readRDS("../../outputs/models/thermo_ml_ai_treatment_treat.rds")
-thermo_ml_treat_cov <- readRDS("../../outputs/models/thermo_ml_ai_treatment_cov.rds")
-full_thermo_ml_model <- readRDS("../../outputs/models/full_thermo_ml_ai_treatment_model.rds")
+thermo_ml_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ml_ai_treatment_treat.rds"))
+thermo_ml_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ml_ai_treatment_cov.rds"))
+full_thermo_ml_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ml_ai_treatment_model.rds"))
 
-thermo_ll_treat <- readRDS("../../outputs/models/thermo_ll_ai_treatment_treat.rds")
-thermo_ll_treat_cov <- readRDS("../../outputs/models/thermo_ll_ai_treatment_cov.rds")
-full_thermo_ll_model <- readRDS("../../outputs/models/full_thermo_ll_ai_treatment_model.rds")
+thermo_ll_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ll_ai_treatment_treat.rds"))
+thermo_ll_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ll_ai_treatment_cov.rds"))
+full_thermo_ll_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ll_ai_treatment_model.rds"))
 
 # === Load Label Treatment Thermometer Models ===
-thermo_gap_label_treat <- readRDS("../../outputs/models/thermo_gap_label_treatment_treat.rds")
-thermo_gap_label_treat_cov <- readRDS("../../outputs/models/thermo_gap_label_treatment_cov.rds")
-full_thermo_gap_label_model <- readRDS("../../outputs/models/full_thermo_gap_label_treatment_model.rds")
+thermo_gap_label_treat <- readRDS(here("thesis", "outputs", "models", "thermo_gap_label_treatment_treat.rds"))
+thermo_gap_label_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_gap_label_treatment_cov.rds"))
+full_thermo_gap_label_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_gap_label_treatment_model.rds"))
 
-thermo_ml_label_treat <- readRDS("../../outputs/models/thermo_ml_label_treatment_treat.rds")
-thermo_ml_label_treat_cov <- readRDS("../../outputs/models/thermo_ml_label_treatment_cov.rds")
-full_thermo_ml_label_model <- readRDS("../../outputs/models/full_thermo_ml_label_treatment_model.rds")
+thermo_ml_label_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ml_label_treatment_treat.rds"))
+thermo_ml_label_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ml_label_treatment_cov.rds"))
+full_thermo_ml_label_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ml_label_treatment_model.rds"))
 
-thermo_ll_label_treat <- readRDS("../../outputs/models/thermo_ll_label_treatment_treat.rds")
-thermo_ll_label_treat_cov <- readRDS("../../outputs/models/thermo_ll_label_treatment_cov.rds")
-full_thermo_ll_label_model <- readRDS("../../outputs/models/full_thermo_ll_label_treatment_model.rds")
+thermo_ll_label_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ll_label_treatment_treat.rds"))
+thermo_ll_label_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ll_label_treatment_cov.rds"))
+full_thermo_ll_label_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ll_label_treatment_model.rds"))
 
 # === Save Thermometer Tables ===
 
 # AI Treatment Models
 save_thermo_table(
-    file = "../../outputs/tables/thermo_gap_ai_results.tex",
+    file = here("thesis", "outputs", "tables", "thermo_gap_ai_results.tex"),
     treat = thermo_gap_treat,
     cov = thermo_gap_treat_cov,
     full = full_thermo_gap_model,
@@ -63,7 +66,7 @@ save_thermo_table(
 )
 
 save_thermo_table(
-    file = "../../outputs/tables/thermo_ml_ai_results.tex",
+    file = here("thesis", "outputs", "tables", "thermo_ml_ai_results.tex"),
     treat = thermo_ml_treat,
     cov = thermo_ml_treat_cov,
     full = full_thermo_ml_model,
@@ -93,7 +96,7 @@ save_thermo_table(
 )
 
 save_thermo_table(
-    file = "../../outputs/tables/thermo_ll_ai_results.tex",
+    file = here("thesis", "outputs", "tables", "thermo_ll_ai_results.tex"),
     treat = thermo_ll_treat,
     cov = thermo_ll_treat_cov,
     full = full_thermo_ll_model,
@@ -109,7 +112,7 @@ save_thermo_table(
 
 # Label treatment models
 save_thermo_table(
-    file = "../../outputs/tables/thermo_gap_label_results.tex",
+    file = here("thesis", "outputs", "tables", "thermo_gap_label_results.tex"),
     treat = thermo_gap_label_treat,
     cov = thermo_gap_label_treat_cov,
     full = full_thermo_gap_label_model,
@@ -129,7 +132,7 @@ save_thermo_table(
 )
 
 save_thermo_table(
-    file = "../../outputs/tables/thermo_ml_label_results.tex",
+    file = here("thesis", "outputs", "tables", "thermo_ml_label_results.tex"),
     treat = thermo_ml_label_treat,
     cov = thermo_ml_label_treat_cov,
     full = full_thermo_ml_label_model,
@@ -149,7 +152,7 @@ save_thermo_table(
 )
 
 save_thermo_table(
-    file = "../../outputs/tables/thermo_ll_label_results.tex",
+    file = here("thesis", "outputs", "tables", "thermo_ll_label_results.tex"),
     treat = thermo_ll_label_treat,
     cov = thermo_ll_label_treat_cov,
     full = full_thermo_ll_label_model,
@@ -166,20 +169,20 @@ save_thermo_table(
 # === Add save_ordinal_table() calls here as needed ===
 # Create the tables for the ordinal models
 # Load the ordinal models for AI treatment
-agreedisagree_ai_treat <- readRDS("../../outputs/models/agreedisagree_ai_treatment_treat.rds")
-agreedisagree_ai_cov <- readRDS("../../outputs/models/agreedisagree_ai_treatment_cov.rds")
-full_agreedisagree_ai_model <- readRDS("../../outputs/models/full_agreedisagree_ai_treatment_model.rds")
+agreedisagree_ai_treat <- readRDS(here("thesis", "outputs", "models", "agreedisagree_ai_treatment_treat.rds"))
+agreedisagree_ai_cov <- readRDS(here("thesis", "outputs", "models", "agreedisagree_ai_treatment_cov.rds"))
+full_agreedisagree_ai_model <- readRDS(here("thesis", "outputs", "models", "full_agreedisagree_ai_treatment_model.rds"))
 
-xtrust_ai_treat <- readRDS("../../outputs/models/xtrust_ai_treatment_treat.rds")
-xtrust_ai_cov <- readRDS("../../outputs/models/xtrust_ai_treatment_cov.rds")
-full_xtrust_ai_model <- readRDS("../../outputs/models/full_xtrust_ai_treatment_model.rds")
+xtrust_ai_treat <- readRDS(here("thesis", "outputs", "models", "xtrust_ai_treatment_treat.rds"))
+xtrust_ai_cov <- readRDS(here("thesis", "outputs", "models", "xtrust_ai_treatment_cov.rds"))
+full_xtrust_ai_model <- readRDS(here("thesis", "outputs", "models", "full_xtrust_ai_treatment_model.rds"))
 
-child_ai_treat <- readRDS("../../outputs/models/child_ai_treatment_treat.rds")
-child_ai_cov <- readRDS("../../outputs/models/child_ai_treatment_cov.rds")
-full_child_ai_model <- readRDS("../../outputs/models/full_child_ai_treatment_model.rds")
+child_ai_treat <- readRDS(here("thesis", "outputs", "models", "child_ai_treatment_treat.rds"))
+child_ai_cov <- readRDS(here("thesis", "outputs", "models", "child_ai_treatment_cov.rds"))
+full_child_ai_model <- readRDS(here("thesis", "outputs", "models", "full_child_ai_treatment_model.rds"))
 
 save_ordinal_table(
-    file = "../../outputs/tables/agreedisagree_ai_results.tex",
+    file = here("thesis", "outputs", "tables", "agreedisagree_ai_results.tex"),
     treat = agreedisagree_ai_treat,
     cov = agreedisagree_ai_cov,
     full = full_agreedisagree_ai_model,
@@ -198,7 +201,7 @@ save_ordinal_table(
 )
 
 save_ordinal_table(
-    file = "../../outputs/tables/xtrust_ai_results.tex",
+    file = here("thesis", "outputs", "tables", "xtrust_ai_results.tex"),
     treat = xtrust_ai_treat,
     cov = xtrust_ai_cov,
     full = full_xtrust_ai_model,
@@ -224,7 +227,7 @@ save_ordinal_table(
 )
 
 save_ordinal_table(
-    file = "../../outputs/tables/child_ai_results.tex",
+    file = here("thesis", "outputs", "tables", "child_ai_results.tex"),
     treat = child_ai_treat,
     cov = child_ai_cov,
     full = full_child_ai_model,
@@ -246,21 +249,21 @@ save_ordinal_table(
 )
 
 # Load the ordinal models for Label treatment
-agreedisagree_label_treat <- readRDS("../../outputs/models/agreedisagree_label_treatment_treat.rds")
-agreedisagree_label_cov <- readRDS("../../outputs/models/agreedisagree_label_treatment_cov.rds")
-full_agreedisagree_label_model <- readRDS("../../outputs/models/full_agreedisagree_label_treatment_model.rds")
+agreedisagree_label_treat <- readRDS(here("thesis", "outputs", "models", "agreedisagree_label_treatment_treat.rds"))
+agreedisagree_label_cov <- readRDS(here("thesis", "outputs", "models", "agreedisagree_label_treatment_cov.rds"))
+full_agreedisagree_label_model <- readRDS(here("thesis", "outputs", "models", "full_agreedisagree_label_treatment_model.rds"))
 
-xtrust_label_treat <- readRDS("../../outputs/models/xtrust_label_treatment_treat.rds")
-xtrust_label_cov <- readRDS("../../outputs/models/xtrust_label_treatment_cov.rds")
-full_xtrust_label_model <- readRDS("../../outputs/models/full_xtrust_label_treatment_model.rds")
+xtrust_label_treat <- readRDS(here("thesis", "outputs", "models", "xtrust_label_treatment_treat.rds"))
+xtrust_label_cov <- readRDS(here("thesis", "outputs", "models", "xtrust_label_treatment_cov.rds"))
+full_xtrust_label_model <- readRDS(here("thesis", "outputs", "models", "full_xtrust_label_treatment_model.rds"))
 
-child_label_treat <- readRDS("../../outputs/models/child_label_treatment_treat.rds")
-child_label_cov <- readRDS("../../outputs/models/child_label_treatment_cov.rds")
-full_child_label_model <- readRDS("../../outputs/models/full_child_label_treatment_model.rds")
+child_label_treat <- readRDS(here("thesis", "outputs", "models", "child_label_treatment_treat.rds"))
+child_label_cov <- readRDS(here("thesis", "outputs", "models", "child_label_treatment_cov.rds"))
+full_child_label_model <- readRDS(here("thesis", "outputs", "models", "full_child_label_treatment_model.rds"))
 
 # === Save Label Treatment Ordinal Tables ===
 save_ordinal_table(
-    file = "../../outputs/tables/agreedisagree_label_results.tex",
+    file = here("thesis", "outputs", "tables", "agreedisagree_label_results.tex"),
     treat = agreedisagree_label_treat,
     cov = agreedisagree_label_cov,
     full = full_agreedisagree_label_model,
@@ -280,7 +283,7 @@ save_ordinal_table(
 )
 
 save_ordinal_table(
-    file = "../../outputs/tables/xtrust_label_results.tex",
+    file = here("thesis", "outputs", "tables", "xtrust_label_results.tex"),
     treat = xtrust_label_treat,
     cov = xtrust_label_cov,
     full = full_xtrust_label_model,
@@ -299,7 +302,7 @@ save_ordinal_table(
 )
 
 save_ordinal_table(
-    file = "../../outputs/tables/child_label_results.tex",
+    file = here("thesis", "outputs", "tables", "child_label_results.tex"),
     treat = child_label_treat,
     cov = child_label_cov,
     full = full_child_label_model,
@@ -324,13 +327,13 @@ save_ordinal_table(
 
 # === Plotting Logic ===
 
-source("../../analysis/thermo_models_plots.R")
-source("../../analysis/ordinal_models_plots.R")
+source(here("thesis", "analysis", "thermo_models_plots.R"))
+source(here("thesis", "analysis", "ordinal_models_plots.R"))
 
 # === Save Thermometer Plots ===
 # Descriptive Statistics Plot (combined AI and Label Treatment effects)
 ggplot2::ggsave(
-    filename = "../../outputs/figures/thermo_gap_plot.pdf",
+    filename = here("thesis", "outputs", "figures", "thermo_gap_plot.pdf"),
     plot = combined_plot,
     width = 5,
     height = 3,
@@ -343,7 +346,7 @@ plot_thermo_patchwork(
     models = models_ai,
     treatment_var = "ai_treatment",
     subgroups = subgroups_ai,
-    output_file = "../../outputs/figures/thermo_patchwork_ai_treatment.pdf"
+    output_file = here("thesis", "outputs", "figures", "thermo_patchwork_ai_treatment.pdf")
 )
 
 # Generate and save the patchwork plot for Label Treatment
@@ -351,7 +354,7 @@ plot_thermo_patchwork(
     models = models_label,
     treatment_var = "label_treatment",
     subgroups = subgroups_label,
-    output_file = "../../outputs/figures/thermo_patchwork_label_treatment.pdf"
+    output_file = here("thesis", "outputs", "figures", "thermo_patchwork_label_treatment.pdf")
 )
 
 # === Save Ordinal Plots ===
@@ -387,7 +390,7 @@ combined_plot <- plot_disagreement + plot_trust +
     theme(legend.position = "bottom")
 
 ggsave(
-    filename = "../../outputs/figures/ordinal_patchwork_ai_treatment.pdf",
+    filename = here("thesis", "outputs", "figures", "ordinal_patchwork_ai_treatment.pdf"),
     plot = combined_plot,
     width = 10, height = 4
 )
@@ -424,7 +427,7 @@ combined_plot_label <- plot_disagreement_label + plot_trust_label +
     theme(legend.position = "bottom")
 
 ggsave(
-    filename = "../../outputs/figures/ordinal_patchwork_label_treatment.pdf",
+    filename = here("thesis", "outputs", "figures", "ordinal_patchwork_label_treatment.pdf"),
     plot = combined_plot_label,
     width = 10, height = 4
 )
@@ -452,5 +455,8 @@ save_inline_results(
         plot_disagreement_label = plot_disagreement_label,
         plot_trust_label = plot_trust_label
     ),
-    save_path = "../../outputs/helpers/inline_results.rds"
+    save_path = here("thesis", "outputs", "helpers", "inline_results.rds")
 )
+
+# Save treatment conditions table
+source(here("thesis", "analysis", "treatment_conditions.R"))

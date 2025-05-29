@@ -1,3 +1,5 @@
+# Add here package for robust file path handling
+library(here)
 # This script generates a codebook for the YouGov UniOM Survey data.
 
 # Codebook definition into a tibble
@@ -64,8 +66,8 @@ create_codebook_table <- function() {
 }
 
 
-# Save the codebook table as a LaTeX file
-save_codebook_table <- function(file = "../outputs/tables/codebook_table.tex") {
+ # Save the codebook table as a LaTeX file
+save_codebook_table <- function(file = here("thesis", "outputs", "tables", "codebook_table.tex")) {
     kb <- kable(
         codebook,
         format = "latex",

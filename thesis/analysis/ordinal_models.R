@@ -9,11 +9,13 @@
 #' @param moderators List of moderator vectors for each outcome (default: NULL)
 #'
 #' @return Named list of model objects
+# Load required library for file paths
+library(here)
 
 # Load required scripts to run the analysis in this file
-source("../analysis/data.R")
-source("../analysis/data_cleaning.R")
-source("../analysis/survey_design.R")
+source(here("thesis", "analysis", "data.R"))
+source(here("thesis", "analysis", "data_cleaning.R"))
+source(here("thesis", "analysis", "survey_design.R"))
 
 
 fit_ordinal_models <- function(
@@ -121,7 +123,7 @@ child_label_treat <- ordinal_models_list_label[["child_label_treatment_treat"]]
 child_label_cov <- ordinal_models_list_label[["child_label_treatment_cov"]]
 full_child_label_model <- ordinal_models_list_label[["full_child_label_treatment_model"]]
 
-models_dir <- "../outputs/models"
+models_dir <- here("thesis", "outputs", "models")
 
 # Save each model as an .rds
 for (model_name in names(ordinal_models_list_ai)) {
