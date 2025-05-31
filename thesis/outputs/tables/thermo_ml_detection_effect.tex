@@ -1,0 +1,40 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Detection Effect: Thermometer (Most Likely) Results (Labelled AI vs Unlabelled AI) \label{tab:thermo-ml-detection}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Treatment compares labelled AI-generated content to unlabelled AI-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{20}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+(Intercept)                                  & \num{69.504}*** & \num{33.125}*** & \num{58.962}*** \\
+& (\num{1.494})   & (\num{9.710})   & (\num{9.960})   \\
+Label Treatment                              & \num{-3.251}    & \num{-2.357}    & \num{-18.915}*  \\
+& (\num{2.168})   & (\num{2.080})   & (\num{7.888})   \\
+Label Treatment:mostlikelyConservative Party &                  &                  & \num{8.251}     \\
+&                  &                  & (\num{5.565})   \\
+Label Treatment:mostlikelyGreen Party        &                  &                  & \num{1.191}     \\
+&                  &                  & (\num{9.675})   \\
+Label Treatment:mostlikelyLabour Party       &                  &                  & \num{-6.618}    \\
+&                  &                  & (\num{4.935})   \\
+Label Treatment:mostlikelyLiberal Democrats  &                  &                  & \num{-11.118}+  \\
+&                  &                  & (\num{6.455})   \\
+Label Treatment:Political Attention          &                  &                  & \num{1.704}+    \\
+&                  &                  & (\num{0.985})   \\
+Label Treatment:Education LevelHigh          &                  &                  & \num{9.097}+    \\
+&                  &                  & (\num{5.151})   \\
+Label Treatment:Education LevelMedium        &                  &                  & \num{8.898}     \\
+&                  &                  & (\num{5.450})   \\
+Num.Obs.                                     & \num{626}       & \num{541}       & \num{541}       \\
+R2                                           & \num{0.005}     & \num{0.187}     & \num{0.250}     \\
+RMSE                                         & \num{23.57}     & \num{21.76}     & \num{21.12}     \\
+Model                                        & (1)              & (2)              & (3)              \\
+\bottomrule
+\end{talltblr}
+\end{table}

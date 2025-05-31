@@ -62,6 +62,17 @@ yougov_data <- yougov_data %>%
 yougov_data <- yougov_data %>%
     filter(xconsent != "I do not wish to continue with this study")
 
+# Remove rows where 'mostlikely == None of these'
+# and 'leastlikely == None of these'
+yougov_data <- yougov_data %>%
+    filter(mostlikely != "None of these" & leastlikely != "None of these")
+
+# Relevel `mostlikely` to have "Labour" as the reference category
+yougov_data$mostlikely <- relevel(yougov_data$mostlikely, ref = "Reform UK")
+
+# Relevel `leastlikely` to have "Labour" as the reference category
+yougov_data$leastlikely <- relevel(yougov_data$leastlikely, ref = "Reform UK")
+
 
 # Create new MLthermo and LLthermo mean variables
 # Variable is mean of values in MLthermo/LLthermo columns
@@ -70,12 +81,6 @@ yougov_data <- yougov_data %>%
         MLthermoMean = rowMeans(pick(starts_with("MLthermo_")), na.rm = TRUE),
         LLthermoMean = rowMeans(pick(starts_with("LLthermo_")), na.rm = TRUE)
     )
-
-# Remove rows where 'mostlikely == None of these'
-# and 'leastlikely == None of these'
-yougov_data <- yougov_data %>%
-    filter(mostlikely != "None of these" & leastlikely != "None of these")
-
 
 # Refactor child variable
 yougov_data <- yougov_data %>%
@@ -140,6 +145,12 @@ yougov_data <- yougov_data %>%
         education_recode = profile_education_level_recode
     )
 
+# Relevel profile_education_level_recode to have "Low" as the reference category
+yougov_data$education_recode <- relevel(
+    yougov_data$education_recode,
+    ref = "Low"
+)
+
 # Drop levels from `mostlikely` that have no observations
 yougov_data$mostlikely <- droplevels(
     yougov_data$mostlikely
@@ -169,9 +180,9 @@ yougov_data_label <- yougov_data %>%
 
 # Create a labelled AI treatment subset: Labelled AI vs Human-generated (no labels) --- this is the detection effect of AI content when labelled
 # this is the Source Credibility Effect to test the trust penalty for labelled AI content
-# yougov_data_labelled_ai <- yougov_data %>%
-#   filter(split %in% c(2, 4)) %>%
-#   mutate(labelled_ai_treatment = case_when(
-#       split == 2 ~ 1, # AI-generated, labelled
-#       split == 4 ~ 0 # Human-generated, unlabelled
-#   ))
+yougov_data_labelled_ai <- yougov_data %>%
+    filter(split %in% c(2, 4)) %>%
+    mutate(labelled_ai_treatment = case_when(
+        split == 2 ~ 1, # AI-generated, labelled
+        split == 4 ~ 0 # Human-generated, unlabelled
+    ))

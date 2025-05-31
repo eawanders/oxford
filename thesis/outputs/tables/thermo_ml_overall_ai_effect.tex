@@ -1,0 +1,40 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={AI-Generated Content: Thermometer (Most Likely) Results (Overall Treatment Effect) \label{tab:thermo-ml-overall}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{20}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+(Intercept)                               & \num{69.079}*** & \num{44.148}*** & \num{61.597}*** \\
+& (\num{1.520})   & (\num{8.938})   & (\num{9.613})   \\
+AI Treatment                              & \num{0.425}     & \num{-0.717}    & \num{4.445}     \\
+& (\num{2.131})   & (\num{2.105})   & (\num{9.169})   \\
+AI Treatment:mostlikelyConservative Party &                  &                  & \num{-2.069}    \\
+&                  &                  & (\num{5.578})   \\
+AI Treatment:mostlikelyGreen Party        &                  &                  & \num{9.873}     \\
+&                  &                  & (\num{7.860})   \\
+AI Treatment:mostlikelyLabour Party       &                  &                  & \num{6.573}     \\
+&                  &                  & (\num{5.199})   \\
+AI Treatment:mostlikelyLiberal Democrats  &                  &                  & \num{8.678}     \\
+&                  &                  & (\num{5.744})   \\
+AI Treatment:Political Attention          &                  &                  & \num{-0.338}    \\
+&                  &                  & (\num{1.242})   \\
+AI Treatment:Education LevelHigh          &                  &                  & \num{-9.239}+   \\
+&                  &                  & (\num{4.836})   \\
+AI Treatment:Education LevelMedium        &                  &                  & \num{-4.872}    \\
+&                  &                  & (\num{5.026})   \\
+Num.Obs.                                  & \num{634}       & \num{542}       & \num{542}       \\
+R2                                        & \num{0.000}     & \num{0.160}     & \num{0.241}     \\
+RMSE                                      & \num{22.78}     & \num{20.66}     & \num{19.85}     \\
+Model                                     & (1)              & (2)              & (3)              \\
+\bottomrule
+\end{talltblr}
+\end{table}

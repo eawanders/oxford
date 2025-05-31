@@ -73,7 +73,7 @@ fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", 
             outcome = "thermo_gap",
             treatment = "ai_treatment",
             covariates = covariates,
-            moderators = c("pastvote_ge_2024")
+            moderators = c("mostlikely", "political_attention", "education_recode")
         ),
         # MLthermoMean models with ai_treatment
         list(
@@ -95,7 +95,7 @@ fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", 
             outcome = "MLthermoMean",
             treatment = "ai_treatment",
             covariates = covariates,
-            moderators = c("profile_work_stat")
+            moderators = c("mostlikely", "political_attention", "education_recode")
         ),
         # LLthermoMean models with ai_treatment
         list(
@@ -117,7 +117,7 @@ fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", 
             outcome = "LLthermoMean",
             treatment = "ai_treatment",
             covariates = covariates,
-            moderators = c("age")
+            moderators = c("mostlikely", "political_attention", "education_recode")
         ),
         # thermo_gap models with label_treatment
         list(
@@ -139,7 +139,7 @@ fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", 
             outcome = "thermo_gap",
             treatment = "label_treatment",
             covariates = covariates,
-            moderators = c("mostlikely", "political_attention")
+            moderators = c("mostlikely", "political_attention", "education_recode")
         ),
         # MLthermoMean models with label_treatment
         list(
@@ -161,7 +161,7 @@ fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", 
             outcome = "MLthermoMean",
             treatment = "label_treatment",
             covariates = covariates,
-            moderators = c("age", "political_attention", "mostlikely")
+            moderators = c("mostlikely", "political_attention", "education_recode")
         ),
         # LLthermoMean models with label_treatment
         list(
@@ -183,7 +183,73 @@ fit_thermo_models <- function(data, design, treatment_group = c("ai_treatment", 
             outcome = "LLthermoMean",
             treatment = "label_treatment",
             covariates = covariates,
-            moderators = c("profile_gender")
+            moderators = c("mostlikely", "political_attention", "education_recode")
+        ),
+        # theromo_gap models for Source Credibility Effect
+        list(
+            name = "thermo_gap_labelled_ai_treatment_treat",
+            outcome = "thermo_gap",
+            treatment = "labelled_ai_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_gap_labelled_ai_treatment_cov",
+            outcome = "thermo_gap",
+            treatment = "labelled_ai_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_gap_labelled_ai_model",
+            outcome = "thermo_gap",
+            treatment = "labelled_ai_treatment",
+            covariates = covariates,
+            moderators = c("mostlikely", "political_attention", "education_recode")
+        ),
+        # MLthermoMean models for Source Credibility Effect
+        list(
+            name = "thermo_ml_labelled_ai_treatment_treat",
+            outcome = "MLthermoMean",
+            treatment = "labelled_ai_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_ml_labelled_ai_treatment_cov",
+            outcome = "MLthermoMean",
+            treatment = "labelled_ai_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_ml_labelled_ai_model",
+            outcome = "MLthermoMean",
+            treatment = "labelled_ai_treatment",
+            covariates = covariates,
+            moderators = c("mostlikely", "political_attention", "education_recode")
+        ),
+        # LLthermoMean models for Source Credibility Effect
+        list(
+            name = "thermo_ll_labelled_ai_treatment_treat",
+            outcome = "LLthermoMean",
+            treatment = "labelled_ai_treatment",
+            covariates = NULL,
+            moderators = NULL
+        ),
+        list(
+            name = "thermo_ll_labelled_ai_treatment_cov",
+            outcome = "LLthermoMean",
+            treatment = "labelled_ai_treatment",
+            covariates = covariates,
+            moderators = NULL
+        ),
+        list(
+            name = "full_thermo_ll_labelled_ai_model",
+            outcome = "LLthermoMean",
+            treatment = "labelled_ai_treatment",
+            covariates = covariates,
+            moderators = c("mostlikely", "political_attention", "education_recode")
         )
     )
 
@@ -267,6 +333,9 @@ thermo_ll_treat <- thermo_models_list_ai[["thermo_ll_ai_treatment_treat"]]
 thermo_ll_treat_cov <- thermo_models_list_ai[["thermo_ll_ai_treatment_cov"]]
 full_thermo_ll_model <- thermo_models_list_ai[["full_thermo_ll_ai_treatment_model"]]
 
+
+
+
 models_dir <- here("thesis", "outputs", "models")
 
 # Save each model as an .rds for both AI and Label lists
@@ -280,6 +349,34 @@ for (model_name in names(thermo_models_list_ai)) {
 for (model_name in names(thermo_models_list_label)) {
     saveRDS(
         thermo_models_list_label[[model_name]],
+        file = file.path(models_dir, paste0(model_name, ".rds"))
+    )
+}
+
+# Fit all thermometer models for the Labelled AI treatment (Source Credibility Effect)
+thermo_models_list_labelled_ai <- fit_thermo_models(
+    data = yougov_data_labelled_ai,
+    design = yougov_design_labelled_ai,
+    treatment_group = "labelled_ai_treatment"
+)
+
+# Assign objects for easier referencing throughout your document (Labelled AI models)
+thermo_gap_labelled_ai_treat <- thermo_models_list_labelled_ai[["thermo_gap_labelled_ai_treatment_treat"]]
+thermo_gap_labelled_ai_treat_cov <- thermo_models_list_labelled_ai[["thermo_gap_labelled_ai_treatment_cov"]]
+full_thermo_gap_labelled_ai_model <- thermo_models_list_labelled_ai[["full_thermo_gap_labelled_ai_model"]]
+
+thermo_ml_labelled_ai_treat <- thermo_models_list_labelled_ai[["thermo_ml_labelled_ai_treatment_treat"]]
+thermo_ml_labelled_ai_treat_cov <- thermo_models_list_labelled_ai[["thermo_ml_labelled_ai_treatment_cov"]]
+full_thermo_ml_labelled_ai_model <- thermo_models_list_labelled_ai[["full_thermo_ml_labelled_ai_model"]]
+
+thermo_ll_labelled_ai_treat <- thermo_models_list_labelled_ai[["thermo_ll_labelled_ai_treatment_treat"]]
+thermo_ll_labelled_ai_treat_cov <- thermo_models_list_labelled_ai[["thermo_ll_labelled_ai_treatment_cov"]]
+full_thermo_ll_labelled_ai_model <- thermo_models_list_labelled_ai[["full_thermo_ll_labelled_ai_model"]]
+
+# Save each model as an .rds for the Labelled AI models
+for (model_name in names(thermo_models_list_labelled_ai)) {
+    saveRDS(
+        thermo_models_list_labelled_ai[[model_name]],
         file = file.path(models_dir, paste0(model_name, ".rds"))
     )
 }

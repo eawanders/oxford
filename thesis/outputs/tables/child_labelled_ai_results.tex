@@ -1,0 +1,37 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Discomfort: Labelled AI Content vs Human Control (Source Credibility Condition) \label{tab:child-labelled-ai-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{18}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+Label Treatment                              & \num{0.016}   & \num{0.016}   & \num{-1.736}* \\
+& (\num{0.162}) & (\num{0.162}) & (\num{0.797}) \\
+Label Treatment:mostlikelyConservative Party &                &                & \num{0.043}   \\
+&                &                & (\num{0.530}) \\
+Label Treatment:mostlikelyGreen Party        &                &                & \num{-0.374}  \\
+&                &                & (\num{0.609}) \\
+Label Treatment:mostlikelyLabour Party       &                &                & \num{0.253}   \\
+&                &                & (\num{0.539}) \\
+Label Treatment:mostlikelyLiberal Democrats  &                &                & \num{0.062}   \\
+&                &                & (\num{0.558}) \\
+Label Treatment:Political Attention          &                &                & \num{0.187}+  \\
+&                &                & (\num{0.100}) \\
+Label Treatment:Education LevelHigh          &                &                & \num{0.571}   \\
+&                &                & (\num{0.503}) \\
+Label Treatment:Education LevelMedium        &                &                & \num{0.685}   \\
+&                &                & (\num{0.519}) \\
+Num.Obs.                                     & \num{721}     & \num{721}     & \num{721}     \\
+RMSE                                         & \num{2.32}    & \num{2.32}    & \num{2.32}    \\
+Model                                        & (1)            & (2)            & (3)            \\
+\bottomrule
+\end{talltblr}
+\end{table}

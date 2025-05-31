@@ -1,45 +1,37 @@
 \begin{table}
 \centering
 \begin{talltblr}[         %% tabularray outer open
-caption={AI-Generated Content: Trust in Out-Party to Do What Is Right \label{tab:xtrust-results}},
+caption={Trust: AI Content vs Human Control (Detection Condition) \label{tab:xtrust-results}},
 note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
-note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are included but have no substantive interpretation.},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.},
 ]                     %% tabularray outer close
 {                     %% tabularray inner open
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{26}={1,2,3,4}{solid, black, 0.05em},
+hline{18}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-AI Treatment                           & \num{-0.188}   & \num{-0.156}   & \num{1.598}    \\
-& (\num{0.193})  & (\num{0.187})  & (\num{1.008})  \\
-Almost never|Once in a while           & \num{0.873}*** & \num{0.658}    & \num{1.934}*   \\
-& (\num{0.137})  & (\num{0.671})  & (\num{0.927})  \\
-Once in a while|About half of the time & \num{2.846}*** & \num{2.678}*** & \num{3.966}*** \\
-& (\num{0.214})  & (\num{0.652})  & (\num{0.936})  \\
-About half of the time|Always          & \num{3.990}*** & \num{3.820}*** & \num{5.107}*** \\
-& (\num{0.385})  & (\num{0.760})  & (\num{1.033})  \\
-Always|Most of the time                & \num{4.146}*** & \num{3.977}*** & \num{5.264}*** \\
-& (\num{0.425})  & (\num{0.779})  & (\num{1.018})  \\
-AI Treatment:Not Working               &                 &                 & \num{-2.406}+  \\
-&                 &                 & (\num{1.306})  \\
-AI Treatment:Other                     &                 &                 & \num{-2.388}+  \\
-&                 &                 & (\num{1.331})  \\
-AI Treatment:Retired                   &                 &                 & \num{-1.434}   \\
-&                 &                 & (\num{1.050})  \\
-AI Treatment:Unemployed                &                 &                 & \num{-3.604}+  \\
-&                 &                 & (\num{1.936})  \\
-AI Treatment:Working Full Time         &                 &                 & \num{-2.022}+  \\
-&                 &                 & (\num{1.054})  \\
-AI Treatment:Working PT (8–29h)        &                 &                 & \num{-1.420}   \\
-&                 &                 & (\num{1.204})  \\
-AI Treatment:Working PT (<8h)          &                 &                 & \num{-2.019}   \\
-&                 &                 & (\num{1.911})  \\
-Num.Obs.                               & \num{664}      & \num{664}      & \num{664}      \\
-edf                                    & 5               & 17              & 24              \\
-Model                                  & (1)             & (2)             & (3)             \\
+AI Treatment                              & \num{-0.188}  & \num{-0.188}  & \num{-0.768}  \\
+& (\num{0.193}) & (\num{0.193}) & (\num{0.693}) \\
+AI Treatment:mostlikelyConservative Party &                &                & \num{-0.078}  \\
+&                &                & (\num{0.553}) \\
+AI Treatment:mostlikelyGreen Party        &                &                & \num{0.313}   \\
+&                &                & (\num{0.732}) \\
+AI Treatment:mostlikelyLabour Party       &                &                & \num{-0.133}  \\
+&                &                & (\num{0.567}) \\
+AI Treatment:mostlikelyLiberal Democrats  &                &                & \num{1.461}*  \\
+&                &                & (\num{0.650}) \\
+AI Treatment:Political Attention          &                &                & \num{0.063}   \\
+&                &                & (\num{0.099}) \\
+AI Treatment:Education LevelHigh          &                &                & \num{0.354}   \\
+&                &                & (\num{0.589}) \\
+AI Treatment:Education LevelMedium        &                &                & \num{-0.137}  \\
+&                &                & (\num{0.553}) \\
+Num.Obs.                                  & \num{664}     & \num{664}     & \num{664}     \\
+edf                                       & 5              & 5              & 19             \\
+Model                                     & (1)            & (2)            & (3)            \\
 \bottomrule
 \end{talltblr}
 \end{table}

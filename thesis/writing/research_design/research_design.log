@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  29 MAY 2025 01:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  31 MAY 2025 03:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -487,7 +487,9 @@ Package caption Info: threeparttable package is loaded.
 )
 \@float@every@figure=\toks34
 \@float@every@table=\toks35
-(/usr/local/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+(/usr/local/texlive/2024/texmf-dist/tex/latex/placeins/placeins.sty
+Package: placeins 2005/04/18  v 2.2
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 
 \f@nch@headwidth=\skip65
@@ -698,11 +700,11 @@ File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO
 )) (/usr/local/texlive/2024/texmf-dist/tex/latex/xurl/xurl.sty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 169.
+Package hyperref Info: Option `colorlinks' set `true' on input line 177.
 Package translations Info: No language package found. I am going to use `englis
-h' as default language. on input line 174.
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 17
-4.
+h' as default language. on input line 182.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 18
+2.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (./research_design.aux
@@ -715,24 +717,24 @@ LaTeX Warning: Label `eq:change-affective-polarisation' multiply defined.
 )
 \openout1 = `research_design.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 174.
-LaTeX Font Info:    ... okay on input line 174.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 182.
+LaTeX Font Info:    ... okay on input line 182.
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count359
@@ -754,19 +756,19 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Info: Redefining \microtypecontext on input line 174.
-Package microtype Info: Applying patch `item' on input line 174.
-Package microtype Info: Applying patch `toc' on input line 174.
-Package microtype Info: Applying patch `eqnum' on input line 174.
-Package microtype Info: Applying patch `footnote' on input line 174.
-Package microtype Info: Applying patch `verbatim' on input line 174.
+LaTeX Info: Redefining \microtypecontext on input line 182.
+Package microtype Info: Applying patch `item' on input line 182.
+Package microtype Info: Applying patch `toc' on input line 182.
+Package microtype Info: Applying patch `eqnum' on input line 182.
+Package microtype Info: Applying patch `footnote' on input line 182.
+Package microtype Info: Applying patch `verbatim' on input line 182.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 174.
+LaTeX Info: Redefining \showhyphens on input line 182.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -819,12 +821,12 @@ File: translations-basic-dictionary-english.trsl (english translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `english'. on input line 174.
+or `english'. on input line 182.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring ON on input line 174.
+Package hyperref Info: Link coloring ON on input line 182.
 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf,
  id=4, 845.04686pt x 597.50786pt>
 File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford
@@ -832,7 +834,7 @@ File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford
 <use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.
 pdf>
 Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/wri
-ting/objects/oxford.pdf  used on input line 186.
+ting/objects/oxford.pdf  used on input line 194.
 (pdftex.def)             Requested size: 234.8775pt x 166.07022pt.
 [1
 
@@ -895,17 +897,17 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.243 
+l.255 
        [1
 
 ] [2] [3]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 256.
+(Font)              <8> on input line 268.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 256.
+(Font)              <6> on input line 268.
 [4]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
-75.
+87.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [5{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/loc
@@ -913,47 +915,28 @@ al/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}] [6] [7] [8] [9{/usr/l
 ocal/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [10] [11]
 
 LaTeX Warning: Reference `eq:asymmetric-malleability' on page 12 undefined on i
-nput line 568.
+nput line 580.
 
 [12] [13]
 
 LaTeX Warning: Hyper reference `sec:dection-discounting' on page 14 undefined o
-n input line 656.
+n input line 668.
 
 
 LaTeX Warning: Reference `sec:detection-discounting' on page 14 undefined on in
-put line 656.
+put line 668.
 
 [14] [15] [16]
-Overfull \hbox (1.53458pt too wide) in paragraph at lines 831--840
+Overfull \hbox (1.53458pt too wide) in paragraph at lines 843--852
  [][] 
  []
 
-[17]
-
-LaTeX Warning: Hyper reference `tab:experiment-treatment-conditions' on page 18
- undefined on input line 861.
-
-
-LaTeX Warning: Reference `tab:experiment-treatment-conditions' on page 18 undef
-ined on input line 861.
-
-(../../outputs/tables/treatment_conditions_table.tex) [18]
+[17] [18]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 8
-80.
+97.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [19] [20]
-<../../outputs/figures/thermo_gap_plot_combined.pdf, id=499, 361.35pt x 216.81p
-t>
-File: ../../outputs/figures/thermo_gap_plot_combined.pdf Graphic file (type pdf
-)
-<use ../../outputs/figures/thermo_gap_plot_combined.pdf>
-Package pdftex.def Info: ../../outputs/figures/thermo_gap_plot_combined.pdf  us
-ed on input line 915.
-(pdftex.def)             Requested size: 375.80544pt x 225.48369pt.
-[21 <../../outputs/figures/thermo_gap_plot_combined.pdf>] (../../outputs/tables
-/thermo_gap_ai_results.tex
+) [19] [20] (../../outputs/tables/thermo_gap_overall_ai_effect.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -963,29 +946,10 @@ ed on input line 915.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 3
-7.
+9.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-))
-<../../outputs/figures/thermo_patchwork_ai_treatment.pdf, id=514, 542.025pt x 4
-69.755pt>
-File: ../../outputs/figures/thermo_patchwork_ai_treatment.pdf Graphic file (typ
-e pdf)
-<use ../../outputs/figures/thermo_patchwork_ai_treatment.pdf>
-Package pdftex.def Info: ../../outputs/figures/thermo_patchwork_ai_treatment.pd
-f  used on input line 928.
-(pdftex.def)             Requested size: 399.29463pt x 346.065pt.
-[22 <../../outputs/figures/thermo_patchwork_ai_treatment.pdf>] [23]
-<../../outputs/figures/ordinal_patchwork_ai_treatment.pdf, id=534, 722.7pt x 28
-9.08pt>
-File: ../../outputs/figures/ordinal_patchwork_ai_treatment.pdf Graphic file (ty
-pe pdf)
-<use ../../outputs/figures/ordinal_patchwork_ai_treatment.pdf>
-Package pdftex.def Info: ../../outputs/figures/ordinal_patchwork_ai_treatment.p
-df  used on input line 939.
-(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
-[24 <../../outputs/figures/ordinal_patchwork_ai_treatment.pdf>] (../../outputs/
-tables/thermo_gap_label_results.tex
+)) (../../outputs/tables/thermo_gap_source_credibility.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -993,37 +957,86 @@ tables/thermo_gap_label_results.tex
 > Step: parse table inner spec.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
 > Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
+ [][] 
+ []
+
+) (../../outputs/tables/thermo_gap_detection_effect.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
+ [][] 
+ []
+
 )
-<../../outputs/figures/thermo_patchwork_label_treatment.pdf, id=545, 542.025pt 
-x 469.755pt>
-File: ../../outputs/figures/thermo_patchwork_label_treatment.pdf Graphic file (
-type pdf)
-<use ../../outputs/figures/thermo_patchwork_label_treatment.pdf>
-Package pdftex.def Info: ../../outputs/figures/thermo_patchwork_label_treatment
-.pdf  used on input line 958.
-(pdftex.def)             Requested size: 399.29463pt x 346.065pt.
-[25]
-<../../outputs/figures/ordinal_patchwork_label_treatment.pdf, id=553, 722.7pt x
- 289.08pt>
-File: ../../outputs/figures/ordinal_patchwork_label_treatment.pdf Graphic file 
-(type pdf)
-<use ../../outputs/figures/ordinal_patchwork_label_treatment.pdf>
-Package pdftex.def Info: ../../outputs/figures/ordinal_patchwork_label_treatmen
-t.pdf  used on input line 967.
-(pdftex.def)             Requested size: 422.77664pt x 169.1089pt.
-[26 <../../outputs/figures/thermo_patchwork_label_treatment.pdf> <../../outputs
-/figures/ordinal_patchwork_label_treatment.pdf>] [27]
+</Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patc
+hwork_overall.pdf, id=507, 867.24pt x 289.08pt>
+File: /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo
+_patchwork_overall.pdf Graphic file (type pdf)
+<use /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
+patchwork_overall.pdf>
+Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/out
+puts/figures/thermo_patchwork_overall.pdf  used on input line 943.
+(pdftex.def)             Requested size: 469.75502pt x 156.58607pt.
+</Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patc
+hwork_ldem.pdf, id=508, 867.24pt x 289.08pt>
+File: /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo
+_patchwork_ldem.pdf Graphic file (type pdf)
+<use /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
+patchwork_ldem.pdf>
+Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/out
+puts/figures/thermo_patchwork_ldem.pdf  used on input line 949.
+(pdftex.def)             Requested size: 469.75502pt x 156.58607pt.
+[21 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
+patchwork_overall.pdf>] [22] [23] [24] [25 </Users/edwardanders/Documents/GitHu
+b/oxford/thesis/outputs/figures/thermo_patchwork_ldem.pdf>] [26]
 
-LaTeX Warning: Hyper reference `tab:codebook-table' on page 28 undefined on inp
-ut line 998.
+LaTeX Warning: Hyper reference `tab:codebook-table' on page 27 undefined on inp
+ut line 983.
 
 
-LaTeX Warning: Reference `tab:codebook-table' on page 28 undefined on input lin
-e 998.
+LaTeX Warning: Reference `tab:codebook-table' on page 27 undefined on input lin
+e 983.
 
-(../../outputs/tables/codebook_table.tex [28] [29]) [30]
-Underfull \hbox (badness 1975) in paragraph at lines 1012--1013
+(../../outputs/tables/codebook_table.tex [27] [28]) [29]
+</Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-gener
+ated-visual.pdf, id=572, 845.04686pt x 597.50786pt>
+File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-
+generated-visual.pdf Graphic file (type pdf)
+<use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-g
+enerated-visual.pdf>
+Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/wri
+ting/objects/human-generated-visual.pdf  used on input line 995.
+(pdftex.def)             Requested size: 375.80544pt x 265.72148pt.
+[30 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-g
+enerated-visual.pdf, page is rotated 90 degrees>]
+</Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-generate
+d-visual.pdf, id=581, 845.04686pt x 597.50786pt>
+File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gen
+erated-visual.pdf Graphic file (type pdf)
+<use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gene
+rated-visual.pdf>
+Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/wri
+ting/objects/ai-generated-visual.pdf  used on input line 1015.
+(pdftex.def)             Requested size: 375.80544pt x 265.72148pt.
+[31 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gene
+rated-visual.pdf, page is rotated 90 degrees>]
+Underfull \hbox (badness 1975) in paragraph at lines 1047--1048
 \T1/lmtt/m/n/10 MLthermo_NF\T1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10 MLthermo_ED\T
 1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10 MLthermo_CD\T1/lmr/m/n/10 (+20) , \T1/lmtt
 /m/n/10 MLthermo_AR\T1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10 LLthermo_KB\T1/lmr/m/
@@ -1031,11 +1044,11 @@ n/10 (+20) , \T1/lmtt/m/n/10 LLthermo_KS\T1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10
 LLthermo_NF\T1/lmr/m/n/10 (+20) ,
  []
 
-[31] (../../outputs/tables/balance_ai_treatment.tex) (../../outputs/tables/bala
-nce_label_treatment.tex)
+[32] (../../outputs/tables/balance_ai_treatment.tex) (../../outputs/tables/bala
+nce_label_treatment.tex) [33] [34] [35]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1031.
-(../../outputs/tables/thermo_ml_ai_results.tex
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1064.
+(../../outputs/tables/thermo_ml_overall_ai_effect.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -1044,7 +1057,41 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../../outputs/tables/thermo_ll_ai_results.tex
+) (../../outputs/tables/thermo_ml_source_credibility.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
+ [][] 
+ []
+
+) (../../outputs/tables/thermo_ml_detection_effect.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
+ [][] 
+ []
+
+) (../../outputs/tables/thermo_ll_overall_ai_effect.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -1053,7 +1100,7 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) (../../outputs/tables/thermo_ml_label_results.tex
+) (../../outputs/tables/thermo_ll_source_credibility.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -1061,8 +1108,16 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: parse table inner spec.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
 > Step: build the whole table.
-) (../../outputs/tables/thermo_ll_label_results.tex
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
+ [][] 
+ []
+
+) (../../outputs/tables/thermo_ll_detection_effect.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -1070,26 +1125,17 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: parse table inner spec.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
 > Step: build the whole table.
-) (../../outputs/tables/agreedisagree_ai_results.tex
-> Step: init table outer spec.
-> Step: parse table options.
-> Step: split table.
-> Step: init table inner spec.
-> Step: parse table inner spec.
-> Step: execute table commands.
-> Step: calculate cell and line sizes.
-> Step: build the whole table.
-) (../../outputs/tables/xtrust_ai_results.tex
-> Step: init table outer spec.
-> Step: parse table options.
-> Step: split table.
-> Step: init table inner spec.
-> Step: parse table inner spec.
-> Step: execute table commands.
-> Step: calculate cell and line sizes.
-> Step: build the whole table.
-) (../../outputs/tables/child_ai_results.tex
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
+ [][] 
+ []
+
+) [36] [37] [38] [39] [40] [41] (../../outputs/tables/agreedisagree_ai_results.
+tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -1107,14 +1153,40 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 
-Package tabularray Warning: Table width is too small, need 24.52266pt more!
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (24.52266pt too wide) in paragraph at lines 50--51
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
  [][] 
  []
 
+) (../../outputs/tables/agreedisagree_labelled_ai_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
+ [][] 
+ []
+
+) (../../outputs/tables/xtrust_ai_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+> Step: build the whole table.
 ) (../../outputs/tables/xtrust_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -1124,14 +1196,40 @@ Overfull \hbox (24.52266pt too wide) in paragraph at lines 50--51
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 
-Package tabularray Warning: Table width is too small, need 3.02324pt more!
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (3.02324pt too wide) in paragraph at lines 38--39
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
  [][] 
  []
 
+) (../../outputs/tables/xtrust_labelled_ai_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
+ [][] 
+ []
+
+) (../../outputs/tables/child_ai_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+> Step: build the whole table.
 ) (../../outputs/tables/child_label_results.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -1141,21 +1239,38 @@ Overfull \hbox (3.02324pt too wide) in paragraph at lines 38--39
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 
-Package tabularray Warning: Table width is too small, need 24.52266pt more!
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
 
 > Step: build the whole table.
 
-Overfull \hbox (24.52266pt too wide) in paragraph at lines 48--49
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
  [][] 
  []
 
-) [32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] [44]
-Overfull \hbox (0.18271pt too wide) in paragraph at lines 1137--1138
+) (../../outputs/tables/child_labelled_ai_results.tex
+> Step: init table outer spec.
+> Step: parse table options.
+> Step: split table.
+> Step: init table inner spec.
+> Step: parse table inner spec.
+> Step: execute table commands.
+> Step: calculate cell and line sizes.
+
+Package tabularray Warning: Table width is too small, need 5.38495pt more!
+
+> Step: build the whole table.
+
+Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
+ [][] 
+ []
+
+) [42] [43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53]
+Overfull \hbox (0.18271pt too wide) in paragraph at lines 1179--1180
 \T1/lmr/m/n/10 (+14) https://globalwitness.org/en/campaigns/digital-threats/con
 spiracy-and-toxicity-xs-ai-chatbot-grok-shares-
  []
 
-[45] [46] [47] (./research_design.aux)
+[54] [55] [56] [57] (./research_design.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -1168,13 +1283,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 25160 strings out of 474116
- 498522 string characters out of 5743681
- 2194187 words of memory out of 5000000
- 46597 multiletter control sequences out of 15000+600000
- 682164 words of font info for 250 fonts, out of 8000000 for 9000
+ 25073 strings out of 474116
+ 495248 string characters out of 5743681
+ 2117187 words of memory out of 5000000
+ 46467 multiletter control sequences out of 15000+600000
+ 696924 words of font info for 268 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 77i,16n,110p,3243b,1343s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 77i,16n,110p,3556b,1265s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/lo
 cal/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texliv
 e/2024/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2024/te
@@ -1195,10 +1310,10 @@ xlive/2024/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2024
 1/public/lm/lmtk10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/l
 m/lmtt10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt8.pf
 b></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt9.pfb>
-Output written on research_design.pdf (53 pages, 681591 bytes).
+Output written on research_design.pdf (63 pages, 1059142 bytes).
 PDF statistics:
- 958 PDF objects out of 1000 (max. 8388607)
- 831 compressed objects within 9 object streams
- 261 named destinations out of 1000 (max. 500000)
- 53351 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 995 PDF objects out of 1000 (max. 8388607)
+ 858 compressed objects within 9 object streams
+ 285 named destinations out of 1000 (max. 500000)
+ 53346 words of extra memory for PDF output out of 61914 (max. 10000000)
 

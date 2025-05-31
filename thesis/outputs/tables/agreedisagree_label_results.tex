@@ -1,51 +1,37 @@
 \begin{table}
 \centering
 \begin{talltblr}[         %% tabularray outer open
-caption={AI-Labelled Content: Agree Out-Party Respect Beliefs \label{tab:agreedisagree-label-results}},
+caption={Respect: Unlabelled vs Labelled AI Content (Detection Effect) \label{tab:agreedisagree-label-results}},
 note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
-note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are not included as they have no substantive interpretation in this context.},
 ]                     %% tabularray outer close
 {                     %% tabularray inner open
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{32}={1,2,3,4}{solid, black, 0.05em},
+hline{18}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-Label Treatment                                & \num{0.007}   & \num{0.007}   & \num{-1.317}  \\
-& (\num{0.200}) & (\num{0.200}) & (\num{0.806}) \\
-Label Treatment:RegionEast of England          &                &                & \num{1.771}+  \\
-&                &                & (\num{0.990}) \\
-Label Treatment:RegionLondon                   &                &                & \num{1.860}+  \\
-&                &                & (\num{0.989}) \\
-Label Treatment:RegionNorth East               &                &                & \num{1.654}   \\
-&                &                & (\num{1.187}) \\
-Label Treatment:RegionNorth West               &                &                & \num{2.217}*  \\
-&                &                & (\num{0.920}) \\
-Label Treatment:RegionScotland                 &                &                & \num{0.996}   \\
-&                &                & (\num{0.950}) \\
-Label Treatment:RegionSouth East               &                &                & \num{1.797}*  \\
-&                &                & (\num{0.873}) \\
-Label Treatment:RegionSouth West               &                &                & \num{0.460}   \\
-&                &                & (\num{1.050}) \\
-Label Treatment:RegionWales                    &                &                & \num{0.528}   \\
-&                &                & (\num{1.219}) \\
-Label Treatment:RegionWest Midlands            &                &                & \num{2.579}** \\
-&                &                & (\num{0.996}) \\
-Label Treatment:RegionYorkshire and the Humber &                &                & \num{1.866}+  \\
-&                &                & (\num{0.994}) \\
-Label Treatment:mostlikelyGreen Party          &                &                & \num{-1.330}  \\
-&                &                & (\num{0.857}) \\
-Label Treatment:mostlikelyLabour Party         &                &                & \num{0.633}   \\
-&                &                & (\num{0.576}) \\
-Label Treatment:mostlikelyLiberal Democrats    &                &                & \num{-1.082}+ \\
-&                &                & (\num{0.581}) \\
-Label Treatment:mostlikelyReform UK            &                &                & \num{-0.580}  \\
-&                &                & (\num{0.547}) \\
-Num.Obs.                                       & \num{669}     & \num{669}     & \num{669}     \\
-edf                                            & 5              & 5              & 33             \\
-Model                                          & (1)            & (2)            & (3)            \\
+Label Treatment                              & \num{0.007}   & \num{0.007}   & \num{-1.202}  \\
+& (\num{0.200}) & (\num{0.200}) & (\num{0.754}) \\
+Label Treatment:mostlikelyConservative Party &                &                & \num{0.414}   \\
+&                &                & (\num{0.546}) \\
+Label Treatment:mostlikelyGreen Party        &                &                & \num{-0.748}  \\
+&                &                & (\num{0.851}) \\
+Label Treatment:mostlikelyLabour Party       &                &                & \num{1.207}+  \\
+&                &                & (\num{0.619}) \\
+Label Treatment:mostlikelyLiberal Democrats  &                &                & \num{-0.654}  \\
+&                &                & (\num{0.619}) \\
+Label Treatment:Political Attention          &                &                & \num{0.138}   \\
+&                &                & (\num{0.116}) \\
+Label Treatment:Education LevelHigh          &                &                & \num{-0.221}  \\
+&                &                & (\num{0.502}) \\
+Label Treatment:Education LevelMedium        &                &                & \num{0.355}   \\
+&                &                & (\num{0.543}) \\
+Num.Obs.                                     & \num{669}     & \num{669}     & \num{669}     \\
+edf                                          & 5              & 5              & 19             \\
+Model                                        & (1)            & (2)            & (3)            \\
 \bottomrule
 \end{talltblr}
 \end{table}

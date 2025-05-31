@@ -20,5 +20,7 @@ pacman::p_load(
     equatiomatic,
     knitr,
     ggeffects,
-    patchwork
+    patchwork,
+    margins,
+    effects
 )

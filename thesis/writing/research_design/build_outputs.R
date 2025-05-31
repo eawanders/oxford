@@ -13,7 +13,6 @@ source(here("thesis", "analysis", "descriptive_analysis.R"))
 source(here("thesis", "analysis", "survey_design.R"))
 source(here("thesis", "analysis", "thermo_models.R"))
 source(here("thesis", "analysis", "ordinal_models.R"))
-source(here("thesis", "outputs", "helpers", "model_output_helpers.R"))
 
 # === Load AI Treatment Thermometer Models ===
 thermo_gap_treat <- readRDS(here("thesis", "outputs", "models", "thermo_gap_ai_treatment_treat.rds"))
@@ -41,78 +40,127 @@ thermo_ll_label_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ll_
 thermo_ll_label_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ll_label_treatment_cov.rds"))
 full_thermo_ll_label_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ll_label_treatment_model.rds"))
 
-# === Save Thermometer Tables ===
+# === Load Labelled AI Treatment Thermometer Models ===
+thermo_gap_labelled_ai_treat <- readRDS(here("thesis", "outputs", "models", "thermo_gap_labelled_ai_treatment_treat.rds"))
+thermo_gap_labelled_ai_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_gap_labelled_ai_treatment_cov.rds"))
+full_thermo_gap_labelled_ai_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_gap_labelled_ai_model.rds"))
 
-# AI Treatment Models
+thermo_ml_labelled_ai_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ml_labelled_ai_treatment_treat.rds"))
+thermo_ml_labelled_ai_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ml_labelled_ai_treatment_cov.rds"))
+full_thermo_ml_labelled_ai_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ml_labelled_ai_model.rds"))
+
+thermo_ll_labelled_ai_treat <- readRDS(here("thesis", "outputs", "models", "thermo_ll_labelled_ai_treatment_treat.rds"))
+thermo_ll_labelled_ai_treat_cov <- readRDS(here("thesis", "outputs", "models", "thermo_ll_labelled_ai_treatment_cov.rds"))
+full_thermo_ll_labelled_ai_model <- readRDS(here("thesis", "outputs", "models", "full_thermo_ll_labelled_ai_model.rds"))
+
+
+
+# === Save Thermometer Tables (Revised, Theory-Aligned Naming) ===
+
+# === Overall AI Treatment Effect ===
+
 save_thermo_table(
-    file = here("thesis", "outputs", "tables", "thermo_gap_ai_results.tex"),
+    file = here("thesis", "outputs", "tables", "thermo_gap_overall_ai_effect.tex"),
     treat = thermo_gap_treat,
     cov = thermo_gap_treat_cov,
     full = full_thermo_gap_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_EURef|profile_GOR|pastvote_ge_2024)",
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
     coef_rename = c(
         "ai_treatment" = "AI Treatment",
-        "pastvote_ge_2024" = "Vote in GE 2024",
-        "ai_treatment:pastvote_ge_2024Green" = "AI Treatment:Green",
-        "ai_treatment:pastvote_ge_2024Labour" = "AI Treatment:Labour",
-        "ai_treatment:pastvote_ge_2024Liberal Democrat" = "AI Treatment:Lib Dem",
-        "ai_treatment:pastvote_ge_2024Other" = "AI Treatment:Other",
-        "ai_treatment:pastvote_ge_2024Reform UK" = "AI Treatment:Reform UK",
-        "ai_treatment:pastvote_ge_2024Scottish National Party (SNP)" = "AI Treatment:SNP"
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
     ),
-    title = "AI-Generated Content: Thermometer Gap Results \\label{tab:thermo-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    title = "AI-Generated Content: Thermometer Gap Results (Overall Treatment Effect) \\label{tab:thermo-gap-overall}",
+    notes = "Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses. Main effects of included moderators are also reported as rows above the moderator treatment effects.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
 
 save_thermo_table(
-    file = here("thesis", "outputs", "tables", "thermo_ml_ai_results.tex"),
+    file = here("thesis", "outputs", "tables", "thermo_ml_overall_ai_effect.tex"),
     treat = thermo_ml_treat,
     cov = thermo_ml_treat_cov,
     full = full_thermo_ml_model,
-    coef_omit = "^(political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
     coef_rename = c(
         "ai_treatment" = "AI Treatment",
-        "profile_work_statNot working" = "Not Working",
-        "profile_work_statOther" = "Other",
-        "profile_work_statRetired" = "Retired",
-        "profile_work_statUnemployed" = "Unemployed",
-        "profile_work_statWorking full time (30 or more hours per week)" = "Working Full Time",
-        "profile_work_statWorking part time (8-29 hours a week)" = "Working PT (8–29h)",
-        "profile_work_statWorking part time (Less than 8 hours a week)" = "Working PT (<8h)",
-        "ai_treatment:education_recodeLow" = "AI Treatment:Low Education",
-        "ai_treatment:education_recodeMedium" = "AI Treatment:Medium Education",
-        "ai_treatment:profile_work_statNot working" = "AI Treatment:Not Working",
-        "ai_treatment:profile_work_statOther" = "AI Treatment:Other",
-        "ai_treatment:profile_work_statRetired" = "AI Treatment:Retired",
-        "ai_treatment:profile_work_statUnemployed" = "AI Treatment:Unemployed",
-        "ai_treatment:profile_work_statWorking full time (30 or more hours per week)" = "AI Treatment:Working Full Time",
-        "ai_treatment:profile_work_statWorking part time (8-29 hours a week)" = "AI Treatment:Working PT (8–29h)",
-        "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)" = "AI Treatment:Working PT (<8h)"
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
     ),
-    title = "AI-Generated Content: Thermometer (mostlikely) Results \\label{tab:thermo-ml-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    title = "AI-Generated Content: Thermometer (Most Likely) Results (Overall Treatment Effect) \\label{tab:thermo-ml-overall}",
+    notes = "Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
 
 save_thermo_table(
-    file = here("thesis", "outputs", "tables", "thermo_ll_ai_results.tex"),
+    file = here("thesis", "outputs", "tables", "thermo_ll_overall_ai_effect.tex"),
     treat = thermo_ll_treat,
     cov = thermo_ll_treat_cov,
     full = full_thermo_ll_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|profile_GOR|pastvote_EURef)",
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
     coef_rename = c(
         "ai_treatment" = "AI Treatment",
-        "ai_treatment:age" = "AI Treatment:Age"
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
     ),
-    title = "AI-Generated Content: Thermometer (leastlikely) Results \\label{tab:thermo-ll-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    title = "AI-Generated Content: Thermometer (Least Likely) Results (Overall Treatment Effect) \\label{tab:thermo-ll-overall}",
+    notes = "Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
 
-# Label treatment models
+# === Source Credibility Effect ===
+
 save_thermo_table(
-    file = here("thesis", "outputs", "tables", "thermo_gap_label_results.tex"),
+    file = here("thesis", "outputs", "tables", "thermo_gap_source_credibility.tex"),
+    treat = thermo_gap_labelled_ai_treat,
+    cov = thermo_gap_labelled_ai_treat_cov,
+    full = full_thermo_gap_labelled_ai_model,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
+    coef_rename = c(
+        "labelled_ai_treatment" = "Label Treatment",
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
+    ),
+    title = "Source Credibility Effect: Thermometer Gap Results (Labelled AI vs Human, No Label) \\label{tab:thermo-gap-source-cred}",
+    notes = "Treatment compares labelled AI-generated content to unlabelled human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
+    add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
+)
+
+save_thermo_table(
+    file = here("thesis", "outputs", "tables", "thermo_ml_source_credibility.tex"),
+    treat = thermo_ml_labelled_ai_treat,
+    cov = thermo_ml_labelled_ai_treat_cov,
+    full = full_thermo_ml_labelled_ai_model,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
+    coef_rename = c(
+        "labelled_ai_treatment" = "Label Treatment",
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
+    ),
+    title = "Source Credibility Effect: Thermometer (Most Likely) Results (Labelled AI vs Human, No Label) \\label{tab:thermo-ml-source-cred}",
+    notes = "Treatment compares labelled AI-generated content to unlabelled human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
+    add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
+)
+
+save_thermo_table(
+    file = here("thesis", "outputs", "tables", "thermo_ll_source_credibility.tex"),
+    treat = thermo_ll_labelled_ai_treat,
+    cov = thermo_ll_labelled_ai_treat_cov,
+    full = full_thermo_ll_labelled_ai_model,
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
+    coef_rename = c(
+        "labelled_ai_treatment" = "Label Treatment",
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
+    ),
+    title = "Source Credibility Effect: Thermometer (Least Likely) Results (Labelled AI vs Human, No Label) \\label{tab:thermo-ll-source-cred}",
+    notes = "Treatment compares labelled AI-generated content to unlabelled human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
+    add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
+)
+
+# === Detection Effect ===
+
+save_thermo_table(
+    file = here("thesis", "outputs", "tables", "thermo_gap_detection_effect.tex"),
     treat = thermo_gap_label_treat,
     cov = thermo_gap_label_treat_cov,
     full = full_thermo_gap_label_model,
@@ -120,78 +168,74 @@ save_thermo_table(
     coef_rename = c(
         "label_treatment" = "Label Treatment",
         "political_attention" = "Political Attention",
-        "label_treatment:political_attention" = "Label Treatment:Political Attention",
-        "label_treatment:mostlikelyGreen Party" = "Label Treatment:Greens",
-        "label_treatment:mostlikelyLabour Party" = "Label Treatment:Labour",
-        "label_treatment:mostlikelyLiberal Democrats" = "Label Treatment:LibDem",
-        "label_treatment:mostlikelyReform UK" = "Label Treatment:Reform"
+        "education_recode" = "Education Level"
     ),
-    title = "AI-Labelled Content: Thermometer Gap Results \\label{tab:thermo-gap-label-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    title = "Detection Effect: Thermometer Gap Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-gap-detection}",
+    notes = "Treatment compares labelled AI-generated content to unlabelled AI-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
 
 save_thermo_table(
-    file = here("thesis", "outputs", "tables", "thermo_ml_label_results.tex"),
+    file = here("thesis", "outputs", "tables", "thermo_ml_detection_effect.tex"),
     treat = thermo_ml_label_treat,
     cov = thermo_ml_label_treat_cov,
     full = full_thermo_ml_label_model,
-    coef_omit = "^(political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
     coef_rename = c(
         "label_treatment" = "Label Treatment",
-        "label_treatment:age" = "Label Treatment:Age",
-        "label_treatment:political_attention" = "Label Treatment:Political Attention",
-        "label_treatment:mostlikelyGreen Party" = "Label Treatment:Greens",
-        "label_treatment:mostlikelyLabour Party" = "Label Treatment:Labour",
-        "label_treatment:mostlikelyLiberal Democrats" = "Label Treatment:LibDem",
-        "label_treatment:mostlikelyReform UK" = "Label Treatment:Reform"
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
     ),
-    title = "AI-Labelled Content: Thermometer (mostlikely) Results \\label{tab:thermo-ml-label-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    title = "Detection Effect: Thermometer (Most Likely) Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-ml-detection}",
+    notes = "Treatment compares labelled AI-generated content to unlabelled AI-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
 
 save_thermo_table(
-    file = here("thesis", "outputs", "tables", "thermo_ll_label_results.tex"),
+    file = here("thesis", "outputs", "tables", "thermo_ll_detection_effect.tex"),
     treat = thermo_ll_label_treat,
     cov = thermo_ll_label_treat_cov,
     full = full_thermo_ll_label_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|label_treatment:profile_work_stat)",
+    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
     coef_rename = c(
         "label_treatment" = "Label Treatment",
-        "label_treatment:profile_genderMale" = "Label Treatment:Male"
+        "political_attention" = "Political Attention",
+        "education_recode" = "Education Level"
     ),
-    title = "AI-Labelled Content: Thermometer (leastlikely) Results \\label{tab:thermo-ll-label-results}",
-    notes = "Note: Models weighted using YouGov survey weights. The coefficients are reported with robust standard errors in parentheses. Main effects of the included moderators are also reported as rows above the moderator treatment effects.",
+    title = "Detection Effect: Thermometer (Least Likely) Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-ll-detection}",
+    notes = "Treatment compares labelled AI-generated content to unlabelled AI-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
 
 # === Add save_ordinal_table() calls here as needed ===
 # Create the tables for the ordinal models
 # Load the ordinal models for AI treatment
-agreedisagree_ai_treat <- readRDS(here("thesis", "outputs", "models", "agreedisagree_ai_treatment_treat.rds"))
-agreedisagree_ai_cov <- readRDS(here("thesis", "outputs", "models", "agreedisagree_ai_treatment_cov.rds"))
-full_agreedisagree_ai_model <- readRDS(here("thesis", "outputs", "models", "full_agreedisagree_ai_treatment_model.rds"))
+models_dir <- here("thesis", "outputs", "models")
+agreedisagree_ai_treat <- readRDS(file.path(models_dir, "agreedisagree_ai_treatment_treat.rds"))
+agreedisagree_ai_cov <- readRDS(file.path(models_dir, "agreedisagree_ai_treatment_cov.rds"))
+full_agreedisagree_ai_model <- readRDS(file.path(models_dir, "full_agreedisagree_ai_treatment_model.rds"))
 
-xtrust_ai_treat <- readRDS(here("thesis", "outputs", "models", "xtrust_ai_treatment_treat.rds"))
-xtrust_ai_cov <- readRDS(here("thesis", "outputs", "models", "xtrust_ai_treatment_cov.rds"))
-full_xtrust_ai_model <- readRDS(here("thesis", "outputs", "models", "full_xtrust_ai_treatment_model.rds"))
+xtrust_ai_treat <- readRDS(file.path(models_dir, "xtrust_ai_treatment_treat.rds"))
+xtrust_ai_cov <- readRDS(file.path(models_dir, "xtrust_ai_treatment_cov.rds"))
+full_xtrust_ai_model <- readRDS(file.path(models_dir, "full_xtrust_ai_treatment_model.rds"))
 
-child_ai_treat <- readRDS(here("thesis", "outputs", "models", "child_ai_treatment_treat.rds"))
-child_ai_cov <- readRDS(here("thesis", "outputs", "models", "child_ai_treatment_cov.rds"))
-full_child_ai_model <- readRDS(here("thesis", "outputs", "models", "full_child_ai_treatment_model.rds"))
+child_ai_treat <- readRDS(file.path(models_dir, "child_ai_treatment_treat.rds"))
+child_ai_cov <- readRDS(file.path(models_dir, "child_ai_treatment_cov.rds"))
+full_child_ai_model <- readRDS(file.path(models_dir, "full_child_ai_treatment_model.rds"))
 
 save_ordinal_table(
     file = here("thesis", "outputs", "tables", "agreedisagree_ai_results.tex"),
     treat = agreedisagree_ai_treat,
     cov = agreedisagree_ai_cov,
     full = full_agreedisagree_ai_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat)",
+    coef_omit = "^(?!(ai_treatment(:|$))).*|\\|",
     coef_rename = c(
-        "ai_treatment" = "AI Treatment"
+        "ai_treatment" = "AI Treatment",
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
     ),
-    title = "AI-Generated Content: Agree Out-Party Respect Beliefs \\label{tab:agreedisagree-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.",
+    title = "Respect: AI Content vs Human Control (Detection Condition) \\label{tab:agreedisagree-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
         `Treatment Only` = "(1)",
@@ -205,19 +249,14 @@ save_ordinal_table(
     treat = xtrust_ai_treat,
     cov = xtrust_ai_cov,
     full = full_xtrust_ai_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR)",
+    coef_omit = "^(?!(ai_treatment(:|$))).*|\\|",
     coef_rename = c(
         "ai_treatment" = "AI Treatment",
-        "ai_treatment:profile_work_statNot working" = "AI Treatment:Not Working",
-        "ai_treatment:profile_work_statOther" = "AI Treatment:Other",
-        "ai_treatment:profile_work_statRetired" = "AI Treatment:Retired",
-        "ai_treatment:profile_work_statUnemployed" = "AI Treatment:Unemployed",
-        "ai_treatment:profile_work_statWorking full time (30 or more hours per week)" = "AI Treatment:Working Full Time",
-        "ai_treatment:profile_work_statWorking part time (8-29 hours a week)" = "AI Treatment:Working PT (8–29h)",
-        "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)" = "AI Treatment:Working PT (<8h)"
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
     ),
-    title = "AI-Generated Content: Trust in Out-Party to Do What Is Right \\label{tab:xtrust-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are included but have no substantive interpretation.",
+    title = "Trust: AI Content vs Human Control (Detection Condition) \\label{tab:xtrust-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
         `Treatment Only` = "(1)",
@@ -235,11 +274,10 @@ save_ordinal_table(
     coef_rename = c(
         "ai_treatment" = "AI Treatment",
         "education_recode" = "Education Level",
-        "profile_gender" = "Gender",
-        "profile_work_stat" = "Work Status"
+        "political_attention" = "Political Attention"
     ),
-    title = "AI-Generated Content: Comfort with Child Marrying Opposing Partisan \\label{tab:child-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.",
+    title = "Discomfort: AI Content vs Human Control (Detection Condition) \\label{tab:child-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
         `Treatment Only` = "(1)",
@@ -249,17 +287,94 @@ save_ordinal_table(
 )
 
 # Load the ordinal models for Label treatment
-agreedisagree_label_treat <- readRDS(here("thesis", "outputs", "models", "agreedisagree_label_treatment_treat.rds"))
-agreedisagree_label_cov <- readRDS(here("thesis", "outputs", "models", "agreedisagree_label_treatment_cov.rds"))
-full_agreedisagree_label_model <- readRDS(here("thesis", "outputs", "models", "full_agreedisagree_label_treatment_model.rds"))
+agreedisagree_label_treat <- readRDS(file.path(models_dir, "agreedisagree_label_treatment_treat.rds"))
+agreedisagree_label_cov <- readRDS(file.path(models_dir, "agreedisagree_label_treatment_cov.rds"))
+full_agreedisagree_label_model <- readRDS(file.path(models_dir, "full_agreedisagree_label_treatment_model.rds"))
 
-xtrust_label_treat <- readRDS(here("thesis", "outputs", "models", "xtrust_label_treatment_treat.rds"))
-xtrust_label_cov <- readRDS(here("thesis", "outputs", "models", "xtrust_label_treatment_cov.rds"))
-full_xtrust_label_model <- readRDS(here("thesis", "outputs", "models", "full_xtrust_label_treatment_model.rds"))
+xtrust_label_treat <- readRDS(file.path(models_dir, "xtrust_label_treatment_treat.rds"))
+xtrust_label_cov <- readRDS(file.path(models_dir, "xtrust_label_treatment_cov.rds"))
+full_xtrust_label_model <- readRDS(file.path(models_dir, "full_xtrust_label_treatment_model.rds"))
 
-child_label_treat <- readRDS(here("thesis", "outputs", "models", "child_label_treatment_treat.rds"))
-child_label_cov <- readRDS(here("thesis", "outputs", "models", "child_label_treatment_cov.rds"))
-full_child_label_model <- readRDS(here("thesis", "outputs", "models", "full_child_label_treatment_model.rds"))
+child_label_treat <- readRDS(file.path(models_dir, "child_label_treatment_treat.rds"))
+child_label_cov <- readRDS(file.path(models_dir, "child_label_treatment_cov.rds"))
+full_child_label_model <- readRDS(file.path(models_dir, "full_child_label_treatment_model.rds"))
+
+# Load the ordinal models for Labelled AI Treatment (Source Credibility)
+agreedisagree_labelled_ai_treat <- readRDS(file.path(models_dir, "agreedisagree_labelled_ai_treatment_treat.rds"))
+agreedisagree_labelled_ai_cov <- readRDS(file.path(models_dir, "agreedisagree_labelled_ai_treatment_cov.rds"))
+full_agreedisagree_labelled_ai_treatment <- readRDS(file.path(models_dir, "full_agreedisagree_labelled_ai_treatment_model.rds"))
+
+xtrust_labelled_ai_treat <- readRDS(file.path(models_dir, "xtrust_labelled_ai_treatment_treat.rds"))
+xtrust_labelled_ai_cov <- readRDS(file.path(models_dir, "xtrust_labelled_ai_treatment_cov.rds"))
+full_xtrust_labelled_ai_treatment <- readRDS(file.path(models_dir, "full_xtrust_labelled_ai_treatment_model.rds"))
+
+child_labelled_ai_treat <- readRDS(file.path(models_dir, "child_labelled_ai_treatment_treat.rds"))
+child_labelled_ai_cov <- readRDS(file.path(models_dir, "child_labelled_ai_treatment_cov.rds"))
+full_child_labelled_ai_treatment <- readRDS(file.path(models_dir, "full_child_labelled_ai_treatment_model.rds"))
+
+# === Save Labelled AI Treatment (Source Credibility) Ordinal Tables ===
+save_ordinal_table(
+    file = here("thesis", "outputs", "tables", "agreedisagree_labelled_ai_results.tex"),
+    treat = agreedisagree_labelled_ai_treat,
+    cov = agreedisagree_labelled_ai_cov,
+    full = full_agreedisagree_labelled_ai_treatment,
+    coef_omit = "^(?!(labelled_ai_treatment(:|$))).*|\\|",
+    coef_rename = c(
+        "labelled_ai_treatment" = "Label Treatment",
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
+    ),
+    title = "Respect: Labelled AI Content vs Human Control (Source Credibility Condition) \\label{tab:agreedisagree-labelled-ai-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+
+save_ordinal_table(
+    file = here("thesis", "outputs", "tables", "xtrust_labelled_ai_results.tex"),
+    treat = xtrust_labelled_ai_treat,
+    cov = xtrust_labelled_ai_cov,
+    full = full_xtrust_labelled_ai_treatment,
+    coef_omit = "^(?!(labelled_ai_treatment(:|$))).*|\\|",
+    coef_rename = c(
+        "labelled_ai_treatment" = "Label Treatment",
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
+    ),
+    title = "Trust: Labelled AI Content vs Human Control (Source Credibility Condition) \\label{tab:xtrust-labelled-ai-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
+
+save_ordinal_table(
+    file = here("thesis", "outputs", "tables", "child_labelled_ai_results.tex"),
+    treat = child_labelled_ai_treat,
+    cov = child_labelled_ai_cov,
+    full = full_child_labelled_ai_treatment,
+    coef_omit = "^(?!(labelled_ai_treatment(:|$))).*|\\|",
+    coef_rename = c(
+        "labelled_ai_treatment" = "Label Treatment",
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
+    ),
+    title = "Discomfort: Labelled AI Content vs Human Control (Source Credibility Condition) \\label{tab:child-labelled-ai-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
+    add_rows = tibble::tibble(
+        term = "Model",
+        `Treatment Only` = "(1)",
+        `Treatment + Covariates` = "(2)",
+        `Full Model` = "(3)"
+    )
+)
 
 # === Save Label Treatment Ordinal Tables ===
 save_ordinal_table(
@@ -270,10 +385,11 @@ save_ordinal_table(
     coef_omit = "^(?!(label_treatment(:|$))).*|\\|",
     coef_rename = c(
         "label_treatment" = "Label Treatment",
-        "profile_GOR" = "Region"
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
     ),
-    title = "AI-Labelled Content: Agree Out-Party Respect Beliefs \\label{tab:agreedisagree-label-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are included but have no substantive interpretation.",
+    title = "Respect: Unlabelled vs Labelled AI Content (Detection Effect) \\label{tab:agreedisagree-label-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
         `Treatment Only` = "(1)",
@@ -287,12 +403,14 @@ save_ordinal_table(
     treat = xtrust_label_treat,
     cov = xtrust_label_cov,
     full = full_xtrust_label_model,
-    coef_omit = "^(age|political_attention|profile_gender|education_recode|profile_work_stat|pastvote_ge_2024|pastvote_EURef|profile_GOR|mostlikely)",
+    coef_omit = "^(?!(label_treatment(:|$))).*|\\|",
     coef_rename = c(
-        "label_treatment" = "Label Treatment"
+        "label_treatment" = "Label Treatment",
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
     ),
-    title = "AI-Labelled Content: Trust in Out-Party to Do What Is Right \\label{tab:xtrust-label-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are included but have no substantive interpretation.",
+    title = "Trust: Unlabelled vs Labelled AI Content (Detection Effect) \\label{tab:xtrust-label-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
         `Treatment Only` = "(1)",
@@ -309,12 +427,11 @@ save_ordinal_table(
     coef_omit = "^(?!(label_treatment(:|$))).*|\\|",
     coef_rename = c(
         "label_treatment" = "Label Treatment",
-        "profile_GOR" = "Region",
-        "profile_gender" = "Gender",
-        "pastvote_EURef" = "EU Vote"
+        "education_recode" = "Education Level",
+        "political_attention" = "Political Attention"
     ),
-    title = "AI-Labelled Content: Comfort with Child Marrying Opposing Partisan \\label{tab:child-label-results}",
-    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.",
+    title = "Discomfort: Unlabelled vs Labelled AI Content (Detection Effect) \\label{tab:child-label-results}",
+    notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
         `Treatment Only` = "(1)",
@@ -323,140 +440,200 @@ save_ordinal_table(
     )
 )
 
-
-
 # === Plotting Logic ===
-
 source(here("thesis", "analysis", "thermo_models_plots.R"))
-source(here("thesis", "analysis", "ordinal_models_plots.R"))
-
-# === Save Thermometer Plots ===
-# Descriptive Statistics Plot (combined AI and Label Treatment effects)
-ggplot2::ggsave(
-    filename = here("thesis", "outputs", "figures", "thermo_gap_plot.pdf"),
-    plot = combined_plot,
-    width = 5,
-    height = 3,
-    units = "in"
-)
-
-# Patchwork Plos for both AI and Label Treatments
-# Generate and save the patchwork plot for AI Treatment
-plot_thermo_patchwork(
-    models = models_ai,
-    treatment_var = "ai_treatment",
-    subgroups = subgroups_ai,
-    output_file = here("thesis", "outputs", "figures", "thermo_patchwork_ai_treatment.pdf")
-)
-
-# Generate and save the patchwork plot for Label Treatment
-plot_thermo_patchwork(
-    models = models_label,
-    treatment_var = "label_treatment",
-    subgroups = subgroups_label,
-    output_file = here("thesis", "outputs", "figures", "thermo_patchwork_label_treatment.pdf")
-)
-
-# === Save Ordinal Plots ===
-
-# Generate the plots for each significant subgroup to plot
-plot_disagreement <- generate_plot_for_outcome(
-    data = yougov_data_ai,
-    outcome = "agreedisagree",
-    treatment = "ai_treatment",
-    moderators = moderators_agreedisagree_ai,
-    covariates = covariates_agreedisagree_ai,
-    moderator_terms = subgroups_agreedisagree,
-    collapse_levels = c("Strongly disagree", "Tend to disagree"),
-    moderator_labels = subgroup_labels_agreedisagree,
-    plot_title = "Do not Respect Beliefs (AI Treatment)"
-)
-
-plot_trust <- generate_plot_for_outcome(
-    data = yougov_data_ai,
-    outcome = "xtrust",
-    treatment = "ai_treatment",
-    moderators = moderators_xtrust_ai,
-    covariates = covariates_xtrust_ai,
-    moderator_terms = subgroups_trust,
-    collapse_levels = c("Almost never", "Once in a while"),
-    moderator_labels = subgroup_labels_trust,
-    plot_title = "Do not Trust to do Right (AI Treatment)"
-)
-
-# Combine plots with patchwork
-combined_plot <- plot_disagreement + plot_trust +
-    plot_layout(ncol = 2, guides = "collect") &
-    theme(legend.position = "bottom")
-
-ggsave(
-    filename = here("thesis", "outputs", "figures", "ordinal_patchwork_ai_treatment.pdf"),
-    plot = combined_plot,
-    width = 10, height = 4
-)
 
 
-# === Save Ordinal Plots for Label Treatment ===
+# === Inline Results ===
 
-plot_disagreement_label <- generate_plot_for_outcome(
-    data = yougov_data_label,
-    outcome = "agreedisagree",
-    treatment = "label_treatment",
-    moderators = moderators_agreedisagree_label,
-    covariates = covariates_agreedisagree_label,
-    moderator_terms = subgroups_agreedisagree_label,
-    collapse_levels = c("Strongly disagree", "Tend to disagree"),
-    moderator_labels = labels_agreedisagree_label,
-    plot_title = "Do not Respect Beliefs (Label Treatment)"
-)
+model_results <- list()
 
-plot_trust_label <- generate_plot_for_outcome(
-    data = yougov_data_label,
-    outcome = "xtrust",
-    treatment = "label_treatment",
-    moderators = moderators_xtrust_label,
-    covariates = covariates_xtrust_label,
-    moderator_terms = subgroups_trust_label,
-    collapse_levels = c("Almost never", "Once in a while"),
-    moderator_labels = subgroup_labels_trust_label,
-    plot_title = "Do not Trust to do Right (Label Treatment)"
-)
-# Combine and save
-combined_plot_label <- plot_disagreement_label + plot_trust_label +
-    plot_layout(ncol = 2, guides = "collect") &
-    theme(legend.position = "bottom")
+# Extract coefficients from all models
+model_results$ai_thermo_gap_coef <- coef(full_thermo_gap_model)["ai_treatment"]
+model_results$ai_thermo_ml_coef <- coef(full_thermo_ml_model)["ai_treatment"]
+model_results$ai_thermo_ll_coef <- coef(full_thermo_ll_model)["ai_treatment"]
 
-ggsave(
-    filename = here("thesis", "outputs", "figures", "ordinal_patchwork_label_treatment.pdf"),
-    plot = combined_plot_label,
-    width = 10, height = 4
-)
+model_results$label_thermo_gap_coef <- coef(full_thermo_gap_label_model)["label_treatment"]
+model_results$label_thermo_ml_coef <- coef(full_thermo_ml_label_model)["label_treatment"]
+model_results$label_thermo_ll_coef <- coef(full_thermo_ll_label_model)["label_treatment"]
+
+model_results$labelled_thermo_gap_coef <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment"]
+model_results$labelled_thermo_ml_coef <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment"]
+model_results$labelled_thermo_ll_coef <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment"]
 
 
-# Save all inline-referenced results
-save_inline_results(
-    models = list(
-        full_thermo_gap_ai_treatment_model = full_thermo_gap_model,
-        full_thermo_ml_ai_treatment_model = full_thermo_ml_model,
-        full_thermo_ll_ai_treatment_model = full_thermo_ll_model,
-        full_thermo_gap_label_treatment_model = full_thermo_gap_label_model,
-        full_thermo_ml_label_treatment_model = full_thermo_ml_label_model,
-        full_thermo_ll_label_treatment_model = full_thermo_ll_label_model,
-        full_agreedisagree_ai_treatment_model = full_agreedisagree_ai_model,
-        full_xtrust_ai_treatment_model = full_xtrust_ai_model,
-        full_child_ai_treatment_model = full_child_ai_model,
-        full_agreedisagree_label_treatment_model = full_agreedisagree_label_model,
-        full_xtrust_label_treatment_model = full_xtrust_label_model,
-        full_child_label_treatment_model = full_child_label_model
-    ),
-    predicted_probs = list(
-        plot_disagreement = plot_disagreement,
-        plot_trust = plot_trust,
-        plot_disagreement_label = plot_disagreement_label,
-        plot_trust_label = plot_trust_label
-    ),
-    save_path = here("thesis", "outputs", "helpers", "inline_results.rds")
-)
+model_results$label_agreedisagree_coef <- coef(full_agreedisagree_label_model)["label_treatment"]
+model_results$label_xtrust_coef <- coef(full_xtrust_label_model)["label_treatment"]
+model_results$label_child_coef <- coef(full_child_label_model)["label_treatment"]
 
-# Save treatment conditions table
-source(here("thesis", "analysis", "treatment_conditions.R"))
+model_results$labelled_agreedisagree_coef <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment"]
+model_results$labelled_xtrust_coef <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment"]
+model_results$labelled_child_coef <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment"]
+
+model_results$ai_agreedisagree_coef <- coef(full_agreedisagree_ai_model)["ai_treatment"]
+model_results$ai_xtrust_coef <- coef(full_xtrust_ai_model)["ai_treatment"]
+model_results$ai_child_coef <- coef(full_child_ai_model)["ai_treatment"]
+
+# Moderation effects from full_thermo_gap_model
+model_results$gap_ai_mostlikely_conservative <- coef(full_thermo_gap_model)["ai_treatment:mostlikelyConservative Party"]
+model_results$gap_ai_mostlikely_green <- coef(full_thermo_gap_model)["ai_treatment:mostlikelyGreen Party"]
+model_results$gap_ai_mostlikely_labour <- coef(full_thermo_gap_model)["ai_treatment:mostlikelyLabour Party"]
+model_results$gap_ai_mostlikely_ldem <- coef(full_thermo_gap_model)["ai_treatment:mostlikelyLiberal Democrats"]
+model_results$gap_ai_polattn <- coef(full_thermo_gap_model)["ai_treatment:political_attention"]
+model_results$gap_ai_edu_high <- coef(full_thermo_gap_model)["ai_treatment:education_recodeHigh"]
+model_results$gap_ai_edu_medium <- coef(full_thermo_gap_model)["ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_ml_model
+model_results$ml_ai_mostlikely_conservative <- coef(full_thermo_ml_model)["ai_treatment:mostlikelyConservative Party"]
+model_results$ml_ai_mostlikely_green <- coef(full_thermo_ml_model)["ai_treatment:mostlikelyGreen Party"]
+model_results$ml_ai_mostlikely_labour <- coef(full_thermo_ml_model)["ai_treatment:mostlikelyLabour Party"]
+model_results$ml_ai_mostlikely_ldem <- coef(full_thermo_ml_model)["ai_treatment:mostlikelyLiberal Democrats"]
+model_results$ml_ai_polattn <- coef(full_thermo_ml_model)["ai_treatment:political_attention"]
+model_results$ml_ai_edu_high <- coef(full_thermo_ml_model)["ai_treatment:education_recodeHigh"]
+model_results$ml_ai_edu_medium <- coef(full_thermo_ml_model)["ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_ll_model
+model_results$ll_ai_mostlikely_conservative <- coef(full_thermo_ll_model)["ai_treatment:mostlikelyConservative Party"]
+model_results$ll_ai_mostlikely_green <- coef(full_thermo_ll_model)["ai_treatment:mostlikelyGreen Party"]
+model_results$ll_ai_mostlikely_labour <- coef(full_thermo_ll_model)["ai_treatment:mostlikelyLabour Party"]
+model_results$ll_ai_mostlikely_ldem <- coef(full_thermo_ll_model)["ai_treatment:mostlikelyLiberal Democrats"]
+model_results$ll_ai_polattn <- coef(full_thermo_ll_model)["ai_treatment:political_attention"]
+model_results$ll_ai_edu_high <- coef(full_thermo_ll_model)["ai_treatment:education_recodeHigh"]
+model_results$ll_ai_edu_medium <- coef(full_thermo_ll_model)["ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_gap_label_model
+model_results$gap_label_mostlikely_conservative <- coef(full_thermo_gap_label_model)["label_treatment:mostlikelyConservative Party"]
+model_results$gap_label_mostlikely_green <- coef(full_thermo_gap_label_model)["label_treatment:mostlikelyGreen Party"]
+model_results$gap_label_mostlikely_labour <- coef(full_thermo_gap_label_model)["label_treatment:mostlikelyLabour Party"]
+model_results$gap_label_mostlikely_ldem <- coef(full_thermo_gap_label_model)["label_treatment:mostlikelyLiberal Democrats"]
+model_results$gap_label_polattn <- coef(full_thermo_gap_label_model)["label_treatment:political_attention"]
+model_results$gap_label_edu_high <- coef(full_thermo_gap_label_model)["label_treatment:education_recodeHigh"]
+model_results$gap_label_edu_medium <- coef(full_thermo_gap_label_model)["label_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_ml_label_model
+model_results$ml_label_mostlikely_conservative <- coef(full_thermo_ml_label_model)["label_treatment:mostlikelyConservative Party"]
+model_results$ml_label_mostlikely_green <- coef(full_thermo_ml_label_model)["label_treatment:mostlikelyGreen Party"]
+model_results$ml_label_mostlikely_labour <- coef(full_thermo_ml_label_model)["label_treatment:mostlikelyLabour Party"]
+model_results$ml_label_mostlikely_ldem <- coef(full_thermo_ml_label_model)["label_treatment:mostlikelyLiberal Democrats"]
+model_results$ml_label_polattn <- coef(full_thermo_ml_label_model)["label_treatment:political_attention"]
+model_results$ml_label_edu_high <- coef(full_thermo_ml_label_model)["label_treatment:education_recodeHigh"]
+model_results$ml_label_edu_medium <- coef(full_thermo_ml_label_model)["label_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_ll_label_model
+model_results$ll_label_mostlikely_conservative <- coef(full_thermo_ll_label_model)["label_treatment:mostlikelyConservative Party"]
+model_results$ll_label_mostlikely_green <- coef(full_thermo_ll_label_model)["label_treatment:mostlikelyGreen Party"]
+model_results$ll_label_mostlikely_labour <- coef(full_thermo_ll_label_model)["label_treatment:mostlikelyLabour Party"]
+model_results$ll_label_mostlikely_ldem <- coef(full_thermo_ll_label_model)["label_treatment:mostlikelyLiberal Democrats"]
+model_results$ll_label_polattn <- coef(full_thermo_ll_label_model)["label_treatment:political_attention"]
+model_results$ll_label_edu_high <- coef(full_thermo_ll_label_model)["label_treatment:education_recodeHigh"]
+model_results$ll_label_edu_medium <- coef(full_thermo_ll_label_model)["label_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_gap_labelled_ai_model
+model_results$gap_labelled_mostlikely_conservative <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:mostlikelyConservative Party"]
+model_results$gap_labelled_mostlikely_green <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:mostlikelyGreen Party"]
+model_results$gap_labelled_mostlikely_labour <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:mostlikelyLabour Party"]
+model_results$gap_labelled_mostlikely_ldem <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:mostlikelyLiberal Democrats"]
+model_results$gap_labelled_polattn <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:political_attention"]
+model_results$gap_labelled_edu_high <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:education_recodeHigh"]
+model_results$gap_labelled_edu_medium <- coef(full_thermo_gap_labelled_ai_model)["labelled_ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_ml_labelled_ai_model
+model_results$ml_labelled_mostlikely_conservative <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:mostlikelyConservative Party"]
+model_results$ml_labelled_mostlikely_green <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:mostlikelyGreen Party"]
+model_results$ml_labelled_mostlikely_labour <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:mostlikelyLabour Party"]
+model_results$ml_labelled_mostlikely_ldem <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:mostlikelyLiberal Democrats"]
+model_results$ml_labelled_polattn <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:political_attention"]
+model_results$ml_labelled_edu_high <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:education_recodeHigh"]
+model_results$ml_labelled_edu_medium <- coef(full_thermo_ml_labelled_ai_model)["labelled_ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_thermo_ll_labelled_ai_model
+model_results$ll_labelled_mostlikely_conservative <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:mostlikelyConservative Party"]
+model_results$ll_labelled_mostlikely_green <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:mostlikelyGreen Party"]
+model_results$ll_labelled_mostlikely_labour <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:mostlikelyLabour Party"]
+model_results$ll_labelled_mostlikely_ldem <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:mostlikelyLiberal Democrats"]
+model_results$ll_labelled_polattn <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:political_attention"]
+model_results$ll_labelled_edu_high <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:education_recodeHigh"]
+model_results$ll_labelled_edu_medium <- coef(full_thermo_ll_labelled_ai_model)["labelled_ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_agreedisagree_label_model
+model_results$agreedisagree_label_mostlikely_conservative <- coef(full_agreedisagree_label_model)["label_treatment:mostlikelyConservative Party"]
+model_results$agreedisagree_label_mostlikely_green <- coef(full_agreedisagree_label_model)["label_treatment:mostlikelyGreen Party"]
+model_results$agreedisagree_label_mostlikely_labour <- coef(full_agreedisagree_label_model)["label_treatment:mostlikelyLabour Party"]
+model_results$agreedisagree_label_mostlikely_ldem <- coef(full_agreedisagree_label_model)["label_treatment:mostlikelyLiberal Democrats"]
+model_results$agreedisagree_label_polattn <- coef(full_agreedisagree_label_model)["label_treatment:political_attention"]
+model_results$agreedisagree_label_edu_high <- coef(full_agreedisagree_label_model)["label_treatment:education_recodeHigh"]
+model_results$agreedisagree_label_edu_medium <- coef(full_agreedisagree_label_model)["label_treatment:education_recodeMedium"]
+
+# Moderation effects from full_xtrust_label_model
+model_results$xtrust_label_mostlikely_conservative <- coef(full_xtrust_label_model)["label_treatment:mostlikelyConservative Party"]
+model_results$xtrust_label_mostlikely_green <- coef(full_xtrust_label_model)["label_treatment:mostlikelyGreen Party"]
+model_results$xtrust_label_mostlikely_labour <- coef(full_xtrust_label_model)["label_treatment:mostlikelyLabour Party"]
+model_results$xtrust_label_mostlikely_ldem <- coef(full_xtrust_label_model)["label_treatment:mostlikelyLiberal Democrats"]
+model_results$xtrust_label_polattn <- coef(full_xtrust_label_model)["label_treatment:political_attention"]
+model_results$xtrust_label_edu_high <- coef(full_xtrust_label_model)["label_treatment:education_recodeHigh"]
+model_results$xtrust_label_edu_medium <- coef(full_xtrust_label_model)["label_treatment:education_recodeMedium"]
+
+# Moderation effects from full_child_label_model
+model_results$child_label_mostlikely_conservative <- coef(full_child_label_model)["label_treatment:mostlikelyConservative Party"]
+model_results$child_label_mostlikely_green <- coef(full_child_label_model)["label_treatment:mostlikelyGreen Party"]
+model_results$child_label_mostlikely_labour <- coef(full_child_label_model)["label_treatment:mostlikelyLabour Party"]
+model_results$child_label_mostlikely_ldem <- coef(full_child_label_model)["label_treatment:mostlikelyLiberal Democrats"]
+model_results$child_label_polattn <- coef(full_child_label_model)["label_treatment:political_attention"]
+model_results$child_label_edu_high <- coef(full_child_label_model)["label_treatment:education_recodeHigh"]
+model_results$child_label_edu_medium <- coef(full_child_label_model)["label_treatment:education_recodeMedium"]
+
+# Moderation effects from full_agreedisagree_labelled_ai_treatment
+model_results$agreedisagree_labelled_mostlikely_conservative <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyConservative Party"]
+model_results$agreedisagree_labelled_mostlikely_green <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyGreen Party"]
+model_results$agreedisagree_labelled_mostlikely_labour <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyLabour Party"]
+model_results$agreedisagree_labelled_mostlikely_ldem <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyLiberal Democrats"]
+model_results$agreedisagree_labelled_polattn <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:political_attention"]
+model_results$agreedisagree_labelled_edu_high <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:education_recodeHigh"]
+model_results$agreedisagree_labelled_edu_medium <- coef(full_agreedisagree_labelled_ai_treatment)["labelled_ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_xtrust_labelled_ai_treatment
+model_results$xtrust_labelled_mostlikely_conservative <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyConservative Party"]
+model_results$xtrust_labelled_mostlikely_green <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyGreen Party"]
+model_results$xtrust_labelled_mostlikely_labour <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyLabour Party"]
+model_results$xtrust_labelled_mostlikely_ldem <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyLiberal Democrats"]
+model_results$xtrust_labelled_polattn <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:political_attention"]
+model_results$xtrust_labelled_edu_high <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:education_recodeHigh"]
+model_results$xtrust_labelled_edu_medium <- coef(full_xtrust_labelled_ai_treatment)["labelled_ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_child_labelled_ai_treatment
+model_results$child_labelled_mostlikely_conservative <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyConservative Party"]
+model_results$child_labelled_mostlikely_green <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyGreen Party"]
+model_results$child_labelled_mostlikely_labour <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyLabour Party"]
+model_results$child_labelled_mostlikely_ldem <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:mostlikelyLiberal Democrats"]
+model_results$child_labelled_polattn <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:political_attention"]
+model_results$child_labelled_edu_high <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:education_recodeHigh"]
+model_results$child_labelled_edu_medium <- coef(full_child_labelled_ai_treatment)["labelled_ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_agreedisagree_ai_model
+model_results$agreedisagree_ai_mostlikely_conservative <- coef(full_agreedisagree_ai_model)["ai_treatment:mostlikelyConservative Party"]
+model_results$agreedisagree_ai_mostlikely_green <- coef(full_agreedisagree_ai_model)["ai_treatment:mostlikelyGreen Party"]
+model_results$agreedisagree_ai_mostlikely_labour <- coef(full_agreedisagree_ai_model)["ai_treatment:mostlikelyLabour Party"]
+model_results$agreedisagree_ai_mostlikely_ldem <- coef(full_agreedisagree_ai_model)["ai_treatment:mostlikelyLiberal Democrats"]
+model_results$agreedisagree_ai_polattn <- coef(full_agreedisagree_ai_model)["ai_treatment:political_attention"]
+model_results$agreedisagree_ai_edu_high <- coef(full_agreedisagree_ai_model)["ai_treatment:education_recodeHigh"]
+model_results$agreedisagree_ai_edu_medium <- coef(full_agreedisagree_ai_model)["ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_xtrust_ai_model
+model_results$xtrust_ai_mostlikely_conservative <- coef(full_xtrust_ai_model)["ai_treatment:mostlikelyConservative Party"]
+model_results$xtrust_ai_mostlikely_green <- coef(full_xtrust_ai_model)["ai_treatment:mostlikelyGreen Party"]
+model_results$xtrust_ai_mostlikely_labour <- coef(full_xtrust_ai_model)["ai_treatment:mostlikelyLabour Party"]
+model_results$xtrust_ai_mostlikely_ldem <- coef(full_xtrust_ai_model)["ai_treatment:mostlikelyLiberal Democrats"]
+model_results$xtrust_ai_polattn <- coef(full_xtrust_ai_model)["ai_treatment:political_attention"]
+model_results$xtrust_ai_edu_high <- coef(full_xtrust_ai_model)["ai_treatment:education_recodeHigh"]
+model_results$xtrust_ai_edu_medium <- coef(full_xtrust_ai_model)["ai_treatment:education_recodeMedium"]
+
+# Moderation effects from full_child_ai_model
+model_results$child_ai_mostlikely_conservative <- coef(full_child_ai_model)["ai_treatment:mostlikelyConservative Party"]
+model_results$child_ai_mostlikely_green <- coef(full_child_ai_model)["ai_treatment:mostlikelyGreen Party"]
+model_results$child_ai_mostlikely_labour <- coef(full_child_ai_model)["ai_treatment:mostlikelyLabour Party"]
+model_results$child_ai_mostlikely_ldem <- coef(full_child_ai_model)["ai_treatment:mostlikelyLiberal Democrats"]
+model_results$child_ai_polattn <- coef(full_child_ai_model)["ai_treatment:political_attention"]
+model_results$child_ai_edu_high <- coef(full_child_ai_model)["ai_treatment:education_recodeHigh"]
+model_results$child_ai_edu_medium <- coef(full_child_ai_model)["ai_treatment:education_recodeMedium"]
+
+saveRDS(model_results, file = here("thesis", "outputs", "helpers", "model_results.rds"))

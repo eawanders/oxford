@@ -22,33 +22,27 @@ fit_ordinal_models <- function(
     data,
     design,
     outcomes = c("agreedisagree", "xtrust", "child"),
-    treatments = c("ai_treatment", "label_treatment"),
+    treatments = c("ai_treatment", "label_treatment", "labelled_ai_treatment"),
     covariates = list(
-        agreedisagree = list(
-            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat"),
-            label_treatment = NULL
-        ),
-        xtrust = list(
-            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat"),
-            label_treatment = NULL
-        ),
-        child = list(
-            ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat"),
-            label_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
-        )
+        ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR"),
+        label_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR"),
+        labelled_ai_treatment = c("age", "political_attention", "profile_gender", "education_recode", "profile_work_stat", "pastvote_ge_2024", "pastvote_EURef", "profile_GOR")
     ),
     moderators = list(
         agreedisagree = list(
-            ai_treatment = c("mostlikely"),
-            label_treatment = c("profile_GOR", "mostlikely")
+            ai_treatment = c("mostlikely", "political_attention", "education_recode"),
+            label_treatment = c("mostlikely", "political_attention", "education_recode"),
+            labelled_ai_treatment = c("mostlikely", "political_attention", "education_recode")
         ),
         xtrust = list(
-            ai_treatment = c("profile_work_stat"),
-            label_treatment = c("mostlikely")
+            ai_treatment = c("mostlikely", "political_attention", "education_recode"),
+            label_treatment = c("mostlikely", "political_attention", "education_recode"),
+            labelled_ai_treatment = c("mostlikely", "political_attention", "education_recode")
         ),
         child = list(
-            ai_treatment = c("education_recode"),
-            label_treatment = c("profile_gender", "profile_GOR", "pastvote_EURef")
+            ai_treatment = c("mostlikely", "political_attention", "education_recode"),
+            label_treatment = c("mostlikely", "political_attention", "education_recode"),
+            labelled_ai_treatment = c("mostlikely", "political_attention", "education_recode")
         )
     )) {
     results_list <- list()
@@ -96,6 +90,13 @@ ordinal_models_list_label <- fit_ordinal_models(
     treatments = c("label_treatment")
 )
 
+ordinal_models_list_credibility <- fit_ordinal_models(
+    data = yougov_data_labelled_ai,
+    design = yougov_design_labelled_ai,
+    outcomes = c("agreedisagree", "xtrust", "child"),
+    treatments = c("labelled_ai_treatment")
+)
+
 # === Save Models ===
 # Assign objects for each ai model
 agreedisagree_ai_treat <- ordinal_models_list_ai[["agreedisagree_ai_treatment_treat"]]
@@ -123,6 +124,19 @@ child_label_treat <- ordinal_models_list_label[["child_label_treatment_treat"]]
 child_label_cov <- ordinal_models_list_label[["child_label_treatment_cov"]]
 full_child_label_model <- ordinal_models_list_label[["full_child_label_treatment_model"]]
 
+# Assign objects for each credibility model
+agreedisagree_cred_treat <- ordinal_models_list_credibility[["agreedisagree_labelled_ai_treatment_treat"]]
+agreedisagree_cred_cov <- ordinal_models_list_credibility[["agreedisagree_labelled_ai_treatment_cov"]]
+full_agreedisagree_cred_model <- ordinal_models_list_credibility[["full_agreedisagree_labelled_ai_treatment_model"]]
+
+xtrust_cred_treat <- ordinal_models_list_credibility[["xtrust_labelled_ai_treatment_treat"]]
+xtrust_cred_cov <- ordinal_models_list_credibility[["xtrust_labelled_ai_treatment_cov"]]
+full_xtrust_cred_model <- ordinal_models_list_credibility[["full_xtrust_labelled_ai_treatment_model"]]
+
+child_cred_treat <- ordinal_models_list_credibility[["child_labelled_ai_treatment_treat"]]
+child_cred_cov <- ordinal_models_list_credibility[["child_labelled_ai_treatment_cov"]]
+full_child_cred_model <- ordinal_models_list_credibility[["full_child_labelled_ai_treatment_model"]]
+
 models_dir <- here("thesis", "outputs", "models")
 
 # Save each model as an .rds
@@ -139,6 +153,14 @@ for (model_name in names(ordinal_models_list_label)) {
         file = file.path(models_dir, paste0(model_name, ".rds"))
     )
 }
+
+for (model_name in names(ordinal_models_list_credibility)) {
+    saveRDS(
+        ordinal_models_list_credibility[[model_name]],
+        file = file.path(models_dir, paste0(model_name, ".rds"))
+    )
+}
+
 
 # Save Ordinal Results Table as .tex
 save_ordinal_table <- function(file, treat, cov, full, coef_omit, coef_rename, title, notes, add_rows) {

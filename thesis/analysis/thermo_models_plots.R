@@ -1,178 +1,176 @@
-#' Create a patchwork plot for thermometer models
-#'
-#' @param models        A named list with model objects. Should include models for MLthermoMean, LLthermoMean, and thermo_gap.
-#' @param treatment_var The name of the treatment variable as string, e.g. "ai_treatment" or "label_treatment".
-#' @param subgroups     A named list, where each element is a list with:
-#'                      - name: string to show in plot
-#'                      - interaction_terms: named vector, outcome -> interaction term for each outcome model (e.g. c(MLthermoMean="ai_treatment:mostlikelyGreen Party", ...))
-#' @param output_file   Path for the saved plot
-#' @param width, height Plot dimensions (inches)
+# --- Helper: Extract means and standard errors from model for Control and Treatment groups for Liberal Democrat subgroup ---
 
-plot_thermo_patchwork <- function(models, treatment_var, subgroups, output_file,
-                                  width = 7.5, height = 6.5) {
-    # Helper for means
-    get_means <- function(model, treatment_var) {
-        coefs <- coef(model)
-        intercept <- coefs["(Intercept)"]
-        treatment_effect <- coefs[treatment_var]
-        tibble(
-            Group = c("Control", "Treatment"),
-            Mean = c(intercept, intercept + treatment_effect)
+get_means_ldem <- function(model, treatment_var) {
+    coefs <- coef(model)
+    ses <- sqrt(diag(vcov(model)))
+
+    interaction_term <- paste0(treatment_var, ":mostlikelyLiberal Democrats")
+
+    main_mostlikely <- coefs["mostlikelyLiberal Democrats"]
+    main_mostlikely_se <- ses["mostlikelyLiberal Democrats"]
+    intercept <- coefs["(Intercept)"]
+    intercept_se <- ses["(Intercept)"]
+    treatment_effect <- coefs[treatment_var]
+    treatment_se <- ses[treatment_var]
+    interaction_effect <- coefs[interaction_term]
+    interaction_se <- ses[interaction_term]
+
+    mean_control <- intercept + main_mostlikely
+    mean_treat <- intercept + main_mostlikely + treatment_effect + interaction_effect
+
+    se_control <- sqrt(intercept_se^2 + main_mostlikely_se^2)
+    se_treat <- sqrt(intercept_se^2 + main_mostlikely_se^2 + treatment_se^2 + interaction_se^2)
+
+    tibble(
+        Group = c("Control", "Treatment"),
+        Mean = pmax(0, pmin(c(mean_control, mean_treat), 100)),
+        SE = c(se_control, se_treat)
+    )
+}
+# --- Plot function for Liberal Democrat subgroup (Most Likely) ---
+plot_ate_ldem <- function(models, treatment_var, title) {
+    all_means <- bind_rows(
+        get_means_ldem(models$ML, treatment_var) %>% mutate(Outcome = "Most Likely"),
+        get_means_ldem(models$LL, treatment_var) %>% mutate(Outcome = "Least Likely"),
+        get_means_ldem(models$GAP, treatment_var) %>% mutate(Outcome = "Thermometer Gap")
+    )
+    colours <- c("Most Likely" = "#4b4b4b", "Least Likely" = "#bdbdbd", "Thermometer Gap" = "black")
+    ggplot(all_means, aes(x = Group, y = Mean, group = Outcome, colour = Outcome, linetype = Outcome)) +
+        geom_line(size = 0.75) +
+        geom_point(size = 2) +
+        geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2, position = position_dodge(width = 0.2)) +
+        scale_colour_manual(values = colours) +
+        scale_linetype_manual(values = c("Most Likely" = "solid", "Least Likely" = "solid", "Thermometer Gap" = "solid")) +
+        labs(
+            x = NULL,
+            y = "Thermometer Score",
+            colour = NULL,
+            linetype = NULL,
+            title = title
+        ) +
+        theme_classic(base_family = "serif") +
+        ylim(0, 100) +
+        theme(
+            axis.title.y = element_text(size = 10, family = "serif"),
+            axis.text.x = element_text(angle = 0, hjust = 0.5, size = 9, family = "serif"),
+            axis.text = element_text(size = 9, family = "serif"),
+            legend.text = element_text(size = 9, family = "serif"),
+            plot.title = element_text(size = 10, family = "serif", hjust = 0.5),
+            legend.position = "bottom"
         )
-    }
-    # Helper for interaction means
-    get_interaction_means <- function(model, treatment_var, interaction_term) {
-        coefs <- coef(model)
-        intercept <- coefs["(Intercept)"]
-        treatment_effect <- coefs[treatment_var]
-        interaction_effect <- ifelse(!is.null(interaction_term) && interaction_term %in% names(coefs), coefs[interaction_term], 0)
-        tibble(
-            Group = c("Control", "Treatment"),
-            Mean = c(intercept, intercept + treatment_effect + interaction_effect)
-        )
-    }
-    # Standard plot function
-    standardise_plot <- function(p, ylab = "Thermometer Score", title = "") {
-        p +
-            labs(y = ylab, x = NULL, colour = NULL, title = title) +
-            theme(
-                axis.title.y = element_text(size = 9, family = "serif"),
-                axis.text.x = element_text(angle = 0, hjust = 0.5, family = "serif"),
-                axis.text = element_text(size = 9, family = "serif"),
-                legend.text = element_text(size = 9, family = "serif"),
-                plot.title = element_text(size = 9, family = "serif", hjust = 0.5),
-                legend.title = element_blank()
-            )
-    }
+}
+# Script to create plots for Average Treatment Effects (ATE) from Thermometer Models
 
-    plots <- list()
-    outcomes <- c("ML", "LL", "GAP")
-    outcome_labels <- c(ML = "MLthermoMean", LL = "LLthermoMean", GAP = "thermo_gap")
-    outcome_colours <- c("MLthermoMean" = "#4b4b4b", "LLthermoMean" = "#bdbdbd", "thermo_gap" = "black")
-    outcome_legends <- c("Most Likely", "Least Likely", "Thermometer Gap")
-
-    for (sub in names(subgroups)) {
-        subgroup <- subgroups[[sub]]
-        plot_dfs <- list()
-        for (outcome in outcomes) {
-            outcome_name <- outcome_labels[outcome]
-            model <- models[[outcome]]
-            if (is.null(subgroup$interaction_terms)) {
-                df <- get_means(model, treatment_var)
-            } else {
-                interaction_term <- subgroup$interaction_terms[[outcome]]
-                df <- get_interaction_means(model, treatment_var, interaction_term)
-            }
-            plot_dfs[[outcome]] <- df %>% mutate(Outcome = outcome_name)
-        }
-        plot_data <- bind_rows(plot_dfs) %>%
-            mutate(Outcome = factor(Outcome, levels = outcome_labels))
-        p <- ggplot(plot_data, aes(x = Group, y = Mean, group = Outcome, colour = Outcome)) +
-            geom_line(size = 0.75) +
-            geom_point(size = 2) +
-            scale_colour_manual(
-                values = outcome_colours,
-                labels = outcome_legends
-            ) +
-            labs(x = NULL, y = NULL, colour = NULL) +
-            theme_classic(base_family = "serif") +
-            ylim(0, 100)
-        plots[[sub]] <- standardise_plot(p, ylab = "Thermometer Score", title = subgroup$name)
+# --- Helper: Extract means and standard errors from model for Control and Treatment groups ---
+get_means <- function(model, treatment_var) {
+    coefs <- coef(model)
+    ses <- sqrt(diag(vcov(model)))
+    if (!"(Intercept)" %in% names(coefs)) stop("Intercept not found in model coefficients.")
+    if (!treatment_var %in% names(coefs)) {
+        stop(paste0(
+            "Treatment variable '", treatment_var, "' not found in model coefficients.\n",
+            "Available coefficients: ", paste(names(coefs), collapse = ", ")
+        ))
     }
-
-    # Combine (assume 2x2 layout for 4 subgroups, adjust if more/less)
-    if (length(plots) == 4) {
-        patch <- ((plots[[1]] + plots[[2]]) /
-            (plots[[3]] + plots[[4]])) +
-            patchwork::plot_layout(guides = "collect") &
-            theme(legend.position = "bottom")
-    } else if (length(plots) == 2) {
-        patch <- (plots[[1]] + plots[[2]]) +
-            patchwork::plot_layout(guides = "collect") &
-            theme(legend.position = "bottom")
-    } else {
-        patch <- patchwork::wrap_plots(plots) +
-            patchwork::plot_layout(guides = "collect") &
-            theme(legend.position = "bottom")
-    }
-
-    ggsave(filename = output_file, plot = patch, width = width, height = height, units = "in")
-    invisible(output_file)
+    intercept <- coefs["(Intercept)"]
+    intercept_se <- ses["(Intercept)"]
+    treatment_effect <- coefs[treatment_var]
+    treatment_se <- ses[treatment_var]
+    res <- tibble(
+        Group = c("Control", "Treatment"),
+        Mean = c(intercept, intercept + treatment_effect),
+        SE = c(intercept_se, sqrt(intercept_se^2 + treatment_se^2))
+    )
+    return(res)
 }
 
-## Patchwork Plot for AI Treatment
+# --- Plot function for a single scenario (AI, Source Cred, Detection) ---
+plot_ate <- function(models, treatment_var, title) {
+    outcome_labels <- c("MLthermoMean", "LLthermoMean", "thermo_gap")
+    pretty_outcomes <- c("Most Likely", "Least Likely", "Thermometer Gap")
+    colours <- c("Most Likely" = "#4b4b4b", "Least Likely" = "#bdbdbd", "Thermometer Gap" = "black")
+
+    all_means <- bind_rows(
+        get_means(models$ML, treatment_var) %>% mutate(Outcome = "Most Likely"),
+        get_means(models$LL, treatment_var) %>% mutate(Outcome = "Least Likely"),
+        get_means(models$GAP, treatment_var) %>% mutate(Outcome = "Thermometer Gap")
+    )
+    # Truncate Mean values to [0, 100]
+    all_means <- all_means %>%
+        mutate(Mean = pmax(0, pmin(Mean, 100)))
+
+    p <- ggplot(all_means, aes(x = Group, y = Mean, group = Outcome, colour = Outcome, linetype = Outcome)) +
+        geom_line(size = 0.75) +
+        geom_point(size = 2) +
+        geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2, position = position_dodge(width = 0.2)) + # Error bars represent ±1 SE (edit as needed for 95% CI)
+        scale_colour_manual(values = colours) +
+        scale_linetype_manual(values = c("Most Likely" = "solid", "Least Likely" = "solid", "Thermometer Gap" = "solid")) +
+        labs(
+            x = NULL,
+            y = "Thermometer Score",
+            colour = NULL,
+            linetype = NULL,
+            title = title
+        ) +
+        theme_classic(base_family = "serif") +
+        ylim(0, 100) +
+        theme(
+            axis.title.y = element_text(size = 10, family = "serif"),
+            axis.text.x = element_text(angle = 0, hjust = 0.5, size = 9, family = "serif"),
+            axis.text = element_text(size = 9, family = "serif"),
+            legend.text = element_text(size = 9, family = "serif"),
+            plot.title = element_text(size = 10, family = "serif", hjust = 0.5),
+            legend.position = "bottom"
+        )
+    return(p)
+}
+
+# --- Models: Assign using your actual objects ---
 models_ai <- list(
-    ML = thermo_models_list_ai[["full_thermo_ml_ai_treatment_model"]],
-    LL = thermo_models_list_ai[["full_thermo_ll_ai_treatment_model"]],
-    GAP = thermo_models_list_ai[["full_thermo_gap_ai_treatment_model"]]
+    ML = full_thermo_ml_model,
+    LL = full_thermo_ll_model,
+    GAP = full_thermo_gap_model
 )
-
-# Define the subgroups for plotting
-subgroups_ai <- list(
-    Overall = list(
-        name = "Average Treatment Effect",
-        interaction_terms = NULL
-    ),
-    LibDem = list(
-        name = "Liberal Democrat Subgroup",
-        interaction_terms = c(
-            ML = "ai_treatment:mostlikelyLiberal Democrats",
-            LL = "ai_treatment:mostlikelyLiberal Democrats",
-            GAP = "ai_treatment:mostlikelyLiberal Democrats"
-        )
-    ),
-    Green = list(
-        name = "Green Party Subgroup",
-        interaction_terms = c(
-            ML = "ai_treatment:mostlikelyGreen Party",
-            LL = "ai_treatment:mostlikelyGreen Party",
-            GAP = "ai_treatment:mostlikelyGreen Party"
-        )
-    ),
-    PartTime = list(
-        name = "Part Time Work",
-        interaction_terms = c(
-            ML = "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)",
-            LL = "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)",
-            GAP = "ai_treatment:profile_work_statWorking part time (Less than 8 hours a week)"
-        )
-    )
+models_labelled_ai <- list(
+    ML = full_thermo_ml_labelled_ai_model,
+    LL = full_thermo_ll_labelled_ai_model,
+    GAP = full_thermo_gap_labelled_ai_model
 )
-
-## Patchwork Plot for Label Treatment
 models_label <- list(
-    ML = thermo_models_list_label[["full_thermo_ml_label_treatment_model"]],
-    LL = thermo_models_list_label[["full_thermo_ll_label_treatment_model"]],
-    GAP = thermo_models_list_label[["full_thermo_gap_label_treatment_model"]]
+    ML = full_thermo_ml_label_model,
+    LL = full_thermo_ll_label_model,
+    GAP = full_thermo_gap_label_model
 )
 
-subgroups_label <- list(
-    Overall = list(
-        name = "Average Treatment Effect",
-        interaction_terms = NULL
-    ),
-    LibDem = list(
-        name = "Liberal Democrat Subgroup",
-        interaction_terms = c(
-            ML = "label_treatment:mostlikelyLiberal Democrats",
-            LL = "label_treatment:mostlikelyLiberal Democrats",
-            GAP = "label_treatment:mostlikelyLiberal Democrats"
-        )
-    ),
-    London = list(
-        name = "London Subgroup",
-        interaction_terms = c(
-            ML = "label_treatment:profile_GORLondon",
-            LL = "label_treatment:profile_GORLondon",
-            GAP = "label_treatment:profile_GORLondon"
-        )
-    ),
-    FullTime = list(
-        name = "Full Time Work",
-        interaction_terms = c(
-            ML = "label_treatment:profile_work_statWorking full time (30 hours or more a week)",
-            LL = "label_treatment:profile_work_statWorking full time (30 hours or more a week)",
-            GAP = "label_treatment:profile_work_statWorking full time (30 hours or more a week)"
-        )
-    )
+# --- Create each plot ---
+plot_ai <- plot_ate(models_ai, "ai_treatment", "AI-Generated Content: Average Treatment Effect")
+plot_sourcecred <- plot_ate(models_labelled_ai, "labelled_ai_treatment", "Source Credibility Effect: Average Treatment Effect")
+plot_detection <- plot_ate(models_label, "label_treatment", "Detection Effect: Average Treatment Effect")
+
+# --- Combine into 1x3 patchwork ---
+overall_patchwork <- plot_ai + plot_sourcecred + plot_detection +
+    plot_layout(ncol = 3, guides = "collect") &
+    theme(legend.position = "bottom")
+
+# --- Save the patchwork plot ---
+ggsave(
+    filename = here::here("thesis", "outputs", "figures", "thermo_patchwork_overall.pdf"),
+    plot = overall_patchwork,
+    width = 12, height = 4
+)
+
+
+# --- Liberal Democrat (Most Likely) subgroup 1x3 patchwork ---
+plot_ai_ldem <- plot_ate_ldem(models_ai, "ai_treatment", "AI-Generated Content: Liberal Democrat Most Likely")
+plot_sourcecred_ldem <- plot_ate_ldem(models_labelled_ai, "labelled_ai_treatment", "Source Credibility: Liberal Democrat Most Likely")
+plot_detection_ldem <- plot_ate_ldem(models_label, "label_treatment", "Detection Effect: Liberal Democrat Most Likely")
+
+patchwork_ldem <- plot_ai_ldem + plot_sourcecred_ldem + plot_detection_ldem +
+    plot_layout(ncol = 3, guides = "collect") &
+    theme(legend.position = "bottom")
+
+ggsave(
+    filename = here::here("thesis", "outputs", "figures", "thermo_patchwork_ldem.pdf"),
+    plot = patchwork_ldem,
+    width = 12, height = 4
 )

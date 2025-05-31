@@ -1,0 +1,37 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Trust: Labelled AI Content vs Human Control (Source Credibility Condition) \label{tab:xtrust-labelled-ai-results}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{2,3,4}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{18}={1,2,3,4}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
+Label Treatment                              & \num{-0.105}  & \num{-0.105}  & \num{-0.798}  \\
+& (\num{0.195}) & (\num{0.195}) & (\num{0.741}) \\
+Label Treatment:mostlikelyConservative Party &                &                & \num{-0.128}  \\
+&                &                & (\num{0.527}) \\
+Label Treatment:mostlikelyGreen Party        &                &                & \num{0.171}   \\
+&                &                & (\num{0.805}) \\
+Label Treatment:mostlikelyLabour Party       &                &                & \num{-0.095}  \\
+&                &                & (\num{0.565}) \\
+Label Treatment:mostlikelyLiberal Democrats  &                &                & \num{0.322}   \\
+&                &                & (\num{0.682}) \\
+Label Treatment:Political Attention          &                &                & \num{0.145}   \\
+&                &                & (\num{0.094}) \\
+Label Treatment:Education LevelHigh          &                &                & \num{-0.064}  \\
+&                &                & (\num{0.572}) \\
+Label Treatment:Education LevelMedium        &                &                & \num{-0.347}  \\
+&                &                & (\num{0.552}) \\
+Num.Obs.                                     & \num{688}     & \num{688}     & \num{688}     \\
+edf                                          & 5              & 5              & 19             \\
+Model                                        & (1)            & (2)            & (3)            \\
+\bottomrule
+\end{talltblr}
+\end{table}

@@ -27,7 +27,8 @@ linkcolor: blue
 ```{r setup, include=FALSE}
 library(here)
 source(here("thesis", "analysis", "packages.R"))
-source(here("thesis", "writing", "research_design", "load_outputs.R"))
+source(here("thesis", "writing", "research_design", "build_outputs.R"))
+model_results <- readRDS(here("thesis", "outputs", "helpers", "model_results.rds"))
 ```
 
 \newpage
@@ -37,6 +38,10 @@ source(here("thesis", "writing", "research_design", "load_outputs.R"))
 # Abstract {-}
 
 Machine learning advancements to efficiently handle sequential data inputs and outputs have popularised the field of Artificial Intelligence (AI). Amongst AI’s applications, generating hyper-realistic textual and visual content has become easily accessible, helping AI become an enabling informational tool. Yet, as unregulated AI technologies remain prone to hallucinations and misuse from bad actors, they are raising concern in social and political contexts. This research project assesses the possible negative effects of manipulative political information and deceitful deepfakes. In particular the mechanism of trust, and the association of AI with fake news, are explored to understand whether partisans exposed to AI-generated content become more affectively polarised to one another. This project uses survey experiments to explore exposure effects, using labels to indicate an AI- or human-generated provenance. Agent-based modelling will also be used to test repeated exposures. Initial hypotheses expect minimal effects, but negative unintended consequences of labelling AI-generated content may be found.
+
+\begin{flushleft}
+\textbf{Keywords:} artificial intelligence, affective polarisation, fake news, survey experiment, agent-based modelling
+\end{flushleft}
 
 \newpage
 \tableofcontents
@@ -76,7 +81,7 @@ This research focuses on the United Kingdom (UK). Structural effects of globalis
 
 Generative AI is a subfield of Artificial Intelligence with the ability to generate new content in the form of text, images, video based on generative models which use machine learning to take patterns from data they are trained on [@sengar2024]. This AI-generated content, while often produced by human prompts, is generally computationally generated using probabilities rather than fact-checked, pre-defined truths. This research defines the use of AI-generated content as any content produced by AI-based models, primarily through human prompting to provide people with information, news, and arguments on any question or topic, including political ones. The focus is on whether such AI-generated content can affect political attitudes, behaviour, and therefore increase affective polarisation: the gap between the emotional warmth and attachment towards your in-group political party, compared to the hostility shown to the out-group party [@green2004; @iyengar2012]. While affective polarisation is return to later, it’s important to raise why there is such a fear of AI-generated content. As emphasised by @iyengar2019, 'exposure to messages attacking the out-group reinforces partisans’ biased views of their opponents.’ This negative messaging often takes the form of ‘fake news,’ a term @tandoc2018 focus on facticity and the perceptions of truth from its audience. It is this issue of fake news which is critical for AI-generated content, and why increased divides could be seen within our political societies. If AI generates fake or misleading content which is spread widely and used to attack out-groups within in-group echo chambers, polarisation may inevitably increase.
 
-Despite the infancy of these AI tools, their use in politics is therefore a noticeable point of contention. OpenAI tried to avoid political biases by ensuring ‘ChatGPT did not express political preferences or recommend candidates even when asked explicitly,’ while others such as X’s Grok has been caught sharing divisive political disinformation [@openai2024; @conger2025; @globalwitness2024]. These early, un-regulated, yet widely used models, are therefore raising concern that the content they generate may have negative consequences on elections through the spread of misinformation. The @worldeconomicforum2024 sees this as a severe short-term risk as ‘AI is amplifying manipulated and distorted information that could destabilise societies.’ But AI-generated misinformation is more than just inaccurate chatbots. Fear also surrounds more deceitful and deliberately manipulative uses of AI to generate deepfake images and videos used to perpetuate a divisive stereotype or false narratives. However, the nascent nature of the technology means these deepfakes are often detectable, showing the need to consider the ability of someone to detect the use of AI in the research design [@kapoor2024]. But what if the deepfakes or AI-generated misinformation goes undetected? Despite minimal literature on AI in political science, early research suggests AI-generated messages can also persuasive, and propaganda produced by AI can be compelling [@bai2023; @goldstein2024]. As the quality of machine learning research improves, AI-generated content will only likely become more realistic and undetectable. Research has shown that AI chatbots can be more persuasive than humans, showing how the personalised nature of GPTs can exploit user heterogeneity and their in- versus out-group views [@salvi2025]. Yet, simultaneously, these GPTs are regularly shown to hallucinate facts they provide, giving credence to the fears that AI’s will perpetuate fake news even further due to the reinforcement learning algorithms [@thornhill2025]. Another issue is potential unintended consequences of consumers’ perceptions of AI. It has been found that when aware of political content being AI-generated, readers become sceptical of its validity even if the content is true [@altay2024]. A possible mechanism here is trust. Users may associate AI-generated —determined by their own detection, or if labelled — content with fake news, which in turn increases scepticism towards its veracity. Consequently, labelling content as AI-generated may be a misinformed interception. With detection, labelling, and association of AI-generated content with being fake, @cashell2024 argues deepfakes and AI-generated content is often instead used to perpetuate existing stereotypes rather than attempting to persuade new views.
+Despite the infancy of these AI tools, their use in politics is a noticeable point of contention. @hackenburg2024 show that GPT-4 could have a persuasive influence of political microtargeting. This research only found evidence of increased support for pre-existing policy perspectives; but, AI could be used to persaude volatile voters towards another side. For this reason, OpenAI tried to avoid political biases by ensuring ‘ChatGPT did not express political preferences or recommend candidates even when asked explicitly,’ while others such as X’s Grok has been caught sharing divisive political disinformation [@openai2024; @conger2025; @globalwitness2024]. These early, un-regulated, yet widely used models, are therefore raising concern that the content they generate may have negative consequences on elections through the spread of misinformation. The @worldeconomicforum2024 sees this as a severe short-term risk as ‘AI is amplifying manipulated and distorted information that could destabilise societies.’ But AI-generated misinformation is more than just inaccurate chatbots. Fear also surrounds more deceitful and deliberately manipulative uses of AI to generate deepfake images and videos used to perpetuate a divisive stereotype or false narratives. However, the nascent nature of the technology means these deepfakes are often detectable, showing the need to consider the ability of someone to detect the use of AI in the research design [@kapoor2024]. But what if the deepfakes or AI-generated misinformation goes undetected? Despite minimal literature on AI in political science, early research suggests AI-generated messages can also persuasive, and propaganda produced by AI can be compelling [@bai2023; @goldstein2024]. As the quality of machine learning research improves, AI-generated content will only likely become more realistic and undetectable. Research has shown that AI chatbots can be more persuasive than humans, showing how the personalised nature of GPTs can exploit user heterogeneity and their in- versus out-group views [@salvi2025]. Yet, simultaneously, these GPTs are regularly shown to hallucinate facts they provide, giving credence to the fears that AI’s will perpetuate fake news even further due to the reinforcement learning algorithms [@thornhill2025]. Another issue is potential unintended consequences of consumers’ perceptions of AI. It has been found that when aware of political content being AI-generated, readers become sceptical of its validity even if the content is true [@altay2024]. A possible mechanism here is trust. Users may associate AI-generated —determined by their own detection, or if labelled — content with fake news, which in turn increases scepticism towards its veracity. Consequently, labelling content as AI-generated may be a misinformed interception. With detection, labelling, and association of AI-generated content with being fake, @cashell2024 argues deepfakes and AI-generated content is often instead used to perpetuate existing stereotypes rather than attempting to persuade new views.
 
 To consider the causal effect of AI-generated content on affective polarisation and how this may be driven by AI’s link with fake news, the conceptualisation and causes of affective polarisation require consideration. At its roots, political polarisation is the distribution of a population along an ideological dimension [@hare2022]. This ideological description can explain policy polarisation; whereas, differences in partisan identity grew in salience such that social identity with a partisan group became a better predictor of voting behaviour compared to ideological disagreement [@algara2023].[^affective-polarisation-hypothesis] However, recent research has suggested that the *affect* in affective polarisation — the emotional animosity felt towards opposing partisans — is driven by emotions of fear, anxiety, disgust, and animosity [@bakker2024]. Summarised as partisan disdain, affective polarisation self-reinforces differences. These emotions towards out-groups affects the engagement and selective choices of which information to consume. Consequently, the information environment, primarily on social media, skews the reader’s perceptions of reality, engaging themselves with content they want to see as a representation of the out-groups. This is where AI’s potential is a threat. Angry partisans seek disconfirming information to support their own views [@mackuen2010]. AI can be easily and quickly used to generate this disconfirming information. AI helps affectively polarised voters exacerbate the spread of fictitious, divisive, yet ostensibly real content, within the correct in- and out-groups.  As a result, affective polarisation could increase discrimination, cut trust in democratic institutions, and suppress political engagement [@kingzette2021; @layman2006]. Taking this understanding of affective polarisation in the context of AI-generated content and the volatile political environment, the next section builds a formal model to predict how exposure to AI-generated content can impact affective polarisation.
 
@@ -574,7 +579,7 @@ We now map the theoretical model onto the experimental design, which comprises o
 \toprule
  & \textbf{Labelled (AI)} & \textbf{Unlabelled} \\
 \midrule
-\textbf{Human} & \textit{---} (not used) & (1) Control Group \\
+\textbf{Human} & (not used) & (1) Control Group \\
 \textbf{AI} & (2) Source Discount Condition & (3) Detection Condition \\
 \bottomrule
 \end{tabular}
@@ -672,7 +677,7 @@ As a result of this formal modelling, the model dentifies conditions under which
 
 # Methodological Approaches {#sec-methods}
 
-This research aims to identify the direction and size of *effects of causes*. To test the hypotheses derived in the \hyperref[sec-hypotheses]{Section \ref*{sec-hypotheses}}, a survey experiment approach appears most appropriate such that the efefcts of AI-generated content on affective polarisation can be isolated. However, this research proposal also suggests an innovative use of synthetic, agent-based modelling to compliment survey experiments with large LLM-based simulations. This section outlines the survey experimental design, initial pilot study results, and an initial look at how agent-based modelling could be used.
+This research aims to identify the direction and size of *effects of causes*. To test the hypotheses derived in the \hyperref[sec-hypotheses]{Section \ref*{sec-hypotheses}}, a survey experiment approach appears most appropriate such that the efefcts of AI-generated content on affective polarisation can be isolated. However, this research proposal also suggests an innovative use of synthetic, agent-based modelling to compliment survey experiments with large LLM-based simulations. This section outlines the survey experimental design, initial pilot study results, and an initial look at how agent-based modelling could be used to expnd the research.
 
 As explained in the review of existing literature (\hyperref[sec-lit-review]{Section \ref*{sec-lit-review}}), this project focuses on the case of the UK. Although the majority of affective polarisation research focuses on the US, @berntzen2024 shows that UK partisans also experience negative emotions towards their out-groups. With the rise of populism and this affective polarisation in the UK, it is imperative to understand whether new technologies pose a risk to the UK's political system as many speculated in the 2024 General Election [@simon2024b].[^external-validity]
 
@@ -680,11 +685,44 @@ As explained in the review of existing literature (\hyperref[sec-lit-review]{Sec
 
 ## Pilot Study: YouGov UniOM Survey Experiment {#sec-data-analysis}
 
-To initially test whether effects are seen, and for whom, a pilot study was conducted with a single survey experiment exposure to an AI-generated article. The pilot study was conducted with YouGov's UniOM panel, which is a representative sample of the UK population. The survey experiment was designed to test the effects of AI-generated content on affective polarisation, with a focus on the treatment conditions of AI-generated and AI-labelled content. The survey experiment is designed to be between-subjects to avoid sensitivity issues noted by @levendusky2021. The key outcomes of interest are measures of affective polarisation --- discussed in \hyperref[sec-outcome-measures]{Section \ref*{sec-outcome-measures}} --- which are measured in response to exposure to AI-generated political content. The hypotheses of how the outcome is affected, can be tested by comparing the effects of AI-generated and AI-labelled content to a control group of human-generated content. The treatment conditions are summarised in \hyperref[tab:experiment-treatment-conditions]{Table \ref*{tab:experiment-treatment-conditions}}:
+To initially test whether effects are seen, and for whom, a pilot study was conducted with a single survey experiment exposure to an AI-generated article. The pilot study was conducted with YouGov's UniOM panel, which is a representative sample of the UK population. The survey experiment used two treatment conditions: AI-generated (unlabelled) and AI-labelled content. The survey experiment is designed to be between-subjects to avoid pre-survey sensitivity issues noted by @levendusky2021. The key outcomes of interest are measures of affective polarisation --- discussed in \hyperref[sec-experiment-variables]{Section \ref*{sec-experiment-variables}}. The treatments are compared with a control group of human-generated content.[^human-labelled] The treatment conditions are summarised in \hyperref[tab:experiment-treatment-conditions]{Table \ref*{tab:experiment-treatment-conditions}}:
 
-\input{../../outputs/tables/treatment_conditions_table.tex}
+\begin{table}[H]
+\centering
+\caption{Treatments and Control for AI-generated Content Exposure}
+\label{tab:experiment-treatment-conditions}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{No Labels} & \textbf{Labelled as AI} \\
+\midrule
+\textbf{Control} & Human-Generated Article & Human-Generated Article \\
+\textbf{Treatment} & AI-generated Article & AI-generated Article \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-The following data analyses focus on all outcome measures of affective polarisation to give a holistic understading of both general and tangible prejudices, and discriminatory behaviours towards the opposing out-group to that of the respondent's identified in-group. The analysis is split by the treatments being tested: AI-generated content and AI-labelled content. Each treatment is analysed across the outcome measures of thermometer scores, trait-based measures, and social-distance measures.
+[^human-labelled]: A third treatment condition of human-generated content labelled as AI-generated is also tested. This condition can be used to help understand whether participents discount based on content or whether they discount based on the source (i.e., AI vs. human). This additional analysis is not included in this proposal, but may be included in the final thesis.
+
+After outlining the treatments, outcome measures, and the associted regression specification for modelling the treatment effects, a very brief review of the initial pilot results are presented. These are accompanied by a discussion of the implications of the results for informing the final research design and the agent-based modelling.
+
+### Experimental Variables {#sec-experiment-variables}
+
+Although politics is about persuasion, it is hard to move people's beliefs --- at least, not very quickly. @cobb1997 argue that voters often assess political arguments through emotional, feeling-based heuristics. Therefore, the treatment in the survey experiment was designed to be on a divise topic, which is likely to elicit strong feelings to encourage movement, especially as a single exposure is unlikely to change attitudes significantly. The treatment was an article on rising immigration in the UK, a topic which is prominment amongst populist rhetoric and polarised groups. The human-generated control article was written by @mckiernan2024 for the BBC. The AI-generated article was generated by OpenAI's GPT-4 model using the BBC article as an initial prompt, but instructed to re-write the article in a more divisive and exaggerated tone. Full versions of the articles can be found in the Appendix in \hyperref[sec-treatment-articles]{Section \ref*{sec-treatment-articles}}. Given the nature of the imflammatory topic of immigration used particularly by right-wing populists, the treatment is likely aligned with the ideological priors of right wing Conservative or Reform Party supporters, minimising their ideological distance \(( \delta \)), and therefore maximising the potential for belief updating and further affective polarisation shown in \hyperref[eq:delta-affective-polarisation]{Equation \ref*{eq:delta-affective-polarisation}}.
+
+The measures required to understand AI's affect on affective polarisation are multi-faceted. Different measures can be used to understand the primary outcome of affective polarisation; however, the implication of each measure differs. @druckman2019 clearly outline the best practices for these affective polarisation measures, and how the measures interact. Therefore, this research chooses to follow these measurement recommendations for use in survey self-reporting [@iyengar2019].
+
+The most common measure of someone's identifiction with a political party is through a feeling thermometer score. This aims to understand how warmly or coldly someone feels towards the political parties they most and leat prefer. The thermometer scores are measured on a scale of `0` to `100`, where `0` is the coldest and `100` is the warmest.[^thermo-scale] This survey experiment firstly asks respondents to identify their most and least preferred party (`mostlikely` and `leastlikely`), allowing for in- and out-party identities to be exposed. We then ask respondents to firstly rate how warmly they feel towards each of these party's leaders, `MLthermo_XY` and `LLthermo_XY`, where `XY` is replaced by each party leader's initials. The use of party-leader thermometers is a common measure, leaning on valence theory's emphasis on the importance of party leaders in shaping party identification and voting behaviour [@garzia2023].[^green-leaders] Moreover, Druckman and Levendusky's (2019: 119) findings show that respondents are more  negative towards party elites rather than party voters; thus, the focus on party leaders here helps elicit the more visceral feelings. Alongside these in- and out-group measures, a net-difference score (`thermo_gap`) is also calculated as the difference between the thermometer scores (`MLthermoMean - LLthermoMean`) [@iyengar2012].
+
+The next indicator of affective polarisation is a trait-based rating. This measure identifies the traits that respondents associate with opposing parties [@garrett2014]. The limited scope of the survey experiment meant we focussed on the trait of positive trait of *respect*, and whether respondents associated this trait with oppossing parties. Respondents were asked: "To what extent do you agree or disagree with the following statement: `[leastlikely]` party voters respect my political beliefs and opinions." This question — coded as `agreedisagree` — was asked in a Likert scale format of levels of agreement.[^codebook]
+
+Additionally, a similar trait-based measure focussed on *trust* was used [@levendusky2013]. Here, we ask "And how much of the time do you think you can trust `[leastlikely]` party to do what is right for the country?". This question was also asked in a Likert scale format, with the options of `Almost never`, `Once in a while`, `About half of the time`, `Most of the time`, and `Always`. This measure is coded as `xtrust`. Along with the themometer score, the trait-based views of respect, and trust in opposing parties, Druckman and Levendusky (2019: 119) argue that these measures are good, general measures of prejudices held towards opposing parties.
+
+On the other hand, affective polarisation should also be interested in actual tangible discriminatory behaviour. Therefore an emotional, social-distance-based question is included to understand how comfortable respondents are with having opposing partisans in their lives. For example, @iyengar2012 popularised the use of the @almond1963 five-nation survey question "Suppose you had a child who was getting married. How would you feel if they married a `[leastlikely]` party voter?". Coded as `child`, respondents were given options of `Extremely upset`, `Somewhat upset`, `Neither happy nor upset`, `Somewhat happy`, and `Extremely happy`.
+
+[^thermo-scale]: The wording for the theremoeter score questions is as follows: "We’d like to get your feelings toward some of our political leaders and other groups who are in the news these days. On the next page, we’ll ask you to do that using a 0 to 100 scale that we call a feeling thermometer. Ratings between 50 degrees and 100 degrees mean that you feel favourable and warm toward the person. Ratings between 0 degrees and 50 degrees mean that you don't feel favourable toward the person and that you don't care too much for that person. You would rate the person at the 50-degree mark if you don't feel particularly warm or cold toward the person."
+[^green-leaders]: The Green Party has two co-leaders, Carla Denyer and Adrian Ramsay. Therefore, ratings of both leaders are asked, and the thermometer scores for the Green Party are averaged to create a single score for the party. The variables `MLthermoMean` and `LLthermoMean` are used as the final thermometer measures for in- and out-group thermometer scores.
+
+[^codebook]: All survey experiment variables and values are in the codebook \hyperref[sec-codebook]{Section \ref*{sec-codebook}} in the appendix.
 
 ### Regression Specification {#sec-reg-spec}
 
@@ -704,105 +742,51 @@ Y_i = \beta_0 + \beta_1 D_i + \beta_2 \mathbf{X}_i + \beta_3 (D_i \times \mathbf
 
 In this full specitifcation, $\beta_1$ estimates the average treatment effect when the moderator(s) are at their reference level. Estimates are calculated with survey-weighted least squares and ordinal logistic models so results can be generalised to the UK more broadly. $\beta_2$ measures the effect of a one-unit change of a covariate on the outcome variable. $\beta_3$ captures the treatment effect heterogeneity across different sub-groups of the moderator, where statistically significant non-zero values suggest the ATE is different for different sub-group characteristics.
 
-### Outcome Measures {#sec-outcome-measures}
+### Preliminary Results {#sec-results}
 
-The measures required to understand AI's affect on affective polarisation are multi-faceted. Different measures can be used to understand the primary outcome of affective polarisation; however, the implication of each measure differs. @druckman2019 clearly outline the best practices for these affective polarisation measures, and how the measures interact. Therefore, this research chooses to follow these measurement recommendations for use in survey self-reporting [@iyengar2019].
+The results are presented for the three different treatment effect conditions formalised from the theoretical model.
 
-The most common measure of someone's identifiction with a political party is through a feeling thermometer score. This aims to understand how warmly or coldly someone feels towards the political parties they most and leat prefer. The thermometer scores are measured on a scale of `0` to `100`, where `0` is the coldest and `100` is the warmest.[^thermo-scale] This survey experiment firstly asks respondents to identify their most and least preferred party (`mostlikely` and `leastlikely`), allowing for in- and out-party identities to be exposed. We then ask respondents to firstly rate how warmly they feel towards each of these party's leaders, `MLthermo_XY` and `LLthermo_XY`, where `XY` is replaced by each party leader's initials. The use of party-leader thermometers is a common measure, leaning on valence theory's emphasis on the importance of party leaders in shaping party identification and voting behaviour [@garzia2023].[^green-leaders] Moreover, Druckman and Levendusky's (2019: 119) findings show that respondents are more  negative towards party elites rather than party voters; thus, the focus on party leaders here helps elicit the more visceral feelings. Alongside these in- and out-group measures, a net-difference score (`thermo_gap`) is also calculated as the difference between the thermometer scores (`MLthermoMean - LLthermoMean`) [@iyengar2012].
+\input{../../outputs/tables/thermo_gap_overall_ai_effect.tex}
+\input{../../outputs/tables/thermo_gap_source_credibility.tex}
+\input{../../outputs/tables/thermo_gap_detection_effect.tex}
 
-The next indicator of affective polarisation is a trait-based rating. This measure identifies the traits that respondents associate with opposing parties [@garrett2014]. The limited scope of the survey experiment meant we focussed on the trait of positive trait of *respect*, and whether respondents associated this trait with oppossing parties. Respondents were asked: "To what extent do you agree or disagree with the following statement: `[leastlikely]` party voters respect my political beliefs and opinions." This question — coded as `agreedisagree` — was asked in a Likert scale format of levels of agreement.[^codebook]
-
-Additionally, a similar trait-based measure focussed on *trust* was used [@levendusky2013]. Here, we ask "And how much of the time do you think you can trust `[leastlikely]` party to do what is right for the country?". This question was also asked in a Likert scale format, with the options of `Almost never`, `Once in a while`, `About half of the time`, `Most of the time`, and `Always`. This measure is coded as `xtrust`. Along with the themometer score, the trait-based views of respect, and trust in opposing parties, Druckman and Levendusky (2019: 119) argue that these measures are good, general measures of prejudices held towards opposing parties.
-
-On the other hand, affective polarisation should also be interested in actual tangible discriminatory behaviour. Therefore an emotional, social-distance-based question is included to understand how comfortable respondents are with having opposing partisans in their lives. For example, @iyengar2012 popularised the use of the @almond1963 five-nation survey question "Suppose you had a child who was getting married. How would you feel if they married a `[leastlikely]` party voter?". Coded as `child`, respondents were given options of `Extremely upset`, `Somewhat upset`, `Neither happy nor upset`, `Somewhat happy`, and `Extremely happy`.
-
-[^thermo-scale]: The wording for the theremoeter score questions is as follows: "We’d like to get your feelings toward some of our political leaders and other groups who are in the news these days. On the next page, we’ll ask you to do that using a 0 to 100 scale that we call a feeling thermometer. Ratings between 50 degrees and 100 degrees mean that you feel favourable and warm toward the person. Ratings between 0 degrees and 50 degrees mean that you don't feel favourable toward the person and that you don't care too much for that person. You would rate the person at the 50-degree mark if you don't feel particularly warm or cold toward the person."
-[^green-leaders]: The Green Party has two co-leaders, Carla Denyer and Adrian Ramsay. Therefore, ratings of both leaders are asked, and the thermometer scores for the Green Party are averaged to create a single score for the party. The variables `MLthermoMean` and `LLthermoMean` are used as the final thermometer measures for in- and out-group thermometer scores.
-
-[^codebook]: A full breakdown of the survey experiment variables and values can be found in the codebook \hyperref[sec-codebook]{Section \ref*{sec-codebook}} in the appendix.
-
-## AI-Generated Content Treatment {#sec-ai-treatment}
-
-The results show no statistically significant treatment effect of AI-generated content on in- and out-party, nor net-difference thermometer scores. However, it is found that Liberal Democrat voters are significantly susceptible to being polarised from expsure to AI-generated content. Trait-based and emotional ratings and views towards opposing parties and voters are also not signficantly affected by the deliberately divsive treatment of the AI-generated content. Nevertheless, the treatment is significantly more likely to polarise lower-educated respondents, and part-time workers on views of respect and emotional discomfort towards opposing partisans. Together, these results suggest that AI-generated content does not significantly polarise respondents' affective polarisation measures, but there are some sub-group differences in the treatment effect.
-
-### Thermometer Analysis {#sec-thermo-analysis}
-
-Thermometer analysis is one of the primary affective polarisation measures. Before determining a causal link between AI content exposure and the affective polarisation measures, a descriptive summary of the `thermo_gap` measures, averaged over all in- and out-party leaders, given for both treatments is presented in \hyperref[fig:thermo-graph]{Figure \ref*{fig:thermo-graph}}. This shows how net-difference thermometer scores are similar across both control and treatment groups, suggesting causal effects are likely to be minimal.
+The overall treatment effect is ``r round(model_results$ai_thermo_gap_coef, 2)`` which is not significant.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{../../outputs/figures/thermo_gap_plot_combined.pdf}
-    \caption{Average in- and out-party thermometer net-difference scores}
-    \label{fig:thermo-graph}
+    \includegraphics[width=1\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patchwork_overall.pdf}    \caption{Overall Effects of AI/Labelling Treatments on Thermometer Ratings.}
+    \label{fig:thermo-patchwork-overall}
 \end{figure}
-
-To test whether this descriptive expectation is causally salient, models for the outcome variables for in- and out-party, and net-difference thermometer scores are estimated. The thermometer outcome scores are continuous measures. Therefore, survey-weighted least squares regression models are estimated.
-
-ATE models are presented in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}} for the outcome `thermo_gap`.[^thermo-outcomes] A first model (1) sets the benchmark without control for covariates and moderators. A full balanace check (\hyperref[sec-balance]{Section \ref*{sec-balance}}) shows that the treatment and control groups were balanced across all convariates. Despite this, model (2) still includes a full set of pre-treatment covariates as each has theoretical justification for affecting the outcome independently of the treatment, and also to ensure the ATE estimates are efficient. To avoid multicollinearity, individual moderators were sequentially tested within the models; however, few showed any moderation effects. The moderators of party affiliation/warmth (`mostlikely`) and attentivness to politics (`political_attention`) showed the greatest moderation effects, thus are included in the final model (3) as interaction terms to test these groups for heterogeneity.
-
-[^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}}.
-
-\input{../../outputs/tables/thermo_gap_ai_results.tex}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{../../outputs/figures/thermo_patchwork_ai_treatment.pdf}
-    \caption{Thermometer Score Patchwork Plot for AI-Generated Content}
-    \label{fig:thermo-patchwork-ai}
+    \includegraphics[width=1\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patchwork_ldem.pdf}    \caption{Effects of AI/Labelling Treatments on Thermometer Ratings - Liberal Democrats.}
+    \label{fig:thermo-patchwork-libdem}
 \end{figure}
+
+
+
+[^thermo-outcomes] A first model (1) sets the benchmark without control for covariates and moderators. A full balanace check (\hyperref[sec-balance]{Section \ref*{sec-balance}}) shows that the treatment and control groups were balanced across all convariates. Despite this, model (2) still includes a full set of pre-treatment covariates as each has theoretical justification for affecting the outcome independently of the treatment, and also to ensure the ATE estimates are efficient. To avoid multicollinearity, individual moderators were sequentially tested within the models; however, few showed any moderation effects. The moderators of party affiliation/warmth (`mostlikely`) and attentivness to politics (`political_attention`) showed the greatest moderation effects, thus are included in the final model (3) as interaction terms to test these groups for heterogeneity.
+
+[^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in...
 
 [^low-education-significance]: The interaction terms used for plotting are significant for `thermo_gap` only. For the `education_recode` variable however, this is not statistically significant but is a useful comparison for analysis of other models.
 
-### Ordinal Affective Polarisation Analysis {#sec-ordinal-analysis}
+To get a better picture of the treatment effects of AI-generated content on the affective polarisation, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are also estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of *respect*, *trust*, and emotional, social-distance measures of *discomfort* towards opposing partisans are presented in full in...
 
-To get a better picture of the treatment effects of AI-generated content on the affective polarisation, models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are also estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The results of these models for each measure of *respect*, *trust*, and emotional, social-distance measures of *discomfort* towards opposing partisans are presented in full in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} respectively in the Appendix. None of the full models --- estimated with relevant covariates and moderators --- show any significant overall treatment effect of AI-generated content on the ordinal measures of affective polarisation, again giving credence to the viscocity of political attitudes and even a particularly divisive AI-generated article not being able to further polarise respondents' views.
+None of the full models --- estimated with relevant covariates and moderators --- show any significant overall treatment effect of AI-generated content on the ordinal measures of affective polarisation, again giving credence to the viscocity of political attitudes.
 
 [^preds-model-measurement]: Predicted probabilities are calculated using the `polr()` function in R instead of `svyolr()` as `ggpredict()` does not work with the `svyolr()` function. Therefore, probabilities in the visualisation are not representative of the survey-weighted population. Confidence intervals are also not included due to the complications of colapsing the ordinal levels.
 [^summed-preds]: `Strongly disagree` and `Tend to Disagree` for the `agreedisagree` outcome variable; `Almost never` and `Once in a while` for `xtrust`; and `Extremely upset` and `Somewhat upset` for `child`.
 [^ai-subgroups]: No sub-groups for *trust* were statistically significant, but the predicted probabilities are still shown for reference for sub-groups which provide useful comparison.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{../../outputs/figures/ordinal_patchwork_ai_treatment.pdf}
-    \caption{Predicted Probabilities by Subgroup for AI-Generated Content}
-    \label{fig:ordinal-patchwork-ai}
-\end{figure}
-
-These results show that a single exposure to an AI-generated article does not significantly polarise UK respondents towards their political opponents. The treatment does not significantly polarise thermometer ratings, nor the trait- and emotional-based measures of *respect*, *trust*, and *discomfort* towards out-groips. While this appears to be an encouraging null result to help dampen fears towards AI-generated content, there are some subgroups who show significant susceptibility to polarisation. Noteably, Liberal Democrats show increase warmth towards their in-party leader; whereas, low-educated, part-time-working respondents show increased discomfort towards out-party voters. Explanations and theoretical implications of these results are to be investigated.
-
-## AI-Labelled Content Treatment {#sec-label-treatment}
-
-Building on @altay2024, the AI-label treatment is designed to test whether the labelling of content as AI-generated can mitigate the polarising effects of AI-generated content, or whether the association with AI-generated content is enough to polarise respondents. The treatment group is shown the same article as the AI-generated content group, but labelled as AI-generated. The control group is shown the same article but labelled as human-generated. The treatment and control groups are compared to see if there is a significant difference in the thermometer scores, trait-based measures of affective polarisation, and emotional discomfort measures.
-
-The results show that there is no significant treatment effect of AI-labelled content on thermometer scores, nor trait-based measures of affective polarisation. However, there is a significant treatment effect on the emotional discomfort measure of having a child marry an out-party voter. This suggests that labelling content as AI-generated can help mitigate the polarising effects of AI-generated content.
-
-### Thermometer Analysis {#sec-label-thermo-analysis}
-
-\input{../../outputs/tables/thermo_gap_label_results.tex}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{../../outputs/figures/thermo_patchwork_label_treatment.pdf}
-  \caption{Thermometer Score Patchwork Plot for AI-Labelled Content}
-  \label{fig:thermo-patchwork-label}
-\end{figure}
-
-### Ordinal Affective Polarisation Analysis {#sec-label-ordinal-analysis}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{../../outputs/figures/ordinal_patchwork_label_treatment.pdf}
-  \caption{Predicted Probabilities by Subgroup for AI-Labelled Content}
-  \label{fig:ordinal-patchwork-label}
-\end{figure}
-
-## Additional Analysis
+- Create a 3x3 table of the ordinal results and their significance levels
 
 ### Causal Acyclic Testing
 
 (see exeprimental analysis week 6 notes for details)
 
-### Agentic-based Modelling
+## Agent-based Modelling
 - What is agentic-based modelling?
 - Why is agentic-based modelling important?
 - How will I use agentic-based modelling?
@@ -819,6 +803,56 @@ The codebook in \hyperref[tab:codebook-table]{Table \ref*{tab:codebook-table}} b
 \input{../../outputs/tables/codebook_table.tex}
 
 \newpage
+
+## Survey Experiment Treatments {#sec-treatment-articles}
+
+Due to the limited space in the YouGov UniOM survey experiment, the human-generated BBC article was shortened to fit the survey. Each article was presented with a title, image, and text of roughly 200 words. The human-generated article is presented in \hyperref[fig:human-generated-visual]{Figure \ref*{fig:human-generated-visual}} below, and the AI-generated article is presented in \hyperref[fig:ai-generated-visual]{Figure \ref*{fig:ai-generated-visual}}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-generated-visual.pdf}
+  \caption{Human-Generated Article: BBC News}
+  \label{fig:human-generated-visual}
+\end{figure}
+\begin{quote}
+{\large\textbf{Dame Priti Patel Defends Record on Rising Immigration}}
+
+Dame Priti Patel has defended her record on immigration, which hit record levels during her time as home secretary. The MP said it was "too simple" and "lazy" to see the figures without "context" due to the pandemic and the war in Ukraine.
+
+Speaking to supporters she said changes to the system allow ministers to control migration. Patel launched a new points-based immigration system and signed the agreement with Rwanda to send some asylum seekers to the country.
+
+After a drop during the Covid pandemic, net migration - the number of people coming to the UK, minus the number of people leaving - then rose sharply during her time in the role, which she held until September 2022.
+
+In 2022 net migration reached a record 745,000, according to the Office for National Statistics. Some Tories have pointed to the party's failure to reduce migration as a key reason for their historic defeat at the general election.
+
+Pressed over her record on migration, Dame Priti said: "On my watch from 2019 onwards we delivered the structural reforms to the immigration and asylum system. The introduction of a points-based immigration system means the government has the levers to control who comes into our country".
+\end{quote}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-generated-visual.pdf}
+  \caption{AI-Generated Article: OpenAI GPT-4}
+  \label{fig:ai-generated-visual}
+\end{figure}
+\begin{quote}
+{\large\textbf{Border Crisis: Non-EU Migration Skyrockers as EU Numbers Plunge}}
+
+UK Overrun as Non-EU Migration Surges!
+
+Britain is facing an immigration crisis, with non-EU migration skyrocketing to unprecedented levels, far outpacing European arrivals.
+
+Official data shows EU migration has declined since 2016, while non-EU arrivals have surged dramatically. A once-steady trend shot up after 2020, as Britain opened its doors to record numbers of foreign nationals.
+
+Critics warn this surge is overwhelming public services, straining housing, schools, and the NHS. “We’ve lost control of our borders,” said a senior political source. Despite government promises, migration numbers keep rising.
+
+Experts blame lax visa rules, a failing asylum system, and reckless international student policies. “It’s unsustainable,” one warned. “Ordinary Britons struggle to buy homes and see a doctor, yet migration is out of control.”
+
+The shift from EU workers—who integrated and contributed—to non-EU arrivals is creating tensions. Communities are struggling with rapid change, and voters are demanding urgent action.
+
+Pressure is mounting for ministers to act. Will they prioritise British workers? Or continue ignoring public frustration as towns and cities buckle under the strain?
+
+One thing is clear: Britain is at a breaking point.
+\end{quote}
 
 ## Data Cleaning
 
@@ -844,35 +878,40 @@ For each of the categorical variables, there is a base reference category. For e
 \input{../../outputs/tables/balance_ai_treatment.tex}
 \input{../../outputs/tables/balance_label_treatment.tex}
 
-## Sensitivity Analysis
+\newpage
 
-Given the nature of the results often being reported as null effects, a sensitivity analysis to determine what the smallest true effect that could have detected 80% of the time is calculated.
+## Thermometer `MLthermoMean` and `LLthermoMean` {#sec-thermo-means}
 
-## `MLthermoMean` and `LLthermoMean` Analysis {#sec-MLthermo}
+\input{../../outputs/tables/thermo_ml_overall_ai_effect.tex}
+\input{../../outputs/tables/thermo_ml_source_credibility.tex}
+\input{../../outputs/tables/thermo_ml_detection_effect.tex}
 
-The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-results]{Table \ref*{tab:thermo-results}}. These models are presented in \hyperref[tab:thermo-ml-results]{Table \ref*{tab:thermo-ml-results}} and \hyperref[tab:thermo-ll-results]{Table \ref*{tab:thermo-ll-results}} respectvely.
+\input{../../outputs/tables/thermo_ll_overall_ai_effect.tex}
+\input{../../outputs/tables/thermo_ll_source_credibility.tex}
+\input{../../outputs/tables/thermo_ll_detection_effect.tex}
 
-\input{../../outputs/tables/thermo_ml_ai_results.tex}
-\input{../../outputs/tables/thermo_ll_ai_results.tex}
+\newpage
 
-For the `label_treatment` models, the same model specification is used as for the `ai_treatment` models. The models for the outcome variables of `MLthermoMean` and `LLthermoMean` are estimated using the same model specification as for `thermo_gap` in \hyperref[tab:thermo-gap-label-results]{Table \ref*{tab:thermo-gap-label-results}}. These models are presented in \hyperref[tab:thermo-ml-label-results]{Table \ref*{tab:thermo-ml-label-results}} and \hyperref[tab:thermo-ll-label-results]{Table \ref*{tab:thermo-ll-label-results}} respectvely.
-
-\input{../../outputs/tables/thermo_ml_label_results.tex}
-\input{../../outputs/tables/thermo_ll_label_results.tex}
-
-## Ordinal Affective Polarisation Results {#sec-ordinal-results}
-
-### AI-Generated Content
-The following results presented in \hyperref[tab:agreedisagree-results]{Table \ref*{tab:agreedisagree-results}}, \hyperref[tab:xtrust-results]{Table \ref*{tab:xtrust-results}}, and \hyperref[tab:child-results]{Table \ref*{tab:child-results}} show the log-odds change in the probability of being in a higher level (a higher threshold cut point) of agreement, trust, or comfort respectively.
+## Ordinal Outcome Regression Results {#sec-ordinal-results}
 
 \input{../../outputs/tables/agreedisagree_ai_results.tex}
-\input{../../outputs/tables/xtrust_ai_results.tex}
-\input{../../outputs/tables/child_ai_results.tex}
-
-### AI-Labelled Content
-
 \input{../../outputs/tables/agreedisagree_label_results.tex}
+\input{../../outputs/tables/agreedisagree_labelled_ai_results.tex}
+
+\input{../../outputs/tables/xtrust_ai_results.tex}
 \input{../../outputs/tables/xtrust_label_results.tex}
+\input{../../outputs/tables/xtrust_labelled_ai_results.tex}
+
+\input{../../outputs/tables/child_ai_results.tex}
 \input{../../outputs/tables/child_label_results.tex}
+\input{../../outputs/tables/child_labelled_ai_results.tex}
+
+\newpage
+
+## Sensitivity Analysis
+
+Given the nature of the results often being reported as null effects, a sensitivity analysis to determine what the smallest true effect that could have detected 80% of the time can be calculated here.
+
+\newpage
 
 # References {-}

@@ -1,27 +1,37 @@
 \begin{table}
 \centering
 \begin{talltblr}[         %% tabularray outer open
-caption={AI-Generated Content: Comfort with Child Marrying Opposing Partisan \label{tab:child-results}},
+caption={Discomfort: AI Content vs Human Control (Detection Condition) \label{tab:child-results}},
 note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
-note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are included but have no substantive interpretation.},
+note{ }={Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.},
 ]                     %% tabularray outer close
 {                     %% tabularray inner open
 colspec={Q[]Q[]Q[]Q[]},
 column{2,3,4}={}{halign=c,},
 column{1}={}{halign=l,},
-hline{8}={1,2,3,4}{solid, black, 0.05em},
+hline{18}={1,2,3,4}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
 & Treatment Only & Treatment + Covariates & Full Model \\ \midrule %% TinyTableHeader
-AI Treatment                       & \num{-0.015}  & \num{0.060}   & \num{0.446}+  \\
-& (\num{0.157}) & (\num{0.163}) & (\num{0.230}) \\
-AI Treatment:Education LevelLow    &                &                & \num{-1.024}* \\
-&                &                & (\num{0.464}) \\
-AI Treatment:Education LevelMedium &                &                & \num{-0.475}  \\
-&                &                & (\num{0.356}) \\
-Num.Obs.                           & \num{708}     & \num{708}     & \num{708}     \\
-RMSE                               & \num{2.29}    & \num{2.29}    & \num{2.29}    \\
-Model                              & (1)            & (2)            & (3)            \\
+AI Treatment                              & \num{-0.015}  & \num{-0.015}  & \num{-0.620}  \\
+& (\num{0.157}) & (\num{0.157}) & (\num{0.803}) \\
+AI Treatment:mostlikelyConservative Party &                &                & \num{-0.223}  \\
+&                &                & (\num{0.551}) \\
+AI Treatment:mostlikelyGreen Party        &                &                & \num{-0.697}  \\
+&                &                & (\num{0.582}) \\
+AI Treatment:mostlikelyLabour Party       &                &                & \num{-0.105}  \\
+&                &                & (\num{0.525}) \\
+AI Treatment:mostlikelyLiberal Democrats  &                &                & \num{0.842}   \\
+&                &                & (\num{0.559}) \\
+AI Treatment:Political Attention          &                &                & \num{0.006}   \\
+&                &                & (\num{0.102}) \\
+AI Treatment:Education LevelHigh          &                &                & \num{0.937}+  \\
+&                &                & (\num{0.536}) \\
+AI Treatment:Education LevelMedium        &                &                & \num{0.484}   \\
+&                &                & (\num{0.540}) \\
+Num.Obs.                                  & \num{708}     & \num{708}     & \num{708}     \\
+RMSE                                      & \num{2.29}    & \num{2.29}    & \num{2.29}    \\
+Model                                     & (1)            & (2)            & (3)            \\
 \bottomrule
 \end{talltblr}
 \end{table}
