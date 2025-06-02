@@ -70,7 +70,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "AI-Generated Content: Thermometer Gap Results (Overall Treatment Effect) \\label{tab:thermo-gap-overall}",
+    title = "AI Effect (Discounting and Detection): Thermometer Gap Results \\label{tab:thermo-gap-overall}",
     notes = "Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses. Main effects of included moderators are also reported as rows above the moderator treatment effects.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -86,7 +86,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "AI-Generated Content: Thermometer (Most Likely) Results (Overall Treatment Effect) \\label{tab:thermo-ml-overall}",
+    title = "AI Effect (Discounting and Detection): Thermometer Most Likely Results \\label{tab:thermo-ml-overall}",
     notes = "Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -102,7 +102,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "AI-Generated Content: Thermometer (Least Likely) Results (Overall Treatment Effect) \\label{tab:thermo-ll-overall}",
+    title = "AI Effect (Discounting and Detection): Thermometer Least Likely Results \\label{tab:thermo-ll-overall}",
     notes = "Treatment compares AI-generated content to human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -120,7 +120,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "Source Credibility Effect: Thermometer Gap Results (Labelled AI vs Human, No Label) \\label{tab:thermo-gap-source-cred}",
+    title = "Credibility Effect: Thermometer Gap Results (Labelled AI vs Human, No Label) \\label{tab:thermo-gap-source-cred}",
     notes = "Treatment compares labelled AI-generated content to unlabelled human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -136,7 +136,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "Source Credibility Effect: Thermometer (Most Likely) Results (Labelled AI vs Human, No Label) \\label{tab:thermo-ml-source-cred}",
+    title = "Credibility Effect: Thermometer Most Likely Results (Labelled AI vs Human, No Label) \\label{tab:thermo-ml-source-cred}",
     notes = "Treatment compares labelled AI-generated content to unlabelled human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -152,7 +152,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "Source Credibility Effect: Thermometer (Least Likely) Results (Labelled AI vs Human, No Label) \\label{tab:thermo-ll-source-cred}",
+    title = "Credibility Effect: Thermometer Least Likely Results (Labelled AI vs Human, No Label) \\label{tab:thermo-ll-source-cred}",
     notes = "Treatment compares labelled AI-generated content to unlabelled human-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -186,7 +186,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "Detection Effect: Thermometer (Most Likely) Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-ml-detection}",
+    title = "Detection Effect: Thermometer Most Likely Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-ml-detection}",
     notes = "Treatment compares labelled AI-generated content to unlabelled AI-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -202,7 +202,7 @@ save_thermo_table(
         "political_attention" = "Political Attention",
         "education_recode" = "Education Level"
     ),
-    title = "Detection Effect: Thermometer (Least Likely) Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-ll-detection}",
+    title = "Detection Effect: Thermometer Least Likely Results (Labelled AI vs Unlabelled AI) \\label{tab:thermo-ll-detection}",
     notes = "Treatment compares labelled AI-generated content to unlabelled AI-generated content. Models weighted using YouGov survey weights. Coefficients are reported with robust standard errors in parentheses.",
     add_rows = tibble(term = "Model", `Treatment Only` = "(1)", `Treatment + Covariates` = "(2)", `Full Model` = "(3)")
 )
@@ -234,7 +234,7 @@ save_ordinal_table(
         "education_recode" = "Education Level",
         "political_attention" = "Political Attention"
     ),
-    title = "Respect: AI Content vs Human Control (Detection Condition) \\label{tab:agreedisagree-results}",
+    title = "Respect: AI Content vs Human Control (AI Effect: Discounting and Detection) \\label{tab:agreedisagree-results}",
     notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
@@ -255,7 +255,7 @@ save_ordinal_table(
         "education_recode" = "Education Level",
         "political_attention" = "Political Attention"
     ),
-    title = "Trust: AI Content vs Human Control (Detection Condition) \\label{tab:xtrust-results}",
+    title = "Trust: AI Content vs Human Control (AI Effect: Discounting and Detection) \\label{tab:xtrust-results}",
     notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
@@ -276,7 +276,7 @@ save_ordinal_table(
         "education_recode" = "Education Level",
         "political_attention" = "Political Attention"
     ),
-    title = "Discomfort: AI Content vs Human Control (Detection Condition) \\label{tab:child-results}",
+    title = "Discomfort: AI Content vs Human Control (AI Effect: Discounting and Detection) \\label{tab:child-results}",
     notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
@@ -324,7 +324,7 @@ save_ordinal_table(
         "education_recode" = "Education Level",
         "political_attention" = "Political Attention"
     ),
-    title = "Respect: Labelled AI Content vs Human Control (Source Credibility Condition) \\label{tab:agreedisagree-labelled-ai-results}",
+    title = "Respect: Labelled AI Content vs Human Control (Credibility Effect) \\label{tab:agreedisagree-labelled-ai-results}",
     notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of agreement that opposing partisans respect political beliefs. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
@@ -345,7 +345,7 @@ save_ordinal_table(
         "education_recode" = "Education Level",
         "political_attention" = "Political Attention"
     ),
-    title = "Trust: Labelled AI Content vs Human Control (Source Credibility Condition) \\label{tab:xtrust-labelled-ai-results}",
+    title = "Trust: Labelled AI Content vs Human Control (Credibility Effect) \\label{tab:xtrust-labelled-ai-results}",
     notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of trusting that opposing parties will do what is right for the country. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
@@ -366,7 +366,7 @@ save_ordinal_table(
         "education_recode" = "Education Level",
         "political_attention" = "Political Attention"
     ),
-    title = "Discomfort: Labelled AI Content vs Human Control (Source Credibility Condition) \\label{tab:child-labelled-ai-results}",
+    title = "Discomfort: Labelled AI Content vs Human Control (Credibility Effect) \\label{tab:child-labelled-ai-results}",
     notes = "Note: Ordered logistic regression with survey weights and robust standard errors in parentheses. Coefficients represent log-odds of comfort with a child marrying an opposing party voter. Threshold cutpoints are not included as they have no substantive interpretation in this context.",
     add_rows = tibble::tibble(
         term = "Model",
@@ -443,6 +443,47 @@ save_ordinal_table(
 # === Plotting Logic ===
 source(here("thesis", "analysis", "thermo_models_plots.R"))
 
+# === Build Summary Table of Full Model Treatment Effects ===
+
+# Create named list of full models (theory-aligned treatment names)
+models_grid <- list(
+    "Discomfort" = list(
+        "Discounting and Detection" = full_child_ai_model,
+        "Detection Effect" = full_child_label_model,
+        "Credibility Effect" = full_child_labelled_ai_treatment
+    ),
+    "Trust" = list(
+        "Discounting and Detection" = full_xtrust_ai_model,
+        "Detection Effect" = full_xtrust_label_model,
+        "Credibility Effect" = full_xtrust_labelled_ai_treatment
+    ),
+    "Respect" = list(
+        "Discounting and Detection" = full_agreedisagree_ai_model,
+        "Detection Effect" = full_agreedisagree_label_model,
+        "Credibility Effect" = full_agreedisagree_labelled_ai_treatment
+    )
+)
+
+# Flatten into a long list and keep model names
+flattened_models <- unlist(models_grid, recursive = FALSE)
+names(flattened_models) <- rep(names(models_grid), each = 3)
+
+# Generate the summary table
+modelsummary::modelsummary(
+    flattened_models,
+    coef_map = c(
+        "ai_treatment" = "Discounting and Detection",
+        "label_treatment" = "Detection Effect",
+        "labelled_ai_treatment" = "Credibility Effect"
+    ),
+    coef_omit = "^(?!ai_treatment|label_treatment|labelled_ai_treatment)", # show only treatment effect
+    statistic = "({std.error})",
+    stars = TRUE,
+    output = here("thesis", "outputs", "tables", "ordinal_results_matrix.tex"),
+    title = "Treatment Effects of Trait- and Emotional-Based Outcome Measures",
+    shape = model ~ term,
+    notes = "Ordered logistic regression results. Table shows only treatment effects from full models with robust standard errors."
+)
 
 # === Inline Results ===
 
