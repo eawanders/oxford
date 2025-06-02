@@ -128,7 +128,7 @@ cat(save_balance_table(
     data = yougov_data_ai,
     treatment_var = "ai_treatment",
     covariates = balance_covariates,
-    caption = "Balance Table of Covariates by AI Treatment Group \\label{tab:ai-balance}",
+    caption = "Balance Table of Covariates by AI Treatment Group",
     file = here("thesis", "outputs", "tables", "balance_ai_treatment.tex")
 ))
 
@@ -136,6 +136,6 @@ cat(save_balance_table(
     data = yougov_data_label,
     treatment_var = "label_treatment",
     covariates = balance_covariates,
-    caption = "Balance Table of Covariates by Label Treatment Group \\label{tab:label-balance}",
+    caption = "Balance Table of Covariates by Label Treatment Group",
     file = here("thesis", "outputs", "tables", "balance_label_treatment.tex")
 ))

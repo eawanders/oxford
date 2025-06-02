@@ -53,7 +53,7 @@ create_codebook_table <- function() {
             booktabs = TRUE,
             longtable = TRUE,
             escape = FALSE,
-            caption = "YouGov UniOM Survey Codebook \\label{tab:codebook-table}"
+            caption = "YouGov UniOM Survey Codebook"
         ) %>%
             kable_styling(
                 latex_options = c("repeat_header"),
@@ -66,7 +66,7 @@ create_codebook_table <- function() {
 }
 
 
- # Save the codebook table as a LaTeX file
+# Save the codebook table as a LaTeX file
 save_codebook_table <- function(file = here("thesis", "outputs", "tables", "codebook_table.tex")) {
     kb <- kable(
         codebook,
