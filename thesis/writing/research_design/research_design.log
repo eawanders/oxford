@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  2 JUN 2025 01:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  4 JUN 2025 23:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -827,54 +827,44 @@ Package caption Info: hyperref package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package hyperref Info: Link coloring ON on input line 173.
-</Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.pdf,
- id=4, 845.04686pt x 597.50786pt>
-File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford
-.pdf Graphic file (type pdf)
-<use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/oxford.
-pdf>
-Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/wri
-ting/objects/oxford.pdf  used on input line 185.
-(pdftex.def)             Requested size: 234.8775pt x 166.07022pt.
 [1
 
 {/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
-al/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc} </Users/edwardanders/D
-ocuments/GitHub/oxford/thesis/writing/objects/oxford.pdf, page is rotated 90 de
-grees>] [1] (./research_design.toc
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
+al/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}] [1] (./research_desig
+n.toc
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 6
 .
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 6
 .
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-7.
+6.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-7.
+6.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 7.
+(Font)              <10> on input line 6.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 7.
+(Font)              <7> on input line 6.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 7.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 7.
+(Font)              <5> on input line 6.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 6.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 7.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 6.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/microtype/mt-msb.cfg
@@ -896,53 +886,34 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.251 
+l.250 
        [1
 
-] [2] [3]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 266.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 266.
-[4] [5]
+] [2]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
-87.
+76.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [6{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/loc
+) [3{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/loc
 al/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive
 /2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2024/texmf-di
-st/fonts/enc/dvips/lm/lm-mathsy.enc}] [7] [8] [9] [10{/usr/local/texlive/2024/t
-exmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [11] [12]
-
-LaTeX Warning: Reference `eq:asymmetric-malleability' on page 13 undefined on i
-nput line 580.
-
-[13] [14]
-
-LaTeX Warning: Hyper reference `sec:dection-discounting' on page 15 undefined o
-n input line 668.
-
-
-LaTeX Warning: Reference `sec:detection-discounting' on page 15 undefined on in
-put line 668.
-
-[15] [16] [17]
-Overfull \hbox (1.53458pt too wide) in paragraph at lines 843--852
+st/fonts/enc/dvips/lm/lm-mathsy.enc}] [4] [5] [6] [7{/usr/local/texlive/2024/te
+xmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [8] [9] [10] [11] [12] [13] [14]
+Overfull \hbox (1.53458pt too wide) in paragraph at lines 832--841
  [][] 
  []
 
-[18] [19] [20]
+[15] [16]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 866.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 866.
+[17]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 8
-99.
+86.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [21] [22]
-
-LaTeX Warning: Hyper reference `sec-thory' on page 23 undefined on input line 9
-29.
-
-[23] (../../outputs/tables/thermo_gap_overall_ai_effect.tex
+) [18] (../../outputs/tables/thermo_gap_overall_ai_effect.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -989,34 +960,29 @@ Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
  [][] 
  []
 
-)
+) [19] [20] [21] [22]
 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patc
-hwork_overall.pdf, id=506, 867.24pt x 289.08pt>
+hwork_overall.pdf, id=427, 867.24pt x 289.08pt>
 File: /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo
 _patchwork_overall.pdf Graphic file (type pdf)
 <use /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
 patchwork_overall.pdf>
 Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/out
-puts/figures/thermo_patchwork_overall.pdf  used on input line 947.
+puts/figures/thermo_patchwork_overall.pdf  used on input line 930.
 (pdftex.def)             Requested size: 469.75502pt x 156.58607pt.
-[24] [25] [26] [27]
 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patc
-hwork_ldem.pdf, id=532, 867.24pt x 289.08pt>
+hwork_ldem.pdf, id=428, 867.24pt x 289.08pt>
 File: /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo
 _patchwork_ldem.pdf Graphic file (type pdf)
 <use /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
 patchwork_ldem.pdf>
 Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/out
-puts/figures/thermo_patchwork_ldem.pdf  used on input line 953.
+puts/figures/thermo_patchwork_ldem.pdf  used on input line 936.
 (pdftex.def)             Requested size: 469.75502pt x 156.58607pt.
-[28 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
+[23 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_
 patchwork_overall.pdf> </Users/edwardanders/Documents/GitHub/oxford/thesis/outp
-uts/figures/thermo_patchwork_ldem.pdf>]
-
-LaTeX Warning: Reference `sec-ordinal-results ' on page 29 undefined on input l
-ine 961.
-
-(../../outputs/tables/ordinal_results_matrix.tex
+uts/figures/thermo_patchwork_ldem.pdf>] (../../outputs/tables/ordinal_results_m
+atrix.tex
 > Step: init table outer spec.
 > Step: parse table options.
 > Step: split table.
@@ -1025,30 +991,31 @@ ine 961.
 > Step: execute table commands.
 > Step: calculate cell and line sizes.
 > Step: build the whole table.
-) [29] [30] (../../outputs/tables/codebook_table.tex [31] [32]) [33]
+) [24] [25] [26] [27] [28] [29] [30] (../../outputs/tables/codebook_table.tex [
+31] [32]) [33] [34] [35]
 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-gener
-ated-visual.pdf, id=586, 845.04686pt x 597.50786pt>
+ated-visual.pdf, id=615, 845.04686pt x 597.50786pt>
 File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-
 generated-visual.pdf Graphic file (type pdf)
 <use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-g
 enerated-visual.pdf>
 Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/wri
-ting/objects/human-generated-visual.pdf  used on input line 996.
+ting/objects/human-generated-visual.pdf  used on input line 1024.
 (pdftex.def)             Requested size: 375.80544pt x 265.72148pt.
-[34 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-g
+[36 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-g
 enerated-visual.pdf, page is rotated 90 degrees>]
 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-generate
-d-visual.pdf, id=595, 845.04686pt x 597.50786pt>
+d-visual.pdf, id=624, 845.04686pt x 597.50786pt>
 File: /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gen
 erated-visual.pdf Graphic file (type pdf)
 <use /Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gene
 rated-visual.pdf>
 Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/wri
-ting/objects/ai-generated-visual.pdf  used on input line 1016.
+ting/objects/ai-generated-visual.pdf  used on input line 1044.
 (pdftex.def)             Requested size: 375.80544pt x 265.72148pt.
-[35 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gene
-rated-visual.pdf, page is rotated 90 degrees>] [36]
-Underfull \hbox (badness 1975) in paragraph at lines 1050--1051
+[37 </Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-gene
+rated-visual.pdf, page is rotated 90 degrees>] [38]
+Underfull \hbox (badness 1975) in paragraph at lines 1078--1079
 \T1/lmtt/m/n/10 MLthermo_NF\T1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10 MLthermo_ED\T
 1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10 MLthermo_CD\T1/lmr/m/n/10 (+20) , \T1/lmtt
 /m/n/10 MLthermo_AR\T1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10 LLthermo_KB\T1/lmr/m/
@@ -1056,10 +1023,10 @@ n/10 (+20) , \T1/lmtt/m/n/10 LLthermo_KS\T1/lmr/m/n/10 (+20) , \T1/lmtt/m/n/10
 LLthermo_NF\T1/lmr/m/n/10 (+20) ,
  []
 
-[37] (../../outputs/tables/balance_ai_treatment.tex) (../../outputs/tables/bala
-nce_label_treatment.tex) [38] [39] [40]
+[39] (../../outputs/tables/balance_ai_treatment.tex) (../../outputs/tables/bala
+nce_label_treatment.tex) [40] [41] [42]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1069.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1097.
 (../../outputs/tables/thermo_ml_overall_ai_effect.tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -1146,7 +1113,7 @@ Overfull \hbox (5.38495pt too wide) in paragraph at lines 39--40
  [][] 
  []
 
-) [41] [42] [43] [44] [45] [46] (../../outputs/tables/agreedisagree_ai_results.
+) [43] [44] [45] [46] [47] [48] (../../outputs/tables/agreedisagree_ai_results.
 tex
 > Step: init table outer spec.
 > Step: parse table options.
@@ -1276,68 +1243,64 @@ Overfull \hbox (5.38495pt too wide) in paragraph at lines 36--37
  [][] 
  []
 
-) [47] [48] [49] [50] [51] [52] [53] [54] [55]
+) [49] [50] [51] [52] [53] [54] [55] [56] [57]
 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/power_analy
-sis.pdf, id=723, 361.35pt x 216.81pt>
+sis.pdf, id=753, 361.35pt x 216.81pt>
 File: /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/power_
 analysis.pdf Graphic file (type pdf)
 <use /Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/power_a
 nalysis.pdf>
 Package pdftex.def Info: /Users/edwardanders/Documents/GitHub/oxford/thesis/out
-puts/figures/power_analysis.pdf  used on input line 1103.
+puts/figures/power_analysis.pdf  used on input line 1131.
 (pdftex.def)             Requested size: 375.80544pt x 225.48369pt.
-[56 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/power_a
-nalysis.pdf>] [57] [58]
-Overfull \hbox (0.18271pt too wide) in paragraph at lines 1191--1192
+[58 </Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/power_a
+nalysis.pdf>] [59] [60]
+Overfull \hbox (0.18271pt too wide) in paragraph at lines 1231--1232
 \T1/lmr/m/n/10 (+14) https://globalwitness.org/en/campaigns/digital-threats/con
 spiracy-and-toxicity-xs-ai-chatbot-grok-shares-
  []
 
-[59] [60] [61] [62] (./research_design.aux)
+[61] [62] [63] [64] (./research_design.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
 
-LaTeX Warning: There were undefined references.
-
-
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 25076 strings out of 474116
- 495586 string characters out of 5743681
+ 25086 strings out of 474116
+ 495243 string characters out of 5743681
  2117187 words of memory out of 5000000
- 46453 multiletter control sequences out of 15000+600000
- 700643 words of font info for 274 fonts, out of 8000000 for 9000
+ 46449 multiletter control sequences out of 15000+600000
+ 697984 words of font info for 275 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 77i,16n,110p,3556b,1264s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 77i,16n,110p,2598b,1264s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/lo
 cal/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texliv
-e/2024/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2024/texm
-f-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2024/texmf-dist/fo
-nts/type1/public/lm/lmex10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/
-public/lm/lmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/
-lmmi5.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><
-/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/
-texlive/2024/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/202
-4/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2024/texmf-dis
-t/fonts/type1/public/lm/lmr5.pfb></usr/local/texlive/2024/texmf-dist/fonts/type
-1/public/lm/lmr6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/
-lmr7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr8.pfb></u
-sr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/tex
-live/2024/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2024/
-texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2024/texmf-dist
-/fonts/type1/public/lm/lmsy5.pfb></usr/local/texlive/2024/texmf-dist/fonts/type
-1/public/lm/lmsy7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm
-/lmtk10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pf
-b></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/loc
-al/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt9.pfb>
-Output written on research_design.pdf (67 pages, 1097885 bytes).
+e/2024/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2024/te
+xmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2024/texmf-dist/f
+onts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1
+/public/lm/lmmi5.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/
+lmmi7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr10.pfb><
+/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/
+texlive/2024/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/202
+4/texmf-dist/fonts/type1/public/lm/lmr5.pfb></usr/local/texlive/2024/texmf-dist
+/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1
+/public/lm/lmr7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/l
+mr8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr9.pfb></us
+r/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/te
+xlive/2024/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2024
+/texmf-dist/fonts/type1/public/lm/lmsy5.pfb></usr/local/texlive/2024/texmf-dist
+/fonts/type1/public/lm/lmsy7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type
+1/public/lm/lmtk10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/l
+m/lmtt10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt8.pf
+b></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt9.pfb>
+Output written on research_design.pdf (69 pages, 1033377 bytes).
 PDF statistics:
- 1021 PDF objects out of 1200 (max. 8388607)
- 876 compressed objects within 9 object streams
- 294 named destinations out of 1000 (max. 500000)
- 55399 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 1062 PDF objects out of 1200 (max. 8388607)
+ 919 compressed objects within 10 object streams
+ 305 named destinations out of 1000 (max. 500000)
+ 53346 words of extra memory for PDF output out of 61914 (max. 10000000)
 
