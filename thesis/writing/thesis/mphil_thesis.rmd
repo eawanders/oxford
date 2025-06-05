@@ -1,0 +1,947 @@
+---
+output:
+    bookdown::pdf_document2:
+        toc: false
+        number_sections: true
+        includes:
+            in_header:
+                header.tex
+            before_body: thesis_titlepage.tex
+        keep_tex: false
+
+documentclass: article
+
+zotero: true
+link-citations: true
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+
+urlcolor: blue
+linkcolor: blue
+---
+
+```{r setup, include=FALSE}
+library(here)
+source(here("thesis", "analysis", "packages.R"))
+source(here("thesis", "writing", "helpers", "load_outputs.R"))
+model_results <- readRDS(here("thesis", "outputs", "helpers", "model_results.rds"))
+```
+
+\newpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+# Abstract {-}
+
+Advancements in machine learning have made Artificial Intelligence (AI) capable of generating hyper-realistic textual and visual content, accelerating its adoption as a powerful informational tool. Yet as generative AI technologies remain unregulated and vulnerable to misuse, concerns are growing about their potential to distort political messaging. This research investigates the polarising effects of AI-generated political content, focusing on how perceptions of trust and associations with misinformation influence affective polarisation among partisans. Using survey experiments with labelled and unlabelled AI- and human-generated content, the project tests whether source provenance moderates respondents’ emotional and trait-based evaluations of political outgroups. A pilot study conducted with YouGov provides initial evidence that unlabelled AI content increases discomfort and reduces respect toward opposing partisans—supporting the view that undetected AI can act as a persuasive and polarising influence. To complement the experimental design, an agent-based model is developed to simulate repeated exposures and long-run dynamics. Together, these approaches offer new insights into the political consequences of AI being used in poltical communication.
+
+\begin{flushleft}
+\textbf{Keywords:} artificial intelligence, affective polarisation, fake news, survey experiment, agent-based modelling
+\end{flushleft}
+
+\newpage
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\newpage
+# List of Tables {-}
+\renewcommand{\listtablename}{}
+\vspace*{-2em}
+\listoftables
+
+\newpage
+# List of Figures {-}
+\renewcommand{\listfigurename}{}
+\vspace*{-2em}
+\listoffigures
+
+\newpage
+\mainmatter
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+# Introduction {#sec-intro}
+
+Machine learning advancements to efficiently handle sequential data inputs and outputs have popularised the field of Artificial Intelligence (AI) [@vaswani2017]. AI is rapidly evolving into a transformative informational tool, with applications ranging from drug discovery to climate change modelling. Generative AI has emerged as the fastest-growing application, with tools like ChatGPT, Claude, and Midjourney gaining popularity through their ability to create sophisticated text, images, and video from simple prompts. Yet, these technological advancements are raising serious concerns from leading academics and AI developers alike. The ‘Godfather of AI’, Geoffrey Hinton, left Google over fears that safety and governance were are being overlooked in the pursuit of Artificial General Intelligence (AGI) [@metz2023]. As AI systems develop the capability to set their own goals and operate autonomously, they present catastrophic risks through malicious actions, unsafe behaviour, or exploitation by bad actors [@hendrycks2023]. But, in the near-term, sub-catastrophic risks are equally present. In particular, this research project is interested in AI’s capacity to ‘amplify social injustice, erode social stability, […] customised mass manipulation, and pervasive surveillance’ [@bengio2024]. These social and political risks of AI are often discussed anecdotally, but there remains little research nor evidence on what these risks look like. The UK Government's @departmentforsciencetechnology&innovation2025 views ‘manipulation and deception of populations’ a significant threat to political systems and societies; but, the extent to which politically targeted generative AI can be used to distort, deceive, and direct an electorate  remains unclear. Therefore, this project aims to answer:
+
+\begin{quote}
+\textit{Does exposure to AI-generated political content increase affective polarisation?}
+\end{quote}
+
+This question seeks to an answer a notable puzzle. Why should we fear the fake news, or deceitful propaganda produced by generative-AI applications any more than the propaganda produced for centuries before its time? Plausible arguments lay in both the quantity and quality of the information produced. Despite confident responses, AI can hallucinate to produce false political facts and fantasies, and be directed to generate hyper-realistic, undetectable ‘fake news’ [@rawte2023; @duberry2022; @flew2021]. With 45% of the United States population using generative AI, and social media providing a perfect watering ground to promulgate viral misinformation, exposure to AI-generated fake news is increasingly likely [@salesforce2025]. But, widespread misinformation has been deliberately spread within democracies well before technological advancements, with democracies remaining strong throughout [@bernays1928]. Therefore, are the growing fears that AI will deceive and manipulate democratic events justified [@ansell2023]? To answer this, we can work backwards. Can AI swing enough of the right voters to affect our election outcomes? Can AI-generated content manipulate and persuade individual-level voting behaviour? Can exposure to AI-generated content affect political attitudes, in particular feelings of affective polarisation?
+
+This question and focus on affective polarisation is especially important. Fake news has been shown to spread rapidly amongst networks of echo chambers which, in turn, are incubators of partisans with ever-more polarised views against their out-groups [@tornberg2018; @hobolt2023]. With polarisation being a theme of democratic backsliding and populist politics, understanding the effects of AI in fuelling the spread of manipulative fake news to polarise partisans further is imperative. Answering this question provides governments, institutions, and technology companies with political implications of failing to improve governance and regulation of AI models. Moreover, understanding the mechanisms through which AI affects behaviour and the effectiveness of possible interventions is a key implications of this research. Labelling content is ostensibly the best approach to warn that generative AI has been used. Yet this may bring overly adverse associations of AI with fake news which may only exacerbate polarisation [@altay2024]. Consequently, the effects of labelling content as AI is also an independent variable of interest in this research.
+
+To identify the effects of exposure to AI-generated content, this project proposes the use of survey experiments coupled with AI-augmented synthetic experimental methods to simulate repeated exposures. This proposal starts by reviewing the literatures on AI’s effects and affective polarisation, before laying out the theoretical motivations and hypotheses of this research. A pilot study conducted with YouGov is then presented, where initial results suggest that AI-generated content—particularly when unlabelled—can exert a persuasive and affectively polarising influence on respondents. Finally, an innovative approach using synthetic agents is proposed to address the limitations of survey-based designs and further explore AI’s role in shaping political attitudes.
+
+\newpage
+
+# Literature Review {#sec-lit-review}
+
+This question builds upon the rise of fake news and affective polarisation with a distinct, new focus on the effects of AI-generated content, an area yet to be explored in the academic literature. This section firstly provides the context for the question’s focus, before giving an overview of the existing — limited — literature on AI-generated content, and assessing the mixed literature on affective polarisation.
+
+This research focuses on the United Kingdom (UK). Structural effects of globalisation and economic liberalism, coupled with individual political failings and electoral shocks have created an increasingly unequal and divided world. Consequent disillusionment and disconnected identities have encouraged voter volatility and rising populist narratives, notably in the UK [@norris2019; @fieldhouse2019: 28-32]. This environment — coupled with social media — has encouraged the dangerous spread of fake news which has been shown to favour populists, affect voting behaviour, and strengthen identities and affective polarisation within online echo chambers [@cantarella2023; @pfister2023]. Given this volatile political landscape in the UK, with rising populist challengers, the fears of widespread dissemination of deceitful AI-generated information are justified. But this research hopes to illuminate to what extent we should be concerned about AI’s effect in the UK setting.
+
+Generative AI is a subfield of Artificial Intelligence with the ability to generate new content in the form of text, images, video based on generative models which use machine learning to take patterns from data they are trained on [@sengar2024]. This AI-generated content, while often produced by human prompts, is generally computationally generated using probabilities rather than fact-checked, pre-defined truths. This research defines the use of AI-generated content as any content produced by AI-based models, primarily through human prompting to provide people with information, news, and arguments on any question or topic, including political ones. The focus is on whether such AI-generated content can affect political attitudes, behaviour, and therefore increase affective polarisation: the gap between the emotional warmth and attachment towards your in-group political party, compared to the hostility shown to the out-group party [@green2004; @iyengar2012]. While affective polarisation is return to later, it’s important to raise why there is such a fear of AI-generated content. As emphasised by @iyengar2019, 'exposure to messages attacking the out-group reinforces partisans’ biased views of their opponents.’ This negative messaging often takes the form of ‘fake news,’ a term @tandoc2018 focus on facticity and the perceptions of truth from its audience. It is this issue of fake news which is critical for AI-generated content, and why increased divides could be seen within our political societies. If AI generates fake or misleading content which is spread widely and used to attack out-groups within in-group echo chambers, polarisation may inevitably increase.
+
+Despite the infancy of these AI tools, their use in politics is a noticeable point of contention. @hackenburg2024 show that GPT-4 could have a persuasive influence of political microtargeting. This research only found evidence of increased support for pre-existing policy perspectives; but, AI could be used to persaude volatile voters towards another side. For this reason, OpenAI tried to avoid political biases by ensuring ‘ChatGPT did not express political preferences or recommend candidates even when asked explicitly,’ while others such as X’s Grok has been caught sharing divisive political disinformation [@openai2024; @conger2025; @globalwitness2024]. These early, un-regulated, yet widely used models, are therefore raising concern that the content they generate may have negative consequences on elections through the spread of misinformation. The @worldeconomicforum2024 sees this as a severe short-term risk as ‘AI is amplifying manipulated and distorted information that could destabilise societies.’ But AI-generated misinformation is more than just inaccurate chatbots. Fear also surrounds more deceitful and deliberately manipulative uses of AI to generate deepfake images and videos used to perpetuate a divisive stereotype or false narratives. However, the nascent nature of the technology means these deepfakes are often detectable, showing the need to consider the ability of someone to detect the use of AI in the research design [@kapoor2024]. But what if the deepfakes or AI-generated misinformation goes undetected? Despite minimal literature on AI in political science, early research suggests AI-generated messages can also persuasive, and propaganda produced by AI can be compelling [@bai2023; @goldstein2024]. As the quality of machine learning research improves, AI-generated content will only likely become more realistic and undetectable. Research has shown that AI chatbots can be more persuasive than humans, showing how the personalised nature of GPTs can exploit user heterogeneity and their in- versus out-group views [@salvi2025]. Yet, simultaneously, these GPTs are regularly shown to hallucinate facts they provide, giving credence to the fears that AI’s will perpetuate fake news even further due to the reinforcement learning algorithms [@thornhill2025]. Another issue is potential unintended consequences of consumers’ perceptions of AI. It has been found that when aware of political content being AI-generated, readers become sceptical of its validity even if the content is true [@altay2024]. A possible mechanism here is trust. Users may associate AI-generated —determined by their own detection, or if labelled — content with fake news, which in turn increases scepticism towards its veracity. Consequently, labelling content as AI-generated may be a misinformed interception. With detection, labelling, and association of AI-generated content with being fake, @cashell2024 argues deepfakes and AI-generated content is often instead used to perpetuate existing stereotypes rather than attempting to persuade new views.
+
+To consider the causal effect of AI-generated content on affective polarisation and how this may be driven by AI’s link with fake news, the conceptualisation and causes of affective polarisation require consideration. At its roots, political polarisation is the distribution of a population along an ideological dimension [@hare2022]. This ideological description can explain policy polarisation; whereas, differences in partisan identity grew in salience such that social identity with a partisan group became a better predictor of voting behaviour compared to ideological disagreement [@algara2023].[^affective-polarisation-hypothesis] However, recent research has suggested that the *affect* in affective polarisation — the emotional animosity felt towards opposing partisans — is driven by emotions of fear, anxiety, disgust, and animosity [@bakker2024]. Summarised as partisan disdain, affective polarisation self-reinforces differences. These emotions towards out-groups affects the engagement and selective choices of which information to consume. Consequently, the information environment, primarily on social media, skews the reader’s perceptions of reality, engaging themselves with content they want to see as a representation of the out-groups. This is where AI’s potential is a threat. Angry partisans seek disconfirming information to support their own views [@mackuen2010]. AI can be easily and quickly used to generate this disconfirming information. AI helps affectively polarised voters exacerbate the spread of fictitious, divisive, yet ostensibly real content, within the correct in- and out-groups.  As a result, affective polarisation could increase discrimination, cut trust in democratic institutions, and suppress political engagement [@kingzette2021; @layman2006]. Taking this understanding of affective polarisation in the context of AI-generated content and the volatile political environment, the next section builds a formal model to predict how exposure to AI-generated content can impact affective polarisation.
+
+[^affective-polarisation-hypothesis]: Recent literature has also suggested that the ideological and policy differences between parties is also related to growing affective polarisation [@hobolt2021; @gidron2020].
+
+\newpage
+
+# Theoretical Framework {#sec-theory}
+
+As described in \hyperref[sec-lit-review]{Section \ref*{sec-lit-review}} above, the literature on the effects of AI-generated content is still nascent. Developing a theoretical framework to understand effects of exposure therefore requires a number of assumptions and leaning on theories of fake news and affective polarisation. Of particular guidance are formal models of the spread of misinformation within networks, namely those by @acemoglu2024, @dellalena2024, and @jones2024. The formal theory developed in this section takes these models and applies them to the models and hypotheses used in the affective polarisation literature from @tornberg2021 and @hobolt2023.
+
+The model presented is motivated by these aforementioned models, and uses a simplified Bayesian-inspired updating set up for modelling a utility function response to AI-generated political information. While classical Bayesian updating requires agents to form posterior beliefs using formally specified likelihood functions, a simplified, quasi-Bayesian updating framework is used for three reasons:
+
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{Empirical Tractability:} Full Bayesian inference requires assumptions about prior distributions and signal noise that are unobservable in survey settings.
+    \item \textbf{Psychological Plausibility:} Individuals often rely on heuristics when processing political information, especially under uncertainty about source credibility.
+    \item \textbf{Interpretative Clarity:} The simplified rule permits direct mapping between theoretical parameters (e.g., trust in AI, ideological distance) and experimental treatment conditions.
+\end{enumerate}
+
+## Model Setup
+
+Let the individual's belief about the ideological position of the outgroup be denoted by:
+
+\begin{itemize}
+    \item \( \theta_0 \): prior belief
+    \item \( \theta_1 \): posterior belief
+    \item \( C \): ideological content of the article
+    \item \( \delta = |C - \theta_0| \): ideological distance between article content and prior
+    \item \( S \in \{\text{AI}, \text{Human}\} \): true source of the article
+    \item \( \hat{S} \): perceived source
+    \item \( \beta_i \in [0, \infty) \): responsiveness to detected AI-generated content (higher values indicate greater persuasiveness)
+    \item \( \beta^* \in [1, \infty) \): responsiveness to undetected AI-generated content (relative to baseline human content)
+    \item \( d_i \in [0, 1] \): probability individual \( i \) detects the true source
+\end{itemize}
+
+The individual updates their belief according to \hyperref[eq:update-rule]{Equation \ref*{eq:update-rule}}:
+
+\begin{equation}
+\theta_1 = \theta_0 + \bar{\beta}_i \cdot w(\delta) \cdot (C - \theta_0)
+\label{eq:update-rule}
+\end{equation}
+
+where:
+
+\[
+\bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^*
+\quad \text{and} \quad
+w(\delta) = \frac{1}{1 + \lambda \cdot \delta}, \quad \lambda > 0
+\]
+
+The term \( \bar{\beta}_i \) reflects the expected responsiveness to the article, based on the detection probability and whether the content is believed to be AI-generated. When detected, responsiveness is governed by \( \beta_i \), which may reflect either discounting (\( \beta_i < 1 \)) or amplification (\( \beta_i > 1 \)). When undetected, the content is processed with responsiveness \( \beta^* \geq 1 \), which allows for the possibility that AI content is more persuasive than human content even when its origin is unknown, as suggested by @goldstein2024.
+
+The function \( w(\delta) \) reflects ideological receptiveness, with greater distance reducing responsiveness.
+
+## Detection and Responsiveness {#sec:detection-responsiveness}
+
+As has been widely reported, trust in AI-generated content is often low. When individuals are aware that content is AI-generated, they may be less likely to trust it [@afroogh2024]. However, this is not universally the case: for some individuals, particularly those who view algorithmic content as high-quality or ideologically aligned, detected AI content may be treated as even more persuasive than human-generated content. The model captures this by allowing responsiveness to detected AI content to exceed 1 (i.e., \( \beta_i > 1 \)).
+
+Importantly, the model also accounts for the possibility that undetected AI content may be more persuasive than human-generated content. In this case, the individual does not consciously adjust their beliefs based on the source, but may nonetheless respond more strongly than they would to equivalent human-written information. This is captured by allowing the baseline responsiveness to undetected AI content to be \( \beta^* \geq 1 \).
+
+Therefore, the expected responsiveness to content is a convex combination of two components — detection probability and responsiveness to detected AI content — as shown in \hyperref[eq:bar-beta]{Equation \ref*{eq:bar-beta}}:
+
+\begin{equation}
+\bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^*
+\label{eq:bar-beta}
+\end{equation}
+
+Detection probability (\( d_i \)) depends on observable individual characteristics, such as education and political attention, as shown in \hyperref[eq:detection-probability]{Equation \ref*{eq:detection-probability}}:
+
+\begin{equation}
+\frac{\partial d_i}{\partial \text{Education}_i} > 0, \quad \frac{\partial d_i}{\partial \text{Political Attention}_i} > 0
+\label{eq:detection-probability}
+\end{equation}
+
+Education increases individuals' ability to detect linguistic and structural cues of AI authorship. Political attention increases motivation to scrutinise political content, enhancing vigilance in identifying the source even in the absence of explicit labelling [@chein2024].
+
+Responsiveness to detected AI content is captured by the parameter \( \beta_i \in [0, \infty) \), which reflects how much individuals update their beliefs when they are aware the content is AI-generated. Individuals with greater familiarity with or trust in AI systems may respond more strongly to detected AI content, as reflected in \hyperref[eq:discount-factor]{Equation \ref*{eq:discount-factor}}:
+
+\begin{equation}
+\frac{\partial \beta_i}{\partial \text{Education}_i} > 0
+\label{eq:discount-factor}
+\end{equation}
+
+In contrast, \( \beta^* \geq 1 \) represents the baseline responsiveness to AI content that is not detected as such. This term allows for the possibility that undetected AI content may be inherently more persuasive — for example, due to improved stylistic coherence, ideological tailoring, or perceived neutrality.
+
+Notably, education and political attention may affect both detection and responsiveness components, creating a theoretically rich asymmetry: more educated individuals are more likely to detect AI content (\( d_i \uparrow \)), and may apply a smaller penalty or even an amplification factor when doing so (\( \beta_i \uparrow \)). But even if they do not detect the AI origin, they may still respond more strongly than to human content, due to \( \beta^* \geq 1 \).
+
+## Maximisation Problem
+
+We assume individuals seek to minimise epistemic loss, defined as the squared distance between their updated belief and the article content. This is captured by the utility function:
+
+\begin{equation}
+u(\theta_1, C) = -(\theta_1 - C)^2
+\label{eq:epistemic-loss}
+\end{equation}
+
+Individuals choose a responsiveness parameter \( \mu_i \in [0, \infty) \) such that their updated belief is given by:
+
+\begin{equation}
+\theta_1 = \theta_0 + \mu_i (C - \theta_0)
+\label{eq:mu-update}
+\end{equation}
+
+The individual's optimisation problem becomes:
+
+\begin{equation}
+\max_{\mu_i \in [0, \infty)} -\left[(1 - \mu_i)(\theta_0 - C)\right]^2
+\label{eq:maximise-loss}
+\end{equation}
+
+The utility in \hyperref[eq:epistemic-loss]{Equation \ref*{eq:epistemic-loss}} is maximised when \( \mu_i = 1 \), corresponding to full alignment between updated beliefs and the article content. However, individuals do not always fully trust the content, and their responsiveness is shaped by both ideological distance and beliefs about the credibility of the source.
+
+We therefore assume that responsiveness is endogenously constrained by detection and perceived source credibility:
+
+\begin{equation}
+\mu_i = \bar{\beta}_i \cdot w(\delta)
+\label{eq:mu-determined}
+\end{equation}
+
+Because \( \bar{\beta}_i \in [0, \infty) \), the model allows for cases where individuals update less than, equally to, or more than the signal direction (i.e., \( \mu_i < 1 \), \( = 1 \), or \( > 1 \)), depending on how persuasive they find the content.
+
+## Treatment Conditions
+
+As noted, labelling content as AI-generated may affect the perceived source and trust in the information. The model therefore considers two treatment arms based on the combination of true source (S) and whether the article is labelled:
+
+**1. AI + Labelled**
+\begin{itemize}
+    \item \( \hat{S} = \text{AI} \)
+    \item \( \bar{\beta}_i = \beta_i \)
+    \item \( \mu_i = \beta_i \cdot w(\delta) \)
+\end{itemize}
+
+**2. AI + Unlabelled**
+\begin{itemize}
+    \item \( \bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^* \)
+    \item \( \mu_i = \bar{\beta}_i \cdot w(\delta) \)
+\end{itemize}
+
+These treatment conditions are in reference to the control group where the article is human-generated and not labelled:
+
+**Human + Unlabelled**
+\begin{itemize}
+    \item \( \bar{\beta}_i = 1 \) (assumed human by default)
+    \item \( \mu_i = w(\delta) \)
+\end{itemize}
+
+## Comparative Statics
+
+We now examine how the responsiveness parameter \( \mu_i \) varies with respect to key exogenous parameters in the model. This comparative statics analysis focuses on understanding how belief updating is shaped by source detection, ideological distance, and trust in AI.
+
+### Exogenous Parameters
+
+\hyperref[tab:model-parameters]{Table \ref*{tab:model-parameters}} below lists the key exogenous parameters in the model. These are a subset of a likely much longer list of possible parameters, but these are the most relevant and prominent factors:
+
+\begin{table}[H]
+\centering
+\caption{Key Parameters Used in the Theoretical Model}
+\label{tab:model-parameters}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Description} & \textbf{Type} \\
+\midrule
+\( C \) & Ideological content of the article & Experimental treatment \\
+\( \theta_0 \) & Individual's prior belief & Observed (pre-treatment) \\
+\( S \in \{\text{AI}, \text{Human}\} \) & True source of article & Experimental treatment \\
+Label & Whether the source is labelled & Experimental treatment \\
+\( \delta = |C - \theta_0| \) & Ideological distance & Derived (individual-level) \\
+\( \beta_i \) & Discount factor (AI trust) & Observed/inferred \\
+\( d_i \) & Probability of detecting AI source & Derived \\
+\( \beta^* \) & Responsiveness to undetected AI content & Model parameter \\
+\( \lambda \) & Responsiveness decay parameter & Model parameter \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Recall that responsiveness is defined in \hyperref[eq:mu-definition]{Equation \ref*{eq:mu-definition}}:
+
+\begin{equation}
+\mu_i = \bar{\beta}_i \cdot w(\delta) = \bar{\beta}_i \cdot \frac{1}{1 + \lambda \cdot \delta}
+\label{eq:mu-definition}
+\end{equation}
+
+where:
+
+\[
+\bar{\beta}_i =
+\begin{cases}
+1 & \text{if } S = \text{Human or perceived as Human} \\
+\beta_i & \text{if } S = \text{AI and detected as such (i.e., labelled)} \\
+d_i \cdot \beta_i + (1 - d_i) \cdot \beta^* & \text{if } S = \text{AI and unlabelled}
+\end{cases}
+\]
+
+We now derive the relevant partial derivatives, one parameter at a time.
+
+###  Ideological Distance \( \delta \)
+
+The responsiveness parameter \( \mu_i \) is inversely related to ideological distance \( \delta \). As the ideological distance between the article content and the individual's prior belief increases, the responsiveness decreases due to the diminishing returns of ideological receptiveness. This effect is more pronounced when source credibility is high (i.e., when \( \bar{\beta}_i \) is large). This is captured by the derivative in \hyperref[eq:mu-derivative]{Equation \ref*{eq:mu-derivative}}:
+
+
+\begin{equation}
+\frac{\partial \mu_i}{\partial \delta} = \bar{\beta}_i \cdot \frac{\partial w(\delta)}{\partial \delta}
+= \bar{\beta}_i \cdot \left( \frac{-\lambda}{(1 + \lambda \cdot \delta)^2} \right) < 0
+\label{eq:mu-derivative}
+\end{equation}
+
+### Source Detection Probability \( d_i \)
+
+In the cases where \(S = \text{AI}\) and the content is unlabelled, then the detection probability affects the responsiveness parameter \( \mu_i \) through the discount factor \( \bar{\beta}_i \). The derivative in \hyperref[eq:detection-probability]{Equation \ref*{eq:detection-probability}} captures this relationship:
+
+\begin{equation}
+\bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^*
+\quad \Rightarrow \quad
+\frac{\partial \mu_i}{\partial d_i} = (\beta_i - \beta^*) \cdot w(\delta)
+\label{eq:detection-probability}
+\end{equation}
+
+When individuals become more likely to detect that content is AI-generated, they apply a different responsiveness depending on their trust in AI. If \( \beta^* > \beta_i \), then detection reduces responsiveness, as detected content is trusted less than undetected content. However, if \( \beta_i > \beta^* \), detection increases responsiveness. This captures the idea that more sophisticated individuals --- while better at detecting AI --- may also treat detected content differently depending on their predispositions.
+
+### Discount Factor \( \beta_i \)
+
+For AI-generated articles (labelled or unlabelled), individuals apply a discount factor \( \beta_i \) to the content based on their trust in AI. Individuals who are more trusting of AI-generated content (higher \( \beta_i \)) update their beliefs more strongly in response to such content. The effect is larger when the source is detected (higher \( d_i \)) shown in both \hyperref[eq:beta-derivative-labelled]{Equation \ref*{eq:beta-derivative-labelled}} and \hyperref[eq:beta-derivative-unlabelled]{Equation \ref*{eq:beta-derivative-unlabelled}}:
+
+\begin{itemize}
+    \item \textbf{Labelled AI:}
+    \begin{equation}
+    \mu_i = \beta_i \cdot w(\delta)
+    \quad \Rightarrow \quad
+    \frac{\partial \mu_i}{\partial \beta_i} = w(\delta) > 0
+    \label{eq:beta-derivative-labelled}
+    \end{equation}
+    \item \textbf{Unlabelled AI:}
+    \begin{equation}
+    \bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^*
+    \quad \Rightarrow \quad
+    \frac{\partial \mu_i}{\partial \beta_i} = d_i \cdot w(\delta) > 0
+    \label{eq:beta-derivative-unlabelled}
+    \end{equation}
+\end{itemize}
+
+### Responsiveness to Undetected AI Content \( \beta^* \)
+
+In the case of unlabelled AI content, responsiveness also depends on the baseline credibility of content that is not recognised as AI-generated. This is captured by the parameter \( \beta^* \), which enters the convex combination that defines \( \bar{\beta}_i \) when the source is AI and unlabelled:
+
+\[
+\bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^*
+\]
+
+The partial effect of \( \beta^* \) on the responsiveness parameter \( \mu_i \) is given by \hyperref[eq:beta-star-derivative]{Equation \ref*{eq:beta-star-derivative}}:
+
+\begin{equation}
+\frac{\partial \mu_i}{\partial \beta^*} = (1 - d_i) \cdot w(\delta) > 0
+\label{eq:beta-star-derivative}
+\end{equation}
+
+This derivative reflects the idea that responsiveness increases with \( \beta^* \) when AI content goes undetected. In other words, the more persuasive undetected AI content is (higher \( \beta^* \)), the more the individual updates their beliefs in response to it. This effect is stronger when detection probability \( d_i \) is low.
+
+### Responsiveness Decay Parameter \( \lambda \)
+
+This parameter is a theoretical parameter which assumes that an individual's responsiveness to ideological content decays as the ideological distance increases. This is captured by the derivative in \hyperref[eq:lambda-derivative]{Equation \ref*{eq:lambda-derivative}}:
+
+\begin{equation}
+\frac{\partial \mu_i}{\partial \lambda} = \bar{\beta}_i \cdot \frac{\partial w(\delta)}{\partial \lambda}
+= \bar{\beta}_i \cdot \left( \frac{-\delta}{(1 + \lambda \cdot \delta)^2} \right) < 0
+\label{eq:lambda-derivative}
+\end{equation}
+
+Higher values of \( \lambda \) imply sharper declines in responsiveness with ideological distance. A higher \( \lambda \) implies more resistance to persuasion at larger ideological distances, but this effect flattens out as the distance increases. This parameter governs how ideologically resistant individuals are in general. It could be treated as a theoretical parameter or estimated at the population level.
+
+### Summary of Comparative Statics
+
+\begin{table}[H]
+\centering
+\caption{Summary of Comparative Statics for each Parameter}
+\label{tab:comparative-statics}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Partial Derivative} & \textbf{Sign} & \textbf{Interpretation} \\
+\midrule
+\( \delta \) & \( \frac{\partial \mu_i}{\partial \delta} \) & Negative & Greater ideological distance reduces responsiveness \\
+\( d_i \) (AI + unlabelled) & \( \frac{\partial \mu_i}{\partial d_i} \) & Negative & Detection increases discounting and reduces updating \\
+\( \beta_i \) (AI only) & \( \frac{\partial \mu_i}{\partial \beta_i} \) & Positive & More trust in AI increases responsiveness \\
+\( \beta^* \) (AI + unlabelled) & \( \frac{\partial \mu_i}{\partial \beta^*} \) & Positive & Greater persuasiveness of undetected AI content increases responsiveness \\
+\( \lambda \) & \( \frac{\partial \mu_i}{\partial \lambda} \) & Negative & More rigidity reduces responsiveness across the board \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+## Belief Updating to Affective Polarisation
+
+The model presented above provides a theoretical framework for understanding how individuals update their beliefs in response to AI-generated political content. The key parameters and comparative statics highlight the complex interplay between ideological distance, source detection, trust in AI, and responsiveness to content. Affective polarisation is defined as the difference between in- and out-group evaluations, shown in \hyperref[eq:affective-polarisation]{Equation \ref*{eq:affective-polarisation}}:
+
+\begin{equation}
+\text{AP}_i = L^{\text{in}}_i - L^{\text{out}}_i
+\label{eq:affective-polarisation}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item \( L^{\text{in}}_i \): affective evaluation of the in-group,
+    \item \( L^{\text{out}}_i \): affective evaluation of the out-group.
+\end{itemize}
+
+We are interested in how the treatment-induced belief change \( \Delta \theta_i = \theta_1 - \theta_0 = \mu_i (C - \theta_0) \), where \( \mu_i \) incorporates detection and source responsiveness, affects the change in affective polarisation:
+
+\begin{equation}
+\Delta \text{AP}_i = \Delta L^{\text{in}}_i - \Delta L^{\text{out}}_i
+\label{eq:change-affective-polarisation}
+\end{equation}
+
+### Asymmetric Malleability of Attitudes
+
+The malleability of affective evaluations is not symmetric. @lee2022 find that most people are positive partisans, meaning they identify with a party because they like their side, rather than opposing the other side. Greater in-group identification — or particularly strong animosity toward the out-group — suggests that the malleability of affective evaluations declines with stronger initial feelings. This implies diminishing marginal returns to new information: individuals who already feel very positively or negatively about a group are less likely to change their attitudes. This is formalised in \hyperref[eq:asymmetric-malleability-out]{Equation \ref*{eq:asymmetric-malleability}} and \hyperref[eq:asymmetric-malleability-in]{Equation \ref*{eq:asymmetric-malleability-in}}:
+
+\begin{equation}
+\Delta L^{\text{out}}_i = \frac{1}{|L^{\text{out}}_i| + \varepsilon} \cdot \Delta \theta_i
+\label{eq:asymmetric-malleability-out}
+\end{equation}
+
+\begin{equation}
+\Delta L^{\text{in}}_i = \frac{1}{|L^{\text{in}}_i| + \varepsilon} \cdot f(\Delta \theta_i)
+\label{eq:asymmetric-malleability-in}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item \( \varepsilon > 0 \) ensures continuity at zero affect,
+    \item \( f(\cdot) \) is a scaling function determining how belief updates about the out-group influence in-group feelings,
+    \item If \( f(\cdot) = -\phi \cdot \Delta \theta_i \), with \( \phi \geq 0 \), then belief improvements about the out-group reduce in-group warmth due to contrast or identity differentiation. Here, \( \phi \) captures the extent to which belief updates favouring the out-group lead to reductions in in-group warmth.
+\end{itemize}
+
+Substituting into the expression for \( \Delta \text{AP}_i \), we obtain the final expression for the change in affective polarisation in \hyperref[eq:change-affective-polarisation]{Equation \ref*{eq:change-affective-polarisation}}:
+
+\begin{equation}
+\Delta \text{AP}_i = \left( \frac{-\phi}{|L^{\text{in}}_i| + \varepsilon} - \frac{1}{|L^{\text{out}}_i| + \varepsilon} \right) \cdot \Delta \theta_i
+\label{eq:change-affective-polarisation}
+\end{equation}
+
+### Interpretation of Affective Polarisation Change
+
+\begin{itemize}
+    \item \textbf{Direction of change:} If \( \Delta \theta_i > 0 \) (i.e., the individual updates in a more favourable direction toward the out-group), then affective polarisation may decrease or increase depending on which affect is more malleable.
+
+    \item \textbf{Attitude strength asymmetry:} The more entrenched an individual's dislike of the out-group, the less likely that attitude is to change. In such cases, belief change is more likely to influence in-group evaluations, potentially increasing polarisation if \( \phi > 0 \).
+
+    \item \textbf{Symmetry:} If in-group and out-group attitudes are of similar strength, then affective polarisation is more likely to respond symmetrically to belief change.
+
+    \item \textbf{Contrast effect:} When \( \phi > 0 \), positive updates about the out-group may reduce in-group warmth (e.g., due to identity threat or cognitive balancing), further decreasing polarisation.
+\end{itemize}
+
+This framework allows us to capture heterogeneity in the direction and magnitude of affective polarisation change as a function of both belief updating and initial affective attachments.
+
+## Affective Polarisation Comparative Statics
+
+We can now derive how changes in the model's exogenous parameters affect the change in affective polarisation \( \Delta \text{AP}_i \). As derived in \hyperref[eq:change-affective-polarisation]{Equation \ref*{eq:change-affective-polarisation}}, and restated below, we can define the responsiveness of affective polarisation to a belief change \( A_i \), and \( \mu_i \) in \hyperref[eq:responsiveness-affective-polarisation]{Equation \ref*{eq:responsiveness-affective-polarisation}} to give a cleaner expression for the change in affective polarisation in \hyperref[eq:rearanged-change-affective-polarisation]{Equation \ref*{eq:rearanged-change-affective-polarisation}}:
+
+\[
+\Delta \text{AP}_i = \left( \frac{-\phi}{|L^{\text{in}}_i| + \varepsilon} - \frac{1}{|L^{\text{out}}_i| + \varepsilon} \right) \cdot \Delta \theta_i
+\quad \text{where} \quad \Delta \theta_i = \mu_i \cdot (C - \theta_0)
+\]
+
+Letting:
+
+\begin{equation}
+A_i = \left( \frac{-\phi}{|L^{\text{in}}_i| + \varepsilon} - \frac{1}{|L^{\text{out}}_i| + \varepsilon} \right)
+\quad \text{and} \quad
+\mu_i = \left( d_i \cdot \beta_i + (1 - d_i) \cdot \beta^* \right) \cdot \frac{1}{1 + \lambda \cdot \delta}
+\label{eq:responsiveness-affective-polarisation}
+\end{equation}
+
+we can write:
+
+\begin{equation}
+\Delta \text{AP}_i = A_i \cdot \mu_i \cdot (C - \theta_0)
+\label{eq:rearanged-change-affective-polarisation}
+\end{equation}
+
+### Ideological Distance \( \delta \)
+
+As the ideological distance between the article content and the individual's prior belief increases, the individual's responsiveness declines, reducing belief updating and therefore the effect on affective polarisation. This is formalised in \hyperref[eq:delta-affective-polarisation]{Equation \ref*{eq:delta-affective-polarisation}}:
+
+\begin{equation}
+\frac{\partial \Delta \text{AP}_i}{\partial \delta} = A_i \cdot \frac{\partial \mu_i}{\partial \delta} \cdot (C - \theta_0)
+= A_i \cdot \left( d_i \cdot \beta_i + (1 - d_i) \cdot \beta^* \right) \cdot \left( \frac{-\lambda}{(1 + \lambda \cdot \delta)^2} \right) \cdot (C - \theta_0)
+< 0
+\label{eq:delta-affective-polarisation}
+\end{equation}
+
+### Detection Probability \( d_i \)
+
+This condition is relevant in the scenario where the article is AI-generated and unlabelled. In this case, more accurate detection of AI content increases the likelihood of discounting it, reducing belief updating and attenuating affective response, given by \hyperref[eq:detection-affective-polarisation]{Equation \ref*{eq:detection-affective-polarisation}}:
+
+\begin{equation}
+\frac{\partial \Delta \text{AP}_i}{\partial d_i} = A_i \cdot \frac{\partial \mu_i}{\partial d_i} \cdot (C - \theta_0)
+= A_i \cdot (\beta_i - \beta^*) \cdot \frac{1}{1 + \lambda \cdot \delta} \cdot (C - \theta_0)
+< 0 \quad \text{if } \beta_i < \beta^*
+\label{eq:detection-affective-polarisation}
+\end{equation}
+
+As shown in \hyperref[sec:dection-discounting]{Section \ref*{sec:detection-discounting}}, \( d_i \) can be thought of as a function of individual characteristics such as education and political attention. Therefore, as education and political attention increase, the detection probability increases, leading to a decrease in affective polarisation if \( \beta_i < \beta^* \).
+
+### Discount Factor \( \beta_i \)
+
+The discount factor \( \beta_i \) captures the individual's trust in AI-generated content when it is detected. Higher trust leads to greater belief updating and potentially greater affective polarisation. In the case of labelled AI content, the source is explicitly known and \( \beta_i \) governs responsiveness directly. For unlabelled AI content, \( \beta_i \) only affects affective polarisation to the extent that the content is detected (i.e., \( d_i > 0 \)); otherwise, belief updating is governed by \( \beta^* \). This is formalised in \hyperref[eq:beta-affective-polarisation-labelled]{Equation \ref*{eq:beta-affective-polarisation-labelled}} and \hyperref[eq:beta-affective-polarisation-unlabelled]{Equation \ref*{eq:beta-affective-polarisation-unlabelled}}:
+
+\begin{itemize}
+    \item \textbf{Labelled AI:}
+    \begin{equation}
+    \frac{\partial \Delta \text{AP}_i}{\partial \beta_i} = A_i \cdot w(\delta) \cdot (C - \theta_0) > 0
+    \label{eq:beta-affective-polarisation-labelled}
+    \end{equation}
+
+    \item \textbf{Unlabelled AI:}
+    \begin{equation}
+    \frac{\partial \Delta \text{AP}_i}{\partial \beta_i} = A_i \cdot d_i \cdot w(\delta) \cdot (C - \theta_0) > 0
+    \label{eq:beta-affective-polarisation-unlabelled}
+    \end{equation}
+\end{itemize}
+
+
+### Responsiveness to Undetected AI Content \( \beta^* \)
+
+The parameter \( \beta^* \) governs how strongly individuals respond to AI-generated content that is not detected as AI This term enters into the responsiveness expression \( \mu_i \), and therefore affects belief updating and affective polarisation in unlabelled AI conditions. The partial derivative of affective polarisation with respect to \( \beta^* \) is given by \hyperref[eq:beta-star-affective-polarisation]{Equation \ref*{eq:beta-star-affective-polarisation}}:
+
+\begin{equation}
+\frac{\partial \Delta \text{AP}_i}{\partial \beta^*} = A_i \cdot (1 - d_i) \cdot w(\delta) \cdot (C - \theta_0)
+\label{eq:beta-star-affective-polarisation}
+\end{equation}
+
+This effect is strictly positive, indicating that increases in the persuasiveness of undetected AI content \( \beta^* \), increase the change in affective polarisation. This effect is strongest when the detection probability \( d_i \) is low, and declines as detection increases. This implies that as AI content becomes more realistic, it has greater potential to persuade individuals and affect their in-group and out-group evaluations.
+
+### Contrast Parameter \( \phi \)
+
+Higher contrast sensitivity implies that more positive beliefs about the out-group reduce in-group warmth, thus reducing affective polarisation more strongly, given by \hyperref[eq:contrast-affective-polarisation]{Equation \ref*{eq:contrast-affective-polarisation}}:
+
+\begin{equation}
+\frac{\partial \Delta \text{AP}_i}{\partial \phi} = \frac{-1}{|L^{\text{in}}_i| + \varepsilon} \cdot \mu_i \cdot (C - \theta_0)
+\label{eq:contrast-affective-polarisation}
+\end{equation}
+
+### Initial Affective Attachments
+
+Stronger in-group warmth reduces in-group responsiveness, shifting weight to the out-group channel. Stronger out-group hostility makes it harder to reduce polarisation via changing out-group attitudes. For in-group warmth, this is captured by \hyperref[eq:in-group-affective-polarisation]{Equation \ref*{eq:in-group-affective-polarisation}} and for out-group hostility by \hyperref[eq:out-group-affective-polarisation]{Equation \ref*{eq:out-group-affective-polarisation}}:
+
+\begin{equation}
+\frac{\partial A_i}{\partial |L^{\text{in}}_i|} = \frac{\phi}{(|L^{\text{in}}_i| + \varepsilon)^2} > 0
+\quad \Rightarrow \quad \frac{\partial \Delta \text{AP}_i}{\partial |L^{\text{in}}_i|} > 0 \text{ if } \Delta \theta_i > 0
+\label{eq:in-group-affective-polarisation}
+\end{equation}
+
+\begin{equation}
+\frac{\partial A_i}{\partial |L^{\text{out}}_i|} = \frac{1}{(|L^{\text{out}}_i| + \varepsilon)^2} > 0
+\quad \Rightarrow \quad \frac{\partial \Delta \text{AP}_i}{\partial |L^{\text{out}}_i|} < 0 \text{ if } \Delta \theta_i > 0
+\label{eq:out-group-affective-polarisation}
+\end{equation}
+
+### Summary of Affective Polarisation Comparative Statics
+
+The comparative statics for the change in affective polarisation \( \Delta \text{AP}_i \) are summarised in \hyperref[tab:affective-polarisation-comparative-statics]{Table \ref*{tab:affective-polarisation-comparative-statics}} below:
+
+\begin{table}[H]
+\centering
+\caption{Comparative statics of affective polarisation: summary of partial effects}
+\label{tab:affective-polarisation-comparative-statics}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Partial Derivative} & \textbf{Sign} & \textbf{Interpretation} \\
+\midrule
+\( \delta \) & \( \frac{\partial \Delta \text{AP}_i}{\partial \delta} \) & Negative & Greater ideological distance reduces belief updating \\
+\( d_i \) & \( \frac{\partial \Delta \text{AP}_i}{\partial d_i} \) & Negative & Detection reduces responsiveness to AI content \\
+\( \beta_i \) & \( \frac{\partial \Delta \text{AP}_i}{\partial \beta_i} \) & Positive & More trust in AI increases responsiveness \\
+\( \beta^* \) & \( \frac{\partial \Delta \text{AP}_i}{\partial \beta^*} \) & Positive & More persuasive undetected AI content increases affective polarisation \\
+\( \phi \) & \( \frac{\partial \Delta \text{AP}_i}{\partial \phi} \) & Negative & In-group contrast reduces affective polarisation \\
+\( |L^{\text{in}}_i| \) & \( \frac{\partial \Delta \text{AP}_i}{\partial |L^{\text{in}}_i|} \) & Positive & In-group affect less malleable → greater weight on out-group \\
+\( |L^{\text{out}}_i| \) & \( \frac{\partial \Delta \text{AP}_i}{\partial |L^{\text{out}}_i|} \) & Negative & Strong out-group dislike reduces scope for affective change \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+## Hypotheses {#sec-hypotheses}
+
+From this formal model of belief updating and affective polarisation, several testable hypotheses regarding the effects of AI-generated content on individuals' affective evaluations of in- and out-groups can be derived.
+
+We now map the theoretical model onto the experimental design, which comprises one control group and two treatment conditions. The design is defined by whether the article is AI-generated and whether it is labelled. Articles not labelled are assumed to be human-generated by default, consistent with participants' likely priors in naturalistic settings.
+
+### Treatment Structure
+
+\begin{table}[H]
+\centering
+\caption{Treatment conditions by source and labelling}
+\label{tab:treatment-conditions}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Labelled (AI)} & \textbf{Unlabelled} \\
+\midrule
+\textbf{Human} & (not used) & (1) Control Group \\
+\textbf{AI} & (2) Source Discount Condition & (3) Detection Condition \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+### Theoretical Predictions and Heterogeneity
+
+The primary theoretical prediction, and hypothesis this research project aims to test is:
+
+\begin{quote}
+\textbf{Hypothesis 1:} Exposure to AI-generated political content \textit{can} increase affective polarisation, particularly when the AI origin is not detected and the content is ideologically aligned with the individual’s priors.
+\end{quote}
+
+**(1) Human + Unlabelled — \textit{Control Group}**
+
+\begin{itemize}
+    \item Participants are expected to assume the article is human-generated.
+    \item Belief responsiveness is high: \( \mu_i = w(\delta) \)
+    \item No discounting is applied, and content is assumed credible.
+    \item Affective polarisation change depends on the size of \( \Delta \theta_i \) and affective malleability.
+\end{itemize}
+
+\textit{Treatment effect heterogeneity:}
+\begin{itemize}
+    \item Higher ideological distance \( \delta \) → lower responsiveness
+    \item Stronger affective priors → reduced attitude change
+\end{itemize}
+
+**(2) AI + Labelled — \textit{Source Discount Condition}**
+
+\begin{itemize}
+    \item Participants are explicitly told the article is AI-generated.
+    \item Belief responsiveness: \( \mu_i = \beta_i \cdot w(\delta) \)
+    \item Direct awareness of AI authorship reduces trust and updating.
+    \item Affective polarisation change is smaller relative to the control.
+\end{itemize}
+
+\textit{Treatment effect heterogeneity:}
+\begin{itemize}
+    \item Higher \( \beta_i \): more similar to control group
+    \item Lower \( \beta_i \): minimal belief updating and polarisation change
+    \item Higher education → likely higher \( \beta_i \), attenuating the discount
+\end{itemize}
+
+\textit{Key comparison:} (2) vs. (1) — \textbf{Source Credibility Effect}
+
+**(3) AI + Unlabelled — \textit{Detection Condition}**
+
+\begin{itemize}
+    \item Participants are not told the source; belief about source depends on detection probability \( d_i \).
+    \item Responsiveness: \( \mu_i = \bar{\beta}_i \cdot w(\delta) \), where \( \bar{\beta}_i = d_i \cdot \beta_i + (1 - d_i) \cdot \beta^* \)
+    \item Affective polarisation depends on detection probability \( d_i \) and the relative size of \( \beta_i \) vs. \( \beta^* \)
+\end{itemize}
+
+\textit{Treatment effect heterogeneity:}
+\begin{itemize}
+    \item High \( d_i \), low \( \beta_i \): strong discounting → lower responsiveness
+    \item Low \( d_i \), high \( \beta^* \): content treated as credible → stronger responsiveness
+    \item High education → increases detection \( d_i \) and may raise both \( \beta_i \) and \( \beta^* \), producing mixed effects
+\end{itemize}
+
+\textit{Key comparisons:}
+\begin{itemize}
+    \item (3) vs. (2) — \textbf{Detection Effect}
+    \item (3) vs. (1) — \textbf{Combined Discounting and Detection Effect}
+\end{itemize}
+
+### Summary of Theoretical Comparisons
+
+\begin{table}[H]
+\centering
+\caption{Interpretation of comparisons between treatment conditions}
+\label{tab:treatment-comparisons}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Comparison} & \textbf{Name} & \textbf{Interpretation} \\
+\midrule
+(2) vs. (1) & Source Credibility Effect & Trust penalty for labelled AI content \\
+(3) vs. (2) & Detection Effect & Role of source detection in moderating discounting \\
+(3) vs. (1) & Combined Discounting and Detection & Total effect of AI content when not labelled \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As a result of this formal modelling, the model dentifies conditions under which AI-generated content can either increase, attenuate, or reduce affective polarisation. The key moderating mechanisms are:
+
+\begin{itemize}
+    \item Ideological distance \(( \delta \)) — the distance between the content and the individual's prior beliefs.
+    \item Detection probability \(( d_i \)) — whether participants recognise the content is AI-generated.
+    \item Trust in AI \(( \beta_i \)) — how much participants discount detected AI content.
+    \item Persuasiveness of undetected AI content \(( \beta^* \)) — how influential undetected AI content is.
+    \item Contrast sensitivity \(( \phi \)) — affects how in-group evaluations respond to out-group belief changes.
+    \item Initial affective attachments — strength of existing in-group and out-group feelings.
+\end{itemize}
+
+\newpage
+
+# Methodological Approaches {#sec-methods}
+
+This research aims to identify the direction and size of *effects of causes*. To test the hypotheses derived in the \hyperref[sec-hypotheses]{Section \ref*{sec-hypotheses}}, a survey experiment approach appears most appropriate such that the efefcts of AI-generated content on affective polarisation can be isolated. However, this research proposal also suggests an innovative use of synthetic, agent-based modelling to compliment survey experiments with Large Language Model (LLM)-based simulations. This section outlines the survey experimental design, initial pilot study results, and an initial look at how agent-based modelling could be used to expnd the research.
+
+As explained in the review of existing literature (\hyperref[sec-lit-review]{Section \ref*{sec-lit-review}}), this project focuses on the case of the UK. Although the majority of affective polarisation research focuses on the US, @berntzen2024 shows that UK partisans also experience negative emotions towards their out-groups. With the rise of populism and this affective polarisation in the UK, it is imperative to understand whether new technologies pose a risk to the UK's political system as many speculated in the 2024 General Election [@simon2024b].[^external-validity]
+
+[^external-validity]: While the UK is the initial focus, there may be scope for increasing the number of cases outside of the UK to test and (in)validate the external validity of results.
+
+## Pilot Study: YouGov UniOM Survey Experiment {#sec-data-analysis}
+
+To initially test whether effects are seen, and for whom, a pilot study was conducted with a single survey experiment exposure to an AI-generated article. The pilot study was conducted with YouGov's UniOM panel, which is a representative sample of the UK population. The survey experiment used two treatment conditions: AI-generated (unlabelled) and AI-labelled content. The survey experiment is designed to be between-subjects to avoid pre-survey sensitivity issues noted by @levendusky2021. The key outcomes of interest are measures of affective polarisation --- discussed in \hyperref[sec-experiment-variables]{Section \ref*{sec-experiment-variables}}. The treatments are compared with a control group of human-generated content.[^human-labelled] The treatment conditions are summarised in \hyperref[tab:experiment-treatment-conditions]{Table \ref*{tab:experiment-treatment-conditions}}:
+
+\begin{table}[H]
+\centering
+\caption{Treatments and Control for AI-generated Content Exposure}
+\label{tab:experiment-treatment-conditions}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{No Labels} & \textbf{Labelled as AI} \\
+\midrule
+\textbf{Control} & Human-Generated Article & Human-Generated Article \\
+\textbf{Treatment} & AI-generated Article & AI-generated Article \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+[^human-labelled]: A third treatment condition of human-generated content labelled as AI-generated is also tested. This condition can be used to help understand whether participents discount based on content or whether they discount based on the source (i.e., AI vs. human). This additional analysis is not included in this proposal, but may be included in the final thesis.
+
+After outlining the treatments, outcome measures, and the associted regression specification for modelling the treatment effects, a very brief review of the initial pilot results are presented. These are accompanied by a discussion of the implications of the results for informing the final research design and the agent-based modelling.
+
+### Experimental Variables {#sec-experiment-variables}
+
+Although politics is about persuasion, it is hard to move people's beliefs --- at least, not very quickly. @cobb1997 argue that voters often assess political arguments through emotional, feeling-based heuristics. Therefore, the treatment in the survey experiment was designed to be on a divise topic, which is likely to elicit strong feelings to encourage movement, especially as a single exposure is unlikely to change attitudes significantly. The treatment was an article on rising immigration in the UK, a topic which is prominment amongst populist rhetoric and polarised groups. The human-generated control article was written by @mckiernan2024 for the BBC. The AI-generated article was generated by OpenAI's GPT-4 model using the BBC article as an initial prompt, but instructed to re-write the article in a more divisive and exaggerated tone. Full versions of the articles can be found in the Appendix in \hyperref[sec-treatment-articles]{Section \ref*{sec-treatment-articles}}. Given the nature of the imflammatory topic of immigration used particularly by right-wing populists, the treatment is likely aligned with the ideological priors of right wing Conservative or Reform Party supporters, minimising their ideological distance \(( \delta \)), and therefore maximising the potential for belief updating and further affective polarisation shown in \hyperref[eq:delta-affective-polarisation]{Equation \ref*{eq:delta-affective-polarisation}}.
+
+The measures required to understand AI's affect on affective polarisation are multi-faceted. Different measures can be used to understand the primary outcome of affective polarisation; however, the implication of each measure differs. @druckman2019 clearly outline the best practices for these affective polarisation measures, and how the measures interact. Therefore, this research chooses to follow these measurement recommendations for use in survey self-reporting [@iyengar2019].
+
+The most common measure of someone's identifiction with a political party is through a feeling thermometer score. This aims to understand how warmly or coldly someone feels towards the political parties they most and leat prefer. The thermometer scores are measured on a scale of `0` to `100`, where `0` is the coldest and `100` is the warmest.[^thermo-scale] This survey experiment firstly asks respondents to identify their most and least preferred party (`mostlikely` and `leastlikely`), allowing for in- and out-party identities to be exposed. We then ask respondents to firstly rate how warmly they feel towards each of these party's leaders, `MLthermo_XY` and `LLthermo_XY`, where `XY` is replaced by each party leader's initials. The use of party-leader thermometers is a common measure, leaning on valence theory's emphasis on the importance of party leaders in shaping party identification and voting behaviour [@garzia2023].[^green-leaders] Moreover, Druckman and Levendusky's (2019: 119) findings show that respondents are more  negative towards party elites rather than party voters; thus, the focus on party leaders here helps elicit the more visceral feelings. Alongside these in- and out-group measures, a net-difference score (`thermo_gap`) is also calculated as the difference between the thermometer scores (`MLthermoMean - LLthermoMean`) [@iyengar2012].
+
+The next indicator of affective polarisation is a trait-based rating. This measure identifies the traits that respondents associate with opposing parties [@garrett2014]. The limited scope of the survey experiment meant we focussed on the trait of positive trait of *respect*, and whether respondents associated this trait with oppossing parties. Respondents were asked: "To what extent do you agree or disagree with the following statement: `[leastlikely]` party voters respect my political beliefs and opinions." This question — coded as `agreedisagree` — was asked in a Likert scale format of levels of agreement.[^codebook]
+
+Additionally, a similar trait-based measure focussed on *trust* was used [@levendusky2013]. Here, we ask "And how much of the time do you think you can trust `[leastlikely]` party to do what is right for the country?". This question was also asked in a Likert scale format, with the options of `Almost never`, `Once in a while`, `About half of the time`, `Most of the time`, and `Always`. This measure is coded as `xtrust`. Along with the themometer score, the trait-based views of respect, and trust in opposing parties, Druckman and Levendusky (2019: 119) argue that these measures are good, general measures of prejudices held towards opposing parties.
+
+On the other hand, affective polarisation should also be interested in actual tangible discriminatory behaviour. Therefore an emotional, social-distance-based question is included to understand how comfortable respondents are with having opposing partisans in their lives. For example, @iyengar2012 popularised the use of the @almond1963 five-nation survey question "Suppose you had a child who was getting married. How would you feel if they married a `[leastlikely]` party voter?". Coded as `child`, respondents were given options of `Extremely upset`, `Somewhat upset`, `Neither happy nor upset`, `Somewhat happy`, and `Extremely happy`.
+
+[^thermo-scale]: The wording for the theremoeter score questions is as follows: "We’d like to get your feelings toward some of our political leaders and other groups who are in the news these days. On the next page, we’ll ask you to do that using a 0 to 100 scale that we call a feeling thermometer. Ratings between 50 degrees and 100 degrees mean that you feel favourable and warm toward the person. Ratings between 0 degrees and 50 degrees mean that you don't feel favourable toward the person and that you don't care too much for that person. You would rate the person at the 50-degree mark if you don't feel particularly warm or cold toward the person."
+[^green-leaders]: The Green Party has two co-leaders, Carla Denyer and Adrian Ramsay. Therefore, ratings of both leaders are asked, and the thermometer scores for the Green Party are averaged to create a single score for the party. The variables `MLthermoMean` and `LLthermoMean` are used as the final thermometer measures for in- and out-group thermometer scores.
+
+[^codebook]: All survey experiment variables and values are in the codebook \hyperref[sec-codebook]{Section \ref*{sec-codebook}} in the appendix.
+
+### Regression Specification {#sec-reg-spec}
+
+To test the causal Average Treatment Effect (ATE) of respondents being exposed to AI-generated and AI-lebelled content on the set of affective polarisation measures, a series of regression models are estimated. The model specification is given by \hyperref[eq:reg-spec]{Equation \ref*{eq:reg-spec}}:
+
+\begin{equation}
+Y_i = \beta_0 + \beta_1 D_i + \beta_2 \mathbf{X}_i + \beta_3 (D_i \times \mathbf{Z}_i) + \varepsilon_i (\#eq:reg-spec)
+\end{equation}
+
+*where:*
+
+\begin{itemize}
+    \item \( Y_i \): outcome variable (\texttt{thermo\_gap}, \texttt{MLthermoMean}, \texttt{LLthermoMean}, \texttt{agreedisagree}, \texttt{xtrust}, \texttt{child})
+    \item \( D_i \): treatment indicator (\texttt{AI-Generated Content, Labelled or Unlabelled})
+    \item \( \mathbf{X}_i \): vector of covariates (see Balance Check in \hyperref[sec-balance]{Section \ref*{sec-balance}})
+    \item \( \mathbf{Z}_i \): vector of interaction terms (treatment \(\times\) moderator)
+    \item \( \varepsilon_i \): stochastic error term
+\end{itemize}
+
+In this full specitifcation, $\beta_1$ estimates the average treatment effect when the moderator(s) are at their reference level. Estimates are calculated with survey-weighted least squares and ordinal logistic models so results can be generalised to the UK more broadly. $\beta_2$ measures the effect of a one-unit change of a covariate on the outcome variable. $\beta_3$ captures the treatment effect heterogeneity across different sub-groups of the moderator, where statistically significant non-zero values suggest the ATE is different for different sub-group characteristics.
+
+### Preliminary Results {#sec-results}
+
+The results are presented in two phases. Firstly, the results from the continuous thermometer measures of affective polarisation are presented, followed secondly by the ordinal outcome emotional- and trait-based measures. Results also consider each of the three different theoretical treatment effect conditions formalised in the \hyperref[sec-hypotheses]{Section \ref*{sec-hypotheses}}: (1) Source Credibility Effect, (2) Detection Effect, and (3) Combined Discounting and Detection Effect. Regression result tables are presented with three models. A first model (1) sets the benchmark without control for covariates and moderators. Secodnly, despite a full balanace check (\hyperref[sec-balance]{Section \ref*{sec-balance}}) showing that the treatment and control groups were balanced across all convariates, model (2) includes a full set of pre-treatment covariates as each has theoretical justification for affecting the outcome independently of the treatment, and also to ensure the ATE estimates are efficient. Thirdly, as argued in the \hyperref[sec-thory]{Theorectical Framework \ref*{sec-theory}}, the likely moderating variables are education, political attention, and the distance between the treatment and the respondent's prior beliefs (i.e., ideological distance). These variables are included in model (3) as interaction terms with the treatment indicator to test for heterogeneity in the treatment effects. The results are presented for the overall sample, and use survey weights to ensure the results are representative of the UK population.
+
+Overall, the thermometer rating results show that unlabelled AI content slightly increases affective polarisation, while labelling AI content reduces it — with clear effects observed amongst ideologically distant respondents of Liberal Democrat voters; however, none of these effects are statistically significant. On the other hand, the trait- and emotional-based measures provide compelling evidence that exposure to unlabelled AI-generated political content increases affective polarisation, particularly by heightening discomfort and reducing respect toward opposing partisans. These effects are strongest when the AI origin is not disclosed, suggesting that undetected AI content may be more persuasive than human-generated content and capable of reinforcing affective boundaries.
+
+For the core affective polarisation measure of the thermometer-score rating gap between the leaders of the respondents' most and least preferred parties, a higher gap represents greater affective polarisation. The results of the regression models for the thermometer gap are presented for each treatment in \hyperref[tab:thermo-gap-overall]{Table \ref*{tab:thermo-gap-overall}}, \hyperref[tab:thermo-gap-source-cred]{Table \ref*{tab:thermo-gap-source-cred}}, and \hyperref[tab:thermo-gap-detection]{Table \ref*{tab:thermo-gap-detection}}.[^thermo-outcomes]
+
+\input{../../outputs/tables/thermo_gap_overall_ai_effect.tex}
+\input{../../outputs/tables/thermo_gap_source_credibility.tex}
+\input{../../outputs/tables/thermo_gap_detection_effect.tex}
+
+All three treatments provide positive treatment effects on affective polarisation, but none are statistically significant. For the overall effect of unlabelled AI-generated content in in \hyperref[tab:thermo-gap-overall]{Table \ref*{tab:thermo-gap-overall}}, the effect was ``r round(model_results$ai_thermo_gap_coef, 3)`` points, with Liberal Democrats (compared to a base of Reform Party supporters) showin the largest subgroup positive treatment effect of ``r round(model_results$gap_ai_mostlikely_ldem, 3)`` points. With unlabelled AI content, we predict that if detection rates are low, and the persuasiveness of the content is high, then polarisation will increase. The positive point estimate is directionally consistent with this, but the null result suggests heterogeneity or insufficient power.
+
+For the labelled AI-generated content in \hyperref[tab:thermo-gap-source-cred]{Table \ref*{tab:thermo-gap-source-cred}} compared to the human-generated content, the treatment effect is ``r round(model_results$label_thermo_gap_coef, 3)`` points. This is a test of the trust discount applied when content is known to be AI. The theory predicted lower responsiveness, a lower gap, which is seen on average. This aligns with the discounting hypothesis: when content is clearly labelled as AI, participants may apply a credibility penalty. However, Green Party respondents see a large (but not statistically significant) positive effect of ``r round(model_results$gap_ai_mostlikely_green, 3)`` points. This result challenges the core discounting prediction and might suggest that Green Party respondents did not discount labelled AI content; instead, labelling content as AI could fuel polarisation as viewers may associate the 'fake' AI content as a target from their out-group, pushing them further away.
+
+The reslts from the dection effect model of labelled versus non-labelled AI-generated content in \hyperref[tab:thermo-gap-detection]{Table \ref*{tab:thermo-gap-detection}} shows labelled AI content reduced thermometer gap by ``r round(model_results$labelled_thermo_gap_coef, 3)`` points relative to unlabelled AI content. This result captures the pure effect of detection via labelling. While statistically insignificant, the direction and size of effects strongly support the theory that detection (via labelling) reduces affective polarisation, consistent with reduced belief updating from discounted AI content.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patchwork_overall.pdf}    \caption{Thermometer Ratings: Average Treatment Effects}
+    \label{fig:thermo-patchwork-overall}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/thermo_patchwork_ldem.pdf}    \caption{Thermometer Ratings: Average Treatment Effects for Liberal Democrat Respondents}
+    \label{fig:thermo-patchwork-libdem}
+\end{figure}
+
+These results can be summarised in \hyperref[fig:thermo-patchwork-overall]{Figure \ref*{fig:thermo-patchwork-overall}} below, which show how the thermometer gap is driven by further in- or out-group polarisation. As described above, the overall effect of AI-generated content shows a weak trend toward greater polarisation, primarily via more positive in-group affect which is consistent with undetected AI content being more persuasive. On the contrary, the labelled AI content shows a trend towards reduced polarisation, primarily via reduced in-group affect. The detection effect shows a similar trend, with reduced in- and out-group affect, suggesting that when AI content is detected, it is less persuasive and reduces polarisation.
+
+\hyperref[fig:thermo-patchwork-libdem]{Figure \ref*{fig:thermo-patchwork-libdem}} shows the same patchwork plot for respondents most likely to vote for the Liberal Democrats. This subgroup likely has greater ideological distance from the content, which is assumed to target right-wing themes (e.g., Reform Party). According to the theory, this group is expected to show lower responsiveness overall, but may still exhibit increased in-group warmth due to contrast effects when the AI source is undetected. Consistent with this, the results show that unlabelled AI content increases the thermometer gap for LD voters, while labelling the content (i.e. detection) significantly reduces in-group warmth and narrows the gap — providing clear support for the predicted role of ideological distance and detection in moderating affective polarisation.
+
+[^thermo-outcomes]: The full models for the outcome variables of `MLthermoMean` and `LLthermoMean` are available in the appendix in \hyperref[sec-thermo-means]{Section \ref*{sec-thermo-means}}.
+
+To get a better picture of the treatment effects of AI-generated content on the affective polarisation, models for the outcome variables *respect*, *trust*, and emotional, social-distance measures of *discomfort* towards opposing partisan are also estimated. These models are ordinal logistic regression models, as the outcome variables are ordinal measures. The coefficients represent the log-odds of being in a higher category on that outcome (i.e. expressing more respect/trust/comfort), relative to all lower categories combined. The main ATE results of these models for each measure and treatment are summarised in the table below.[^ordinal-outcomes] [^pred-probs]
+
+\input{../../outputs/tables/ordinal_results_matrix.tex}
+
+The overall effects of exposure to unlabelled AI-generated content provide compelling evidence that AI-generated content, when undetected, increases affective polarisation. The log-odds coefficients for discomfort and respect are ``r round(model_results$ai_agreedisagree_coef, 3)`` and ``r round(model_results$ai_xtrust_coef, 3)``, respectively, both statistically significant at the 0.05 level. The negative coefficients for all measures auggest unlabelled AI-generated content leads to stronger negative emotional and trait-based responses, such that participants feel less comfortable, less respectful, and less trusting of opposing partisans. This is a significant and key finding that supports the hypothesis that undetected AI-generated content can exacerbate affective polarisation. This provides evidence that further, larger scale studies are needed to understand the full effects of AI-generated content on affective polarisation as possible negative effects can be seen even after the single exposures in this small pilot study. In addition, significant heterogeneity is seen for Liberal Democrat respondents who appear less prone to affective polarisation from unlabelled AI content. These respondents may not discount the content if it can be persuasive on its own merits, which is consistent with the theory that ideological distance moderates responsiveness to AI content.
+
+The results for labelled AI-generated content, for measuring both the credibility and detection effects, show little conclusive evidence of treatment effects. There is a slight significant finding for discomfort measure under the detection effect condition, but all other coefficients are not statistically significant. However, the direction of all trait-and emotional-based measures for both treatment conditions are negative. While this may reflect weakened responsiveness and reduced persuasion due to detection, the effects are too small to confidently support theoretical predictions.
+
+The key takeaway from these preliminary results is that undetected AI-generated content can increase affective polarisation, highlighted particularly through negative emotional and trait-based responses, with heterogeneous effects are also seen. This provides initial support for the hypotheses that AI-generated content can be a persuasive and effective tool for polarising political attitudes, indicating the need for further research to understand the full implications. An additional YouGov survey will also be going out as part of this project. This survey will focus on better understanding the emotional mechanisms and pathways of affective polarisation, and will be used to inform the agent-based modelling approach.
+
+[^ordinal-outcomes]: The full models for the outcome variables of `agreedisagree`, `xtrust`, and `child` are available in the appendix in \hyperref[sec-ordinal-results]{Section \ref*{sec-ordinal-results }}.
+[^pred-probs]: The predicted probabilities of each outcome category for each treatment condition are not calculated due to limitations of the `polr()` package, especially when using survey weights.
+
+## Agent-based Modelling
+
+The primary limitations of the pilot study is its power due to the sample size, particularly when subsetting the sample based on treatment conditions and heterogeneous groups. This limitation is demonstrated by a power analysis in \hyperref[sec-power-analysis]{Section \ref*{sec-power-analysis}}. This shows that a minimum sample size of `3,000` respondents is required to detect a statistically significant treatment effect size of 5 percentage points with 80% power. However, the YouGov UniOM panel only has a sample size of `2,001` respondents, which is insufficient to detect the treatment effects of interest, especially as the number of observations once the data is subsetting is often `<500`. Therefore, a complementary approach is needed to expand the sample size and increase the power of the analysis, while also giving the ability to simulate multiple, repeated treatment conditions. To address this limitation, an agent-based modelling (ABM) approach using fine-tuned, LLM-based synthetic twins is proposed.
+
+This new research method simulates the behaviours, attitudes, and actions of individual agents and their interactions with others in a virtual environment [@aher2023; @anthis2025]. This method was initially proposed by @argyle2023 who found that conditioning LLMs on sociodemographic and survey data from real humans could allow LLMs to be used to understand human behaviour and social interactions. Taking this approach to the social sciences has been effective, especially when coupled with real experiments to build a mixed-method Prediction Powered Inference and reduce the need for large human sample sizes  [@angelopoulos2023a]. However, fine-tuning the LLM to reflect the behaviours and attitudes of the target population is a key step in this process. @park2024 and @zhang2025 have both respectively shown that training on vast amounts of specific real-world and survey-specific data can improve the performance of LLMs in simulating human-like responses. It should be noted though that this approach is not without its limitations, as @santurkar2023 and @larooij2025 have shown that LLMs can be biased towards the training data; for example, if using data scraped from X, the subject pool is very specific and may not be representative of the wider population.
+
+Therefore, for this method to be useful, an LLM which is trained on a broad set of data, specifically for the use in social science Randomised Controlled Trails (RCTs), such as Nuffield College, Oxford's 'Talking to Machines' project. From the results from the YouGov UniOM survey experiment, the experiment needs more power to detect significant treatment effects, test multiple different treatment conditions (i.e., different articles), and test whether repeated exposure to AI-generated content has a cumulative effect on affective polarisation. Therefore, to run sufficently large and repeated experiments, an agent-based approach with a fine-tuned LLM with sufficiently representative synthetic twins is proposed. While this approach is still in its infancy, it has the potential to provide a powerful tool for understanding the effects of AI-generated content on affective polarisation. Any feedback on next steps and how to best implement this approach, particularly from an accurary and ethical perspective, would be greatly appreciated.
+
+\newpage
+
+# Conclusion {#sec-conclusion}
+
+\newpage
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+# Appendix {-}
+
+## Codebook {#sec-codebook}
+
+The codebook below provides a summary of the variables used in the YouGov UniOM analysis. The variable names are provided in the first column, followed by the type of variable (e.g., categorical, continuous), a description of the variable, and the values that the variable can take. Note that the outcome variables of `agreedisagree`, `xtrust`, and `child` are ordinal variables on an ordered Likert scale.
+
+\input{../../outputs/tables/codebook_table.tex}
+
+\newpage
+
+## Survey Experiment Treatments {#sec-treatment-articles}
+
+Due to the limited space in the YouGov UniOM survey experiment, the human-generated BBC article was shortened to fit the survey. Each article was presented with a title, image, and text of roughly 200 words. The human-generated article is presented in \hyperref[fig:human-generated-visual]{Figure \ref*{fig:human-generated-visual}} below, and the AI-generated article is presented in \hyperref[fig:ai-generated-visual]{Figure \ref*{fig:ai-generated-visual}}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/human-generated-visual.pdf}
+  \caption{Human-Generated Article: BBC News}
+  \label{fig:human-generated-visual}
+\end{figure}
+\begin{quote}
+{\large\textbf{Dame Priti Patel Defends Record on Rising Immigration}}
+
+Dame Priti Patel has defended her record on immigration, which hit record levels during her time as home secretary. The MP said it was "too simple" and "lazy" to see the figures without "context" due to the pandemic and the war in Ukraine.
+
+Speaking to supporters she said changes to the system allow ministers to control migration. Patel launched a new points-based immigration system and signed the agreement with Rwanda to send some asylum seekers to the country.
+
+After a drop during the Covid pandemic, net migration - the number of people coming to the UK, minus the number of people leaving - then rose sharply during her time in the role, which she held until September 2022.
+
+In 2022 net migration reached a record 745,000, according to the Office for National Statistics. Some Tories have pointed to the party's failure to reduce migration as a key reason for their historic defeat at the general election.
+
+Pressed over her record on migration, Dame Priti said: "On my watch from 2019 onwards we delivered the structural reforms to the immigration and asylum system. The introduction of a points-based immigration system means the government has the levers to control who comes into our country".
+\end{quote}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/writing/objects/ai-generated-visual.pdf}
+  \caption{AI-Generated Article: OpenAI GPT-4}
+  \label{fig:ai-generated-visual}
+\end{figure}
+\begin{quote}
+{\large\textbf{Border Crisis: Non-EU Migration Skyrockers as EU Numbers Plunge}}
+
+UK Overrun as Non-EU Migration Surges!
+
+Britain is facing an immigration crisis, with non-EU migration skyrocketing to unprecedented levels, far outpacing European arrivals.
+
+Official data shows EU migration has declined since 2016, while non-EU arrivals have surged dramatically. A once-steady trend shot up after 2020, as Britain opened its doors to record numbers of foreign nationals.
+
+Critics warn this surge is overwhelming public services, straining housing, schools, and the NHS. “We’ve lost control of our borders,” said a senior political source. Despite government promises, migration numbers keep rising.
+
+Experts blame lax visa rules, a failing asylum system, and reckless international student policies. “It’s unsustainable,” one warned. “Ordinary Britons struggle to buy homes and see a doctor, yet migration is out of control.”
+
+The shift from EU workers—who integrated and contributed—to non-EU arrivals is creating tensions. Communities are struggling with rapid change, and voters are demanding urgent action.
+
+Pressure is mounting for ministers to act. Will they prioritise British workers? Or continue ignoring public frustration as towns and cities buckle under the strain?
+
+One thing is clear: Britain is at a breaking point.
+\end{quote}
+
+\newpage
+
+## Data Cleaning
+
+`2,001` respondents were provided with the survey experiment. Respondents who did not give consent to participate in the survey were removed. Respondents were given the option to skip questions. When skipped, a value of `997` was assigned to the question, which was then recoded to `NA`, as were `Not asked` values.
+
+The survey was interested in understanding respondents' views towards their most and least preferred party. When asked who the `mostlikely` and `leastlikely` party was, respondents were given the option to select `None of these`. Respondents who selected `None of these` were removed from the sample as they were unable to answer the follow-up questions.
+
+Categorical variables were recoded to be `factors` in R, these were `profile_gender`, `profile_GOR`, `voted_ge_2024`, `pastvote_ge_2024`, `pastvote_EURef`, `profile_education_level`, `education_recode`, `profile_work_stat`, `xconsent`, `mostlikely`, `leastlikely`, `agreedisagree`, `xtrust`, and `child`.
+
+Each of the thermometer variables were recoded to be `numeric` variables: `MLthermo_KB`, `MLthermo_KS`, `MLthermo_NF`, `MLthermo_ED`, `MLthermo_CD`, `MLthermo_AR`, `LLthermo_KB`, `LLthermo_KS`, `LLthermo_NF`, `LLthermo_ED`, `LLthermo_CD`, and `LLthermo_AR`. As the Green Party has two co-leaders, a mean thermometer score is calculated and used for most and least likely party thermometer scores, coded as `MLthermoMean` and `LLthermoMean`.
+
+For treatment effect analysis, respondents were classified into two treatment groups: those shown AI-generated content (`ai_treatment`), identified where the split variable equalled `1` or `2`; and those shown AI-labelled content (`label_treatment`), identified where the split variable equalled `2` or `3`. Participants in the other split groups were coded as receiving human-generated or unlabelled content. These variables were coded as binary variables, where `1` indicated the treatment group and `0` indicated the control group.
+
+\newpage
+
+## Balance Check {#sec-balance}
+
+To ensure that the randomisation process of the treatment allocation was successful, a balance check is conducted to ensure that the treatment and control groups are comparable in every way other than their treatment assignment status. The tables below report the balance of the covariates across the treatment groups. The continuous variables of `age` and `political_attention` are reported as means with the standard deviations in parentheses. The remaining categorical variables are reported as a count from the sample, with the proportions in parentheses. If there was a significant difference between the treatment and control groups, this is indicated with a `*` for p < 0.05, `**` for p < 0.01, and `***` for p < 0.001. The balance check shows that randomisation was successful across all covariates for both treatment groups as no covariates were significantly different between the treatment and control groups.
+
+Note that the p-values are reported at the variable level, not for each individual category within a categorical variable. For categorical variables (e.g., gender, vote choice), a single p-value is generated using a chi-squared test, which assesses whether the overall distribution of categories differs between treatment and control groups. The individual category rows are displayed for reference, but since the test is run at the variable level, no p-value is reported for each specific level, giving the `NA` values in the tables.
+
+For each of the categorical variables, there is a base reference category. For example, `profile_gender` uses the base reference category `Male` (reported as `Gender (Male)` in the balance tables). This base acts as the comparison group for the other categories, the p-value compares whether the distribution of the other categories is significantly different from the base category.
+
+\input{../../outputs/tables/balance_ai_treatment.tex}
+\input{../../outputs/tables/balance_label_treatment.tex}
+
+\newpage
+
+## Thermometer `MLthermoMean` and `LLthermoMean` {#sec-thermo-means}
+
+\input{../../outputs/tables/thermo_ml_overall_ai_effect.tex}
+\input{../../outputs/tables/thermo_ml_source_credibility.tex}
+\input{../../outputs/tables/thermo_ml_detection_effect.tex}
+
+\input{../../outputs/tables/thermo_ll_overall_ai_effect.tex}
+\input{../../outputs/tables/thermo_ll_source_credibility.tex}
+\input{../../outputs/tables/thermo_ll_detection_effect.tex}
+
+\newpage
+
+## Ordinal Outcome Regression Results {#sec-ordinal-results}
+
+\input{../../outputs/tables/agreedisagree_ai_results.tex}
+\input{../../outputs/tables/agreedisagree_label_results.tex}
+\input{../../outputs/tables/agreedisagree_labelled_ai_results.tex}
+
+\input{../../outputs/tables/xtrust_ai_results.tex}
+\input{../../outputs/tables/xtrust_label_results.tex}
+\input{../../outputs/tables/xtrust_labelled_ai_results.tex}
+
+\input{../../outputs/tables/child_ai_results.tex}
+\input{../../outputs/tables/child_label_results.tex}
+\input{../../outputs/tables/child_labelled_ai_results.tex}
+
+\newpage
+
+## Power Analysis {#sec-power-analysis}
+
+Power analysis is simulated on a model estimating the `thermo_gap` outcome, where the assumed treatment effect is `5` and a residual standard deviation is fairly high at `50`. Estimated across sample sizes of `500-5000`, the power estimates show the share of simulations in which the treatment effect is statistically significant at (( \ alpha \)) = 0.05. To detect an effect at least `80%` of the time, the results show a minimum sample size of `3,000` respondent per treatment subset. These results are summarised in \hyperref[fig:power-analysis]{Figure \ref*{fig:power-analysis}} below.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{/Users/edwardanders/Documents/GitHub/oxford/thesis/outputs/figures/power_analysis.pdf}
+    \caption{Power Analysis for Thermometer Gap Outcome}
+    \label{fig:power-analysis}
+\end{figure}
+
+\newpage
+
+# References {-}
