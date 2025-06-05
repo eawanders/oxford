@@ -143,9 +143,9 @@ models_label <- list(
 )
 
 # --- Create each plot ---
-plot_ai <- plot_ate(models_ai, "ai_treatment", "AI-Generated Content: Average Treatment Effect")
-plot_sourcecred <- plot_ate(models_labelled_ai, "labelled_ai_treatment", "Source Credibility Effect: Average Treatment Effect")
-plot_detection <- plot_ate(models_label, "label_treatment", "Detection Effect: Average Treatment Effect")
+plot_ai <- plot_ate(models_ai, "ai_treatment", "AI Effect (Discounting and Detection)")
+plot_sourcecred <- plot_ate(models_labelled_ai, "labelled_ai_treatment", "Credibility Effect")
+plot_detection <- plot_ate(models_label, "label_treatment", "Detection Effect")
 
 # --- Combine into 1x3 patchwork ---
 overall_patchwork <- plot_ai + plot_sourcecred + plot_detection +
@@ -161,9 +161,9 @@ ggsave(
 
 
 # --- Liberal Democrat (Most Likely) subgroup 1x3 patchwork ---
-plot_ai_ldem <- plot_ate_ldem(models_ai, "ai_treatment", "AI-Generated Content: Liberal Democrat Most Likely")
-plot_sourcecred_ldem <- plot_ate_ldem(models_labelled_ai, "labelled_ai_treatment", "Source Credibility: Liberal Democrat Most Likely")
-plot_detection_ldem <- plot_ate_ldem(models_label, "label_treatment", "Detection Effect: Liberal Democrat Most Likely")
+plot_ai_ldem <- plot_ate_ldem(models_ai, "ai_treatment", "AI Effect (Discounting and Detection))")
+plot_sourcecred_ldem <- plot_ate_ldem(models_labelled_ai, "labelled_ai_treatment", "Credibility Effect")
+plot_detection_ldem <- plot_ate_ldem(models_label, "label_treatment", "Detection Effect")
 
 patchwork_ldem <- plot_ai_ldem + plot_sourcecred_ldem + plot_detection_ldem +
     plot_layout(ncol = 3, guides = "collect") &
