@@ -28,5 +28,5 @@
 
   "cSpell.language": "en-GB",
   "cSpell.words": ["dplyr", "linters", "pacman", "tidyverse", "yougov"],
-  "cSpell.enabled": false
+  "cSpell.enabled": true
 }
