@@ -656,7 +656,7 @@ The primary theoretical prediction, and hypothesis this research project aims to
 \end{tabular}
 \end{table}
 
-As a result of this formal modelling, the model dentifies conditions under which AI-generated content can either increase, attenuate, or reduce affective polarisation. The key moderating mechanisms are:
+As a result of this formal modelling, the model identifies conditions under which AI-generated content can either increase, attenuate, or reduce affective polarisation. The key moderating mechanisms are:
 
 \begin{itemize}
     \item Ideological distance \(( \delta \)) — the distance between the content and the individual's prior beliefs.

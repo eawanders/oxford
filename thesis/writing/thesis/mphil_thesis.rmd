@@ -78,6 +78,10 @@ To identify the effects of exposure to AI-generated content, this project propos
 
 # Literature Review {#sec-lit-review}
 
+- LOOK AT THE CRAWFORD AND SOBEL CHEAP TALK PAPER ON GAME THEORETIC BEHAVIOUR
+
+- There is an issue with the experiment: the control and the treatments will obviously have different effects -> the objective provided to the AI (via the prompt) is to exaggerate and to manipulate, whereas fact-based objective journalism by the BBC has the aim of not deceiving but to provide real facts making it not a fair comparison
+
 This question builds upon the rise of fake news and affective polarisation with a distinct, new focus on the effects of AI-generated content, an area yet to be explored in the academic literature. This section firstly provides the context for the question’s focus, before giving an overview of the existing — limited — literature on AI-generated content, and assessing the mixed literature on affective polarisation.
 
 This research focuses on the United Kingdom (UK). Structural effects of globalisation and economic liberalism, coupled with individual political failings and electoral shocks have created an increasingly unequal and divided world. Consequent disillusionment and disconnected identities have encouraged voter volatility and rising populist narratives, notably in the UK [@norris2019; @fieldhouse2019: 28-32]. This environment — coupled with social media — has encouraged the dangerous spread of fake news which has been shown to favour populists, affect voting behaviour, and strengthen identities and affective polarisation within online echo chambers [@cantarella2023; @pfister2023]. Given this volatile political landscape in the UK, with rising populist challengers, the fears of widespread dissemination of deceitful AI-generated information are justified. But this research hopes to illuminate to what extent we should be concerned about AI’s effect in the UK setting.
@@ -669,7 +673,7 @@ The primary theoretical prediction, and hypothesis this research project aims to
 \end{tabular}
 \end{table}
 
-As a result of this formal modelling, the model dentifies conditions under which AI-generated content can either increase, attenuate, or reduce affective polarisation. The key moderating mechanisms are:
+As a result of this formal modelling, the model identifies conditions under which AI-generated content can either increase, attenuate, or reduce affective polarisation. The key moderating mechanisms are:
 
 \begin{itemize}
     \item Ideological distance \(( \delta \)) — the distance between the content and the individual's prior beliefs.
