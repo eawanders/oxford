@@ -1,0 +1,33 @@
+---
+output:
+    bookdown::pdf_document2:
+        toc: false
+        number_sections: true
+        includes:
+            in_header:
+                header.tex
+            before_body: literature_title.tex
+        keep_tex: false
+
+documentclass: article
+
+zotero: true
+link-citations: true
+bibliography: /Users/edwardanders/Documents/GitHub/oxford/metadata/zotero_library.bib
+csl: /Users/edwardanders/Documents/GitHub/oxford/metadata/harvard-cite-them-right.csl
+
+urlcolor: blue
+linkcolor: blue
+---
+
+# Literature Review
+
+## Early pre-LLM Agent-Based Models
+
+The early application of agent-based models (ABM) in social science can be traced back to the work of @schelling1971 and @schelling1978, who used simple rule-based, yet autonomous agents to interact in aa shared environment (neighbourhood) to explore aggregate outcomes of segregation dynamics in neighbourhoods. Schelling's models demonstrated how individual preferences could lead to emergent social patterns, anticipating the bottom-up evolutionary approach more complex agent-based methodologies would encounter.
+
+Following this, @epstein1996 were one of the first to apply agent-based models to the study of social phenomena. They developed the Sugarscape model to simulate the interactions of agents in a virtual environment, focusing on resource distribution and social dynamics. Their model was a departure from the aggregate macroeconomic models, building on the pioneering work of @schelling1971 (and see @schelling1978), fundamental social structures and behaviours of heterogeneous agent populations were observed through the interaction of rule-based agents within rule-based environments. Thus, their work gave focus to social dynamics through a 'methodologically individualist' lens such that social scientists could used these ABM techniques to 'study the interactions between individuals and institutions' [@epstein1996: 17].
+
+Next look at Artificial Adaptive Agents in Economic Theory (Holland 1991)
+
+# References
