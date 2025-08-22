@@ -1,0 +1,108 @@
+---
+output: pdf_document
+header-includes:
+  - \usepackage{multicol}   # Include the multicol package
+  - \pagenumbering{gobble}
+  - \usepackage{titlesec}
+---
+
+\centerline{\Large \textbf{Edward Anders}} \
+\vspace{-6mm}
+\centerline{Email: edward.anders@politics.ox.ac.uk | Phone: +44 (0) 07942 927727} \
+\vspace{-6mm}
+
+MPhil in Politics student at the University of Oxford researching the effects of AI-generated content on affective polarisation. Interested in using computational social science to model political behaviour.
+
+## Education
+\vspace{-3mm}
+\begin{multicols}{2}  % Start two-column environment
+
+\raggedright  % Left-align text
+\textbf{\normalsize St Antony's College, University of Oxford} \\
+MPhil in Politics (Comparative Government)
+
+\columnbreak  % Move to the right column
+
+\raggedleft  % Right-align text
+2024-2026
+
+\end{multicols}
+\vspace{-3mm}
+Research: Effects of AI-generated content on political attitudes and voting behaviour. \
+Supervisor: Prof. Rachel Bernhard, Nuffield College, Oxford.
+
+\begin{multicols}{2}  % Start two-column environment
+
+\raggedright  % Left-align text
+\textbf{\normalsize University of Bristol} \\
+BSc Economics and Politics, 1st-Class Honours
+
+\columnbreak  % Move to the right column
+
+\raggedleft  % Right-align text
+2018-2021
+
+\end{multicols}
+\vspace{-3mm}
+Research: Effects of the 2019 UK General Election Campaigns on Vote Switching \
+Supervisor: Prof. Mark Wickham-Jones.
+
+## Research Experience
+\vspace{1mm}
+\begin{multicols}{2}  % Start two-column environment
+
+\raggedright  % Left-align text
+\textbf{\normalsize University of Oxford} \\
+MPhil Research
+
+\columnbreak  % Move to the right column
+
+\raggedleft  % Right-align text
+Oct. 2024-present
+\end{multicols}
+
+- Using quantitative and computational social science methods to study the effects of AI-generated content on political attitudes and voting behaviour.
+- Focus on affective polarisation with a deep understanding of the literature.
+- Designed and run multiple experiments with YouGov to measure changes in measures of affective polarisation and the underlying mechanisms.
+- Building an artificial society of AI-Augmented Agents to simulate the spread of viral AI-generated political content on polarisation.
+
+\begin{multicols}{2}  % Start two-column environment
+\raggedright  % Left-align text
+\textbf{\normalsize Securely Technology Limited (Complyance)} \\
+Strategy Research Manager
+
+\raggedleft  % Right-align text
+Apr. 2024-present
+\end{multicols}
+
+- Employee \#10 at a seed-stage AI startup building GRC software for the B2B enterprise market.
+- Cybersecurity programme researcher developing briefs on framework developments across EU AI Act, SOC2, ISO 27001, HIPPA etc.
+- Led regular workshops presenting research to CISOs and CCOs of Fortune 500 companies.
+
+\begin{multicols}{2}  % Start two-column environment
+
+\raggedright  % Left-align text
+\textbf{\normalsize Quanterium Technologies (Compose)} \\
+Senior Founder's Associate
+
+\columnbreak  % Move to the right column
+
+\raggedleft  % Right-align text
+2021-2024
+\end{multicols}
+
+- Employee \#1 working directly with the founders to build a messaging tools for emerging markets.
+- Led geopolitical research into South America, producing reports on economic and political environments.
+- Researched and wrote multiple essays on building technology companies in politically volatile countries.
+
+## Awards
+
+- Norman Chester Fund Research Grant (£1,000).
+- YouGov UniOM Survey Grant.
+- Head of School's Commendation for Excellent Performance in Dissertation.
+- Head of School's Commendation for Excellent Performance in Second and Final Year.
+
+## Skills \& Tooling
+- Quantitative and computational research methods inc. machine learning techniques.
+- Python, R, Stata, SQL, Git, CSS, JavaScript (basic).
+- Linear, GitHub, Vercel, Segment, Webflow, Figma, Metabase, PostHog, Firebase.

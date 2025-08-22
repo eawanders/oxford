@@ -101,5 +101,5 @@ BCG Project, Carnall Farrar, Strategy\&
 
 ## Skills \& Tooling
 - Quantitative and computational research methods inc. machine learning techniques.
-- Python, R, Stata, SQL, Git, CSS, JavaScript.
-- Segment, Webflow, Figma, GitHub, Metabase, PostHog, Firebase.
+- Python, R, Stata, SQL, Git, CSS, JavaScript (basic).
+- Linear, Segment, Webflow, Figma, GitHub, Metabase, PostHog, Firebase.
